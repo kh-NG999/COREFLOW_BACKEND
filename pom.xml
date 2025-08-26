@@ -8,7 +8,7 @@
 		<version>3.5.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.final</groupId>
+	<groupId>com.kh</groupId>
 	<artifactId>coreflow</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>coreflow</name>
