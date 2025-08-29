@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	<!-- 사원 조회 -->
+	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.model.dto.MemberDto$MemberResponse">
+		SELECT
+			USER_NO,
+			USER_NAME,
+			EMAIL,
+			HIRE_DATE,
+			PHONE,
+			COMP_ID,
+			COMP_NAME,
+			EXTENTION,
+			ADDRESS,
+			ADDRESS_DETAIL,
+			UPDATE_DATE,
+			DEP_NAME,
+			POS_NAME
+		FROM MEMBER M
+		LEFT JOIN COMPANY USING(COMP_ID)
+		LEFT JOIN DEPARTMENT USING(DEP_ID)
+		LEFT JOIN POSITION USING(POS_ID)
+		<where>
+			<if test="userName != '' and userName != null and userName != 'all'">
+				USER_NAME LIKE '%' || #{userName} || '%'
+			</if>
+			<if test="depName != null and depName != 'all'">
+				AND DEP_NAME = #{depName}
+			</if>
+			<if test="posName != null and posName != 'all'">
+				AND POS_NAME = #{posName}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 사원 상세 조회 -->
+	<select id="memberDetail" resultType="com.kh.coreflow.model.dto.MemberDto$MemberResponse">
+		SELECT
+			USER_NO,
+			USER_NAME,
+			EMAIL,
+			HIRE_DATE,
+			PHONE,
+			COMP_ID,
+			COMP_NAME,
+			EXTENTION,
+			ADDRESS,
+			ADDRESS_DETAIL,
+			UPDATE_DATE,
+			DEP_NAME,
+			POS_NAME
+		FROM MEMBER M
+		LEFT JOIN COMPANY USING(COMP_ID)
+		LEFT JOIN DEPARTMENT USING(DEP_ID)
+		LEFT JOIN POSITION USING(POS_ID)
+		WHERE USER_NO = #{userNo}
+	</select>
+	
+	<!-- 사원 등록 -->
+	<insert id="memberInsert">
+		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
+			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO MEMBER VALUES
+		(#{userNo}, #{userName}, #{email}, #{hireDate}, #{depId}, #{posId}, #{compID}, #{extention}, #{address}, #{addressDetail}, #{role}, SYSDATE)		
+	</insert>
+	
+	<!-- 사원 정보 수정 -->
+	<update id="memberUpdate">
+		UPDATE MEMBER SET
+		<set>
+			<if test="userName != null and userName != ''">USER_NAME = #{userName},</if>
+			<if test="email != null and email != ''">EMAIL = #{email},</if>
+			<if test="hireDate != null">HIRE_DATE = #{hireDate},</if>
+			<if test="phone != null and phone != ''">PHONE = #{phone},</if>
+			<if test="compId != null and compId != ''">COMP_ID = #{compId},</if>
+			<if test="extention != null and extention != ''">EXTENTION = #{extention},</if>
+			<if test="address != null and address != ''">ADDRESS = #{address},</if>
+			<if test="addressDetail != null and addressDetail != ''">ADDRESS_DETAIL = #{addressDetail},</if>
+			<if test="depName != null">DEP_ID = #{depId},</if>
+			<if test="posName != null">POS_ID = #{posId},</if>
+			UPDATE_DATE = sysdate
+		</set>
+		WHERE USER_NO = #{userNo}
+	</update>
+	
+	<!-- 회원 정보 삭제 -->
+	<delete id="memberDelete">
+		DELETE FROM MEMBER
+		WHERE MEMBER_NO = #{userNo}
+	</delete>
+</mapper>
