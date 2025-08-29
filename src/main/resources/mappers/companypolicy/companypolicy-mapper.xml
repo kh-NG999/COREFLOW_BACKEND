@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cpolicy">
+	<select id="getPolicies" resultType="com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto$CompanyPolicy">
+		select * from company_policy
+		order by policy_id
+	</select>
+	
+	<insert id="addPolicy">
+		<selectKey keyProperty="policyId" resultType="long" order="BEFORE">
+			select "ISEQ$$_81419".nextval from dual		
+		</selectKey>
+		insert into company_policy(policy_id, title, content, creator_user_no) values(#{policyId}, #{title}, #{content}, #{userNo})
+	</insert>
+</mapper>
