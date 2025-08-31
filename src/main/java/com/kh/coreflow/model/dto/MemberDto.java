@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class MemberDto {
+	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
@@ -62,5 +63,21 @@ public class MemberDto {
 		private String extention;
 		private String address;
 		private String addressDetail;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Department{
+		private int depId;
+		private String depName;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Position{
+		private int posId;
+		private String posName;
 	}
 }

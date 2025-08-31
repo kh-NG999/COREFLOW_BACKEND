@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.coreflow.model.dto.MemberDto.Department;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.model.dto.MemberDto.Position;
 import com.kh.coreflow.model.service.MemberServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,32 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class MemberController {
 	private final MemberServiceImpl service;
+	
+	// 부서 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/department")
+	public ResponseEntity<List<Department>> deptList(){
+		List<Department> deptList = service.deptList();
+		
+		if(deptList != null) {
+			return ResponseEntity.ok(deptList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 직위 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/position")
+	public ResponseEntity<List<Position>> posiList(){
+		List<Position> posiList = service.posiList();
+		
+		if(posiList != null) {
+			return ResponseEntity.ok(posiList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
 	
 	// 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")

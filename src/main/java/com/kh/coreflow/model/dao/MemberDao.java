@@ -6,9 +6,11 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kh.coreflow.model.dto.MemberDto.Department;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +42,16 @@ public class MemberDao implements MemberDaoImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return session.delete("member.memberDelete",userNo);
+	}
+
+	@Override
+	public List<Department> deptList() {
+		return session.selectList("memeber.deptList");
+	}
+
+	@Override
+	public List<Position> posiList() {
+		return session.selectList("memeber.posiList");
 	}
 	
 }

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="member">
+
+	<!-- 부서 조회 -->
+	<select id="deptList" resultType="com.kh.coreflow.model.dto.MemberDto$Department">
+		SELECT
+			DEP_ID,
+			DEP_NAME
+		FROM DEPARTMENT
+	</select>
+	
+	<!-- 직위 조회 -->
+	<select id="posiList" resultType="com.kh.coreflow.model.dto.MemberDto$Position">
+		SELECT
+			POS_ID,
+			POS_NAME
+		FROM POSITION
+	</select>
+	
 	<!-- 사원 조회 -->
 	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.model.dto.MemberDto$MemberResponse">
 		SELECT
@@ -22,13 +39,13 @@
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITION USING(POS_ID)
 		<where>
-			<if test="userName != '' and userName != null and userName != 'all'">
+			<if test="userName != '' and userName != null">
 				USER_NAME LIKE '%' || #{userName} || '%'
 			</if>
-			<if test="depName != null and depName != 'all'">
+			<if test="depName != null">
 				AND DEP_NAME = #{depName}
 			</if>
-			<if test="posName != null and posName != 'all'">
+			<if test="posName != null">
 				AND POS_NAME = #{posName}
 			</if>
 		</where>
@@ -63,7 +80,7 @@
 			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
 		</selectKey>
 		INSERT INTO MEMBER VALUES
-		(#{userNo}, #{userName}, #{email}, #{hireDate}, #{depId}, #{posId}, #{compID}, #{extention}, #{address}, #{addressDetail}, #{role}, SYSDATE)		
+		(#{userNo}, #{userName}, #{email}, #{hireDate}, #{depId}, #{posId}, #{compId}, #{extention}, #{address}, #{addressDetail}, #{role}, SYSDATE)		
 	</insert>
 	
 	<!-- 사원 정보 수정 -->
@@ -88,6 +105,6 @@
 	<!-- 회원 정보 삭제 -->
 	<delete id="memberDelete">
 		DELETE FROM MEMBER
-		WHERE MEMBER_NO = #{userNo}
+		WHERE USER_NO = #{userNo}
 	</delete>
 </mapper>

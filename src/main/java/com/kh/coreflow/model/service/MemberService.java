@@ -6,9 +6,11 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.model.dao.MemberDaoImpl;
+import com.kh.coreflow.model.dto.MemberDto.Department;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +42,16 @@ public class MemberService implements MemberServiceImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return dao.memberDelete(userNo);
+	}
+
+	@Override
+	public List<Department> deptList() {
+		return dao.deptList();
+	}
+
+	@Override
+	public List<Position> posiList() {
+		return dao.posiList();
 	}
 
 }
