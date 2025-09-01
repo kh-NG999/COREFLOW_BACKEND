@@ -8,7 +8,7 @@
 	
 	<insert id="addPolicy">
 		<selectKey keyProperty="policyId" resultType="long" order="BEFORE">
-			select "ISEQ$$_81419".nextval from dual		
+			select "ISEQ$$_75875".nextval from dual		
 		</selectKey>
 		insert into company_policy(policy_id, title, content, creator_user_no) values(#{policyId}, #{title}, #{content}, #{creatorUserNo})
 	</insert>
