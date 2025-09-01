@@ -6,6 +6,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicy;
+import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicyModHistory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,5 +23,15 @@ public class CompanyPolicyDaoImpl implements CompanyPolicyDao {
 	@Override
 	public int addPolicy(CompanyPolicy policy) {
 		return session.insert("cpolicy.addPolicy", policy);
+	}
+
+	@Override
+	public int updatePolicy(CompanyPolicyModHistory history) {
+		return session.update("cpolicy.updatePolicy", history);
+	}
+
+	@Override
+	public int saveUpdatePolicyHistory(CompanyPolicyModHistory history) {
+		return session.insert("cpolicy.saveUpdatePolicyHistory", history);
 	}
 }

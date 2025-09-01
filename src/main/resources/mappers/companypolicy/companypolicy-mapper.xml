@@ -10,6 +10,17 @@
 		<selectKey keyProperty="policyId" resultType="long" order="BEFORE">
 			select "ISEQ$$_81419".nextval from dual		
 		</selectKey>
-		insert into company_policy(policy_id, title, content, creator_user_no) values(#{policyId}, #{title}, #{content}, #{userNo})
+		insert into company_policy(policy_id, title, content, creator_user_no) values(#{policyId}, #{title}, #{content}, #{creatorUserNo})
+	</insert>
+	
+	<update id="updatePolicy">
+		update company_policy
+		set content = #{modContent}, mod_user_no = #{userNo}, last_modified_at = sysdate
+		where policy_id = #{policyId}
+	</update>
+	
+	<insert id="saveUpdatePolicyHistory">
+		insert into COMPANY_POLICY_MOD_HISTORY(policy_id, user_no, mod_content)
+		values(#{policyId}, #{userNo}, #{modContent})
 	</insert>
 </mapper>
