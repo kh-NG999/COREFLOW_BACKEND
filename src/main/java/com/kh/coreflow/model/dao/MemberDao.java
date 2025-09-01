@@ -7,8 +7,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.model.dto.MemberDto.Department;
+import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.model.dto.MemberDto.Position;
 
@@ -35,13 +35,13 @@ public class MemberDao implements MemberDaoImpl{
 	}
 	
 	@Override
-	public int memberUpdate(MemberPut member) {
+	public int memberUpdate(MemberPatch member) {
 		return session.update("member.memberUpdate",member);
 	}
 
 	@Override
 	public int memberDelete(int userNo) {
-		return session.delete("member.memberDelete",userNo);
+		return session.update("member.memberDelete",userNo);
 	}
 
 	@Override

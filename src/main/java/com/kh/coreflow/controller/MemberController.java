@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.model.dto.MemberDto.Department;
+import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.model.dto.MemberDto.Position;
 import com.kh.coreflow.model.service.MemberServiceImpl;
@@ -33,9 +33,10 @@ public class MemberController {
 	
 	// 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/department")
+	@GetMapping("/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
+		log.debug("deptList : {}",deptList);
 		
 		if(deptList != null) {
 			return ResponseEntity.ok(deptList);
@@ -46,9 +47,10 @@ public class MemberController {
 	
 	// 직위 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/position")
+	@GetMapping("/positions")
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
+		log.debug("posiList : {}",posiList);
 		
 		if(posiList != null) {
 			return ResponseEntity.ok(posiList);
@@ -81,8 +83,9 @@ public class MemberController {
 			@PathVariable int userNo
 			){
 		MemberResponse member = service.memberDetail(userNo);
-		System.out.println(member);
+		log.debug("member : {}",member);
 
+		
 		if(member != null) {
 			return ResponseEntity.ok(member);
 		}else {
@@ -97,7 +100,6 @@ public class MemberController {
 			@RequestBody MemberPost member 
 			){
 		int result = service.memberInsert(member);
-		System.out.println(result);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/members")).build();
@@ -111,11 +113,10 @@ public class MemberController {
 	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
 			@PathVariable int userNo,
-			@RequestBody MemberPut member
+			@RequestBody MemberPatch member
 			){		
 		member.setUserNo(userNo);
 		int result = service.memberUpdate(member);
-		System.out.println(result);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
@@ -131,7 +132,6 @@ public class MemberController {
 			@PathVariable int userNo
 			) {
 		int result = service.memberDelete(userNo);
-		System.out.println(result);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();

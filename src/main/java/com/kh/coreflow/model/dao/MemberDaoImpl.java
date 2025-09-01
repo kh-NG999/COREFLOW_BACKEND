@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.kh.coreflow.model.dto.MemberDto.Department;
+import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberPut;
 import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.model.dto.MemberDto.Position;
 
@@ -17,7 +17,7 @@ public interface MemberDaoImpl {
 
 	int memberInsert(MemberPost member);
 	
-	int memberUpdate(MemberPut member);
+	int memberUpdate(MemberPatch member);
 
 	int memberDelete(int userNo);
 

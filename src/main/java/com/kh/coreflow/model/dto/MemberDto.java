@@ -19,8 +19,6 @@ public class MemberDto {
 		private String depName;
 		private String posName;
 		private String phone;
-		private int compId;
-		private String compName;
 		private String extention;
 		private String address;
 		private String addressDetail;
@@ -38,19 +36,16 @@ public class MemberDto {
 		private String depName;
 		private String posName;
 		private String phone;
-		private int compId;
-		private String compName;
 		private String extention;
 		private String address;
 		private String addressDetail;
-		private String role;
 		private Date updateDate;
 	}
 	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class MemberPut{
+	public static class MemberPatch{
 		private int userNo;
 		private String userName;
 		private String email;
@@ -58,11 +53,10 @@ public class MemberDto {
 		private String depName;
 		private String posName;
 		private String phone;
-		private int compId;
-		private String compName;
 		private String extention;
 		private String address;
 		private String addressDetail;
+		private Date updateDate;
 	}
 	
 	@Data
