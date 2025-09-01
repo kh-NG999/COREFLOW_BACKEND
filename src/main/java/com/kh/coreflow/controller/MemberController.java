@@ -31,16 +31,34 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberController {
 	private final MemberServiceImpl service;
 	
-	// 부서 조회
+	// 부모 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
+		
 //		log.debug("deptList : {}",deptList);
 //		System.out.println(deptList);
 		
-		if(deptList != null) {
+		if(deptList != null && !deptList.isEmpty()) {
 			return ResponseEntity.ok(deptList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 자식 부서 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/departments/{parentId}")
+	public ResponseEntity<List<Department>> deptDetailList(
+			@PathVariable int parentId
+			){
+		List<Department> deptDetailList = service.deptDetailList(parentId);
+		log.debug("deptDetailList : {}",deptDetailList);
+		System.out.println(deptDetailList);
+		
+		if(deptDetailList != null && !deptDetailList.isEmpty()) {
+			return ResponseEntity.ok(deptDetailList);
 		}else {
 			return ResponseEntity.noContent().build();
 		}

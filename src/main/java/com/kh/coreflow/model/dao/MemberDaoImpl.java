@@ -23,6 +23,8 @@ public interface MemberDaoImpl {
 
 	List<Department> deptList();
 
+	List<Department> deptDetailList(int parentId);
+	
 	List<Position> posiList();
 
 }

@@ -2,12 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="member">
 
-	<!-- 부서 조회 -->
+	<!-- 부모 부서 조회 -->
 	<select id="deptList" resultType="com.kh.coreflow.model.dto.MemberDto$Department">
 		SELECT
 			DEP_ID,
-			DEP_NAME
+			DEP_NAME,
+			PARENT_ID
 		FROM DEPARTMENT
+		WHERE PARENT_ID IS NULL
+	</select>
+	
+	<!-- 자식 부서 조회 -->
+	<select id="deptDetailList" resultType="com.kh.coreflow.model.dto.MemberDto$Department">
+		SELECT
+			DEP_ID,
+			DEP_NAME,
+			PARENT_ID
+		FROM DEPARTMENT
+		WHERE PARENT_ID = #{parentId}
 	</select>
 	
 	<!-- 직위 조회 -->

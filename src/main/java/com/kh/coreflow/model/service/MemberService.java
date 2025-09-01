@@ -50,8 +50,12 @@ public class MemberService implements MemberServiceImpl{
 	}
 
 	@Override
+	public List<Department> deptDetailList(int parentId) {
+		return dao.deptDetailList(parentId);
+	}
+
+	@Override
 	public List<Position> posiList() {
 		return dao.posiList();
 	}
-
 }

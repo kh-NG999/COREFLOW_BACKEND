@@ -25,7 +25,8 @@ public interface MemberServiceImpl {
 
 	List<Department> deptList();
 
+	List<Department> deptDetailList(int parentId);
+	
 	List<Position> posiList();
-
 
 }
