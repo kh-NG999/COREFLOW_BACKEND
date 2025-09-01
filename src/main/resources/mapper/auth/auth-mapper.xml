@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="auth">
+	
+	<resultMap id="UserResult" type="com.kh.coreflow.model.dto.UserDto$User" autoMapping="true">
+		<id property="userNo" column="USER_NO" />
+	</resultMap>
+	<!-- 로그인용 -->
+	<select id="findUserByEmail" resultMap="UserResult">
+		SELECT USER_NO, EMAIL, USER_PWD, AUTHORITY
+		FROM MEMBER
+		LEFT JOIN AUTHORITY AU USING(USER_NO)
+		WHERE UPPER(EMAIL) = UPPER(#{email})
+	</select>
+	
+	<!-- 자동 회원가입 -->
+	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="userNo" keyColumn="USER_NO">
+		INSERT INTO MEMBER(EMAIL, USER_NAME, USER_PWD)
+		VALUES (#{email}, #{name}, #{userPwd})
+	</insert>
+	<insert id="insertUserRole">
+    	INSERT ALL
+    	<foreach collection="roles" item="role">
+		INTO AUTHORITY(USER_NO, AUTHORITY)
+    	VALUES(#{userNo}, #{role})
+    	</foreach>
+    	SELECT 1 FROM DUAL
+	</insert>
+	
+	<select id="findUserByUserNo" resultMap="UserResult">
+        SELECT M.USER_NO as USER_NO, EMAIL, USER_PWD, AUTHORITY
+        FROM MEMBER M
+        JOIN AUTHORITY UA ON M.USER_NO = UA.USER_NO
+        WHERE M.USER_NO = #{userNo}
+    </select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
