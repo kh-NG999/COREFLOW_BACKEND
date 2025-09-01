@@ -35,17 +35,20 @@ public class SecurityConfig {
 			// CSRF는 SPA어플리케이션에서 사용하지 않음
 			.csrf(csrf -> csrf.disable())
 			.exceptionHandling(e -> e
-					.authenticationEntryPoint((req,res,ex) -> {
-					// 인증 실패시 401처리
-					res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED");
-					// 인증 실패시 403처리
-					res.sendError(HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN");
-					}))
+				    // 인증 실패 (로그인 안 한 사용자 → 401)
+				    .authenticationEntryPoint((req, res, ex) -> {
+				        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED");
+				    })
+				    // 인가 실패 (권한 없는 사용자 → 403)
+				    .accessDeniedHandler((req, res, ex) -> {
+				        res.sendError(HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN");
+				    }))
 					.sessionManagement(
 							management -> 
 							management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 					.authorizeHttpRequests(auth 
 						-> auth
+						.requestMatchers("/auth/login","/auth/signup","/auth/logout","/auth/refresh").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
 						.requestMatchers("/**").authenticated()
 					);

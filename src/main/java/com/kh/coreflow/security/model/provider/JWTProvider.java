@@ -11,7 +11,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
-
 @Component
 public class JWTProvider {
 
@@ -29,27 +28,27 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(int userId, int minutes) {
+	public String createAccessToken(int userNo, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
-				.setSubject(String.valueOf(userId)) // 페이로드에 저장할 id
+				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
 				.setIssuedAt(now) // 토큰 발행시간
 				.setExpiration(new Date(now.getTime()+(1000L * 60 * minutes)))
 				.signWith(key, SignatureAlgorithm.HS256) // 서명에 사용할 키값과, 알고리즘
 				.compact();
 	}
 
-	public String createRefreshToken(int userId, int i) {
+	public String createRefreshToken(int userNo, int i) {
 		Date now = new Date();
 		return Jwts.builder()
-				.setSubject(String.valueOf(userId)) // 페이로드에 저장할 id
+				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
 				.setIssuedAt(now) // 토큰 발행시간
 				.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * i))) // 토큰 만료시간
 				.signWith(refreshKey, SignatureAlgorithm.HS256) // 서명에 사용할 키값과, 알고리즘
 				.compact();
 	}
 
-	public int getuserId(String token) {
+	public int getUserNo(String token) {
 		return Integer.valueOf(
 				Jwts.parserBuilder()
 				.setSigningKey(key)

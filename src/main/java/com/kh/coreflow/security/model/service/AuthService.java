@@ -13,7 +13,7 @@ public interface AuthService {
 
 	AuthResult refreshByCookie(String refreshCookie);
 
-	User findUserByuserId(int userId);
+	User findUserByUserNo(int userNo);
 
 	
 	

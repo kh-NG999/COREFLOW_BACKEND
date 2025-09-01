@@ -35,14 +35,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 		if(header != null && header.startsWith("Bearer ")) {
 			
 			try {
-			// 2) 토큰에서 userId추출
+			// 2) 토큰에서 userNo추출
 			String token = header.substring(7).trim();
-			int userId = jwt.getuserId(token);
+			int userNo = jwt.getUserNo(token);
 			
-			log.debug("userId : {}", userId);
+			log.debug("userNo : {}", userNo);
 			
 			UsernamePasswordAuthenticationToken authToken
-			= new UsernamePasswordAuthenticationToken(userId, null,
+			= new UsernamePasswordAuthenticationToken(userNo, null,
 				List.of(new SimpleGrantedAuthority("ROLE_USER"))	
 			);
 			// 인증처리 끝

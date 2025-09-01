@@ -11,13 +11,14 @@ import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
-import com.kh.coreflow.model.dto.UserDto.UserCredential;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService{
 	
 	private final AuthDao authDao;
@@ -40,11 +41,11 @@ public class AuthServiceImpl implements AuthService{
 				}
 				
 				// 2. 토큰 발급
-				String accessToken = jwt.createAccessToken(user.getUserId(), 30);
-				String refreshToken = jwt.createRefreshToken(user.getUserId(), 7);
+				String accessToken = jwt.createAccessToken(user.getUserNo(), 30);
+				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7);
 				
-				User userIdPassword = User.builder()
-										.userId(user.getUserId())
+				User userNoPassword = User.builder()
+										.userNo(user.getUserNo())
 										.email(user.getEmail())
 										.name(user.getName())
 										.profile(user.getProfile())
@@ -54,39 +55,34 @@ public class AuthServiceImpl implements AuthService{
 				return AuthResult.builder()
 						.accessToken(accessToken)
 						.refreshToken(refreshToken)
-						.user(userIdPassword)
+						.user(userNoPassword)
 						.build();
 	}
 
 	@Override
-	@Transactional
+	//@Transactional
 	public AuthResult signUp(String email, String userPwd) {
+		log.info("pwd : {}",userPwd);
 		// 1) Users테이블에 데이터 추가
 				User user = User.builder()
 						.email(email)
 						.name(email.split("@")[0])
+						.userPwd(encoder.encode(userPwd))
 						.build();
 				authDao.insertUser(user);
 				
-				// 2) Credentail 추가
-				UserCredential cred = UserCredential.builder()
-													.userId(user.getUserId())
-													.userPwd(encoder.encode(userPwd))
-													.build();
-				authDao.insertCred(cred);
-				
 				// 3) 권한추가
 				UserAuthority auth = UserAuthority.builder()
-													.userId(user.getUserId())
+													.userNo(user.getUserNo())
 													.roles(List.of("ROLE_USER"))
 													.build();
 				authDao.insertUserRole(auth);
 				
 				//토큰 발급
-				String accessToken = jwt.createAccessToken(user.getUserId(), 30); // 30분
-				String refreshToken = jwt.createRefreshToken(user.getUserId(), 7); // 7일
+				String accessToken = jwt.createAccessToken(user.getUserNo(), 30); // 30분
+				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
-				user = authDao.findUserByUserId(user.getUserId()); // 비밀번호 제외 필요
+				user = authDao.findUserByUserNo(user.getUserNo()); // 비밀번호 제외 필요
 				
 				return AuthResult.builder()
 						.accessToken(accessToken)
@@ -97,10 +93,10 @@ public class AuthServiceImpl implements AuthService{
 
 	@Override
 	public AuthResult refreshByCookie(String refreshCookie) {
-		int userId = jwt.parseRefresh(refreshCookie);
-		User user = authDao.findUserByUserId(userId);
+		int userNo = jwt.parseRefresh(refreshCookie);
+		User user = authDao.findUserByUserNo(userNo);
 		
-		String accessToken = jwt.createAccessToken(userId, 30);
+		String accessToken = jwt.createAccessToken(userNo, 30);
 		
 		return AuthResult.builder()
 				.accessToken(accessToken)
@@ -109,8 +105,8 @@ public class AuthServiceImpl implements AuthService{
 	}
 
 	@Override
-	public User findUserByuserId(int userId) {
-		return authDao.findUserByUserId(userId);
+	public User findUserByUserNo(int userNo) {
+		return authDao.findUserByUserNo(userNo);
 	}
 	
 	

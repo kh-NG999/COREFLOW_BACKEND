@@ -10,11 +10,9 @@ public interface AuthDao {
 
 	void insertUser(User user);
 
-	void insertCred(UserCredential cred);
-
 	void insertUserRole(UserAuthority auth);
 
-	User findUserByUserId(int userId);
+	User findUserByUserNo(int userNo);
 	
 	
 }

@@ -25,10 +25,12 @@ import com.kh.coreflow.validator.UserValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
 	private final AuthService service;
@@ -45,7 +47,7 @@ public class AuthController {
 			return ResponseEntity.notFound().build();
 		}
 		try {
-			AuthResult result = service.login(req.getEmail(), req.getUserPwd());
+			AuthResult result = service.login(req.getEmail(), req.getPassword());
 			
 			// refreshToken은 http-only쿠키로 설정하여 반환
 			ResponseCookie refreshCookie = 
@@ -71,7 +73,7 @@ public class AuthController {
 	 */
 	@PostMapping("/signup")
 	public ResponseEntity<AuthResult> signup(@RequestBody LoginRequest req){
-		AuthResult result = service.signUp(req.getEmail(), req.getUserPwd());
+		AuthResult result = service.signUp(req.getEmail(), req.getPassword());
 		
 		// refreshToken은 http-only쿠키로 설정하여 반환
 		ResponseCookie refreshCookie = 
@@ -108,7 +110,7 @@ public class AuthController {
 		
 		// 1. 클라이언트 헤더에서 id값 추출
 		String accessToken = resolveAccessToken(request);
-		int userId = jwt.getuserId(accessToken);
+		int userId = jwt.getUserNo(accessToken);
 				
 		// 리프레쉬토큰 제거
 		ResponseCookie refreshCookie = 
@@ -133,10 +135,10 @@ public class AuthController {
 		}
 		
 		// 2. JWT토큰에서 ID값 추출하기
-		int userId = jwt.getuserId(jwtToken);
+		int userNo = jwt.getUserNo(jwtToken);
 		
 		// 사용자 정보 조회
-		User user = service.findUserByuserId(userId);
+		User user = service.findUserByUserNo(userNo);
 		if(user == null) {
 			return ResponseEntity.notFound().build();
 		}

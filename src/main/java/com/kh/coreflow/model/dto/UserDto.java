@@ -15,7 +15,7 @@ public class UserDto {
 	@AllArgsConstructor
 	public static class LoginRequest {
 		private String email;
-		private String userPwd;
+		private String Password;
 	}
 	
 	@Data
@@ -33,7 +33,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class User {
-		private int userId;
+		private int userNo;
 		private String userPwd;
 		private String email;
 		private String name;
@@ -56,7 +56,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserCreate{
-		private int userId;
+		private int userNo;
 		private String userPwd;
 		private String email;
 		private String name;
@@ -79,7 +79,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserUpdate{
-		private int userId;
+		private int userNo;
 		private String userPwd;
 	}
 	
@@ -88,7 +88,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserCredential {
-		private int userId;
+		private int userNo;
 		private String userPwd;
 	}
 	
@@ -97,7 +97,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserAuthority {
-		private int userId;
+		private int userNo;
 		private List<String> roles;
 	}
 	

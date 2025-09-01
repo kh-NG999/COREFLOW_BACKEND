@@ -26,18 +26,13 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void insertCred(UserCredential cred) {
-		session.insert("auth.insertCred",cred);
-	}
-
-	@Override
 	public void insertUserRole(UserAuthority auth) {
 		session.insert("auth.insertUserRole",auth);
 	}
 
 	@Override
-	public User findUserByUserId(int userId) {
-		return session.selectOne("auth.findUserByUserId" , userId);
+	public User findUserByUserNo(int userNo) {
+		return session.selectOne("auth.findUserByUserNo" , userNo);
 	}
 
 	
