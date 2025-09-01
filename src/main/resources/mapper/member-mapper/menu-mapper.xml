@@ -15,7 +15,7 @@
 		SELECT
 			POS_ID,
 			POS_NAME
-		FROM POSITION
+		FROM POSITIONS
 	</select>
 	
 	<!-- 사원 조회 -->
@@ -32,21 +32,21 @@
 			UPDATE_DATE,
 			DEP_NAME,
 			POS_NAME
-		FROM MEMBER M
+		FROM MEMBER
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
-		LEFT JOIN POSITION USING(POS_ID)
+		LEFT JOIN POSITIONS USING(POS_ID)
 		<where>
-			<if test="userName != '' and userName != null">
-				USER_NAME LIKE '%' || #{userName} || '%'
+			STATUS = 'T'
+			<if test="userName != null and userName != ''">
+				AND USER_NAME LIKE '%' || #{userName} || '%'
 			</if>
-			<if test="depName != null">
+			<if test="depName != null and depName != ''">
 				AND DEP_NAME = #{depName}
 			</if>
-			<if test="posName != null">
+			<if test="posName != null and posName != ''">
 				AND POS_NAME = #{posName}
 			</if>
 		</where>
-			STATUS = 'T'
 	</select>
 	
 	<!-- 사원 상세 조회 -->
@@ -65,7 +65,7 @@
 			POS_NAME
 		FROM MEMBER M
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
-		LEFT JOIN POSITION USING(POS_ID)
+		LEFT JOIN POSITIONS USING(POS_ID)
 		WHERE USER_NO = #{userNo}
 	</select>
 	
@@ -75,7 +75,7 @@
 			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
 		</selectKey>
 		
-		INSERT INTO MEMEBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENTION, UPDATE_DATE)
+		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENTION, UPDATE_DATE)
 		SELECT
 			#{userNo},
 			D.DEP_ID,
@@ -88,26 +88,29 @@
 			#{extention},
 			#{updateDate}
 		FROM DEPARTMENT D
-		JOIN POSITION P
+		JOIN POSITIONS P
 		WHERE D.DEP_NAME = #{depName} AND
 			  P.POS_NAME = #{posName}
 	</insert>
 	
 	<!-- 사원 정보 수정 -->
 	<update id="memberUpdate">
-		UPDATE MEMBER SET
+		UPDATE MEMBER
 		<set>
 			<if test="userName != null and userName != ''">USER_NAME = #{userName},</if>
 			<if test="email != null and email != ''">EMAIL = #{email},</if>
 			<if test="hireDate != null">HIRE_DATE = #{hireDate},</if>
 			<if test="phone != null and phone != ''">PHONE = #{phone},</if>
-			<if test="compId != null and compId != ''">COMP_ID = #{compId},</if>
 			<if test="extention != null and extention != ''">EXTENTION = #{extention},</if>
 			<if test="address != null and address != ''">ADDRESS = #{address},</if>
 			<if test="addressDetail != null and addressDetail != ''">ADDRESS_DETAIL = #{addressDetail},</if>
-			<if test="depName != null">DEP_ID = #{depId},</if>
-			<if test="posName != null">POS_ID = #{posId},</if>
-			UPDATE_DATE = sysdate
+			<if test="depName != null and depName != ''">
+				DEP_ID = (SELECT DEP_ID FROM DEPARTMENT WHERE DEP_NAME = #{depName}),
+			</if>
+			<if test="posName != null and posName != ''">
+				POS_ID = (SELECT POS_ID FROM POSITIONS WHERE POS_NAME = #{posName}),
+			</if>
+			UPDATE_DATE = SYSDATE
 		</set>
 		WHERE USER_NO = #{userNo}
 	</update>
@@ -116,7 +119,7 @@
 	<update id="memberDelete">
 		UPDATE MEMBER SET
 			STATUS = 'F',
-			UPDATE = SYSDATE
+			UPDATE_DATE = SYSDATE
 		WHERE USER_NO = #{userNo}
 	</update>
 </mapper>

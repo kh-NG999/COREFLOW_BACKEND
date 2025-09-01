@@ -16,7 +16,9 @@ public class MemberDto {
 		private String userName;
 		private String email;
 		private Date hireDate;
+		private int depId;
 		private String depName;
+		private int posId;
 		private String posName;
 		private String phone;
 		private String extention;
@@ -50,7 +52,9 @@ public class MemberDto {
 		private String userName;
 		private String email;
 		private Date hireDate;
+		private int depId;
 		private String depName;
+		private int posId;
 		private String posName;
 		private String phone;
 		private String extention;

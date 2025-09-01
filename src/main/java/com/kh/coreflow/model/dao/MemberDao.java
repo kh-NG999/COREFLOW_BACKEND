@@ -46,12 +46,12 @@ public class MemberDao implements MemberDaoImpl{
 
 	@Override
 	public List<Department> deptList() {
-		return session.selectList("memeber.deptList");
+		return session.selectList("member.deptList");
 	}
 
 	@Override
 	public List<Position> posiList() {
-		return session.selectList("memeber.posiList");
+		return session.selectList("member.posiList");
 	}
 	
 }
