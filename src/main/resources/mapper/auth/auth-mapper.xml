@@ -33,6 +33,7 @@
         JOIN AUTHORITY UA ON M.USER_NO = UA.USER_NO
         WHERE M.USER_NO = #{userNo}
     </select>
+    
 	
 </mapper>
 

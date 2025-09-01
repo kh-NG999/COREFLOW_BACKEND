@@ -68,28 +68,6 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); //401
 		}	
 	}
-	/*
-	 * 회원가입
-	 */
-	@PostMapping("/signup")
-	public ResponseEntity<AuthResult> signup(@RequestBody LoginRequest req){
-		AuthResult result = service.signUp(req.getEmail(), req.getPassword());
-		
-		// refreshToken은 http-only쿠키로 설정하여 반환
-		ResponseCookie refreshCookie = 
-				ResponseCookie
-				.from(REFRESH_COOKIE, result.getRefreshToken())
-				.httpOnly(true)
-				.secure(false) // https에서만 사용하는지 여부
-				.path("/")
-				.sameSite("Lax")
-				.maxAge(Duration.ofDays(7)) // 만료시간
-				.build();
-		
-		return ResponseEntity.ok()
-				.header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-				.body(result);
-	}
 	
 	@PostMapping("/refresh")
 	public ResponseEntity<AuthResult> refresh(
