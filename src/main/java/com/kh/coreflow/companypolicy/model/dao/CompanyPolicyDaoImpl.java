@@ -34,4 +34,9 @@ public class CompanyPolicyDaoImpl implements CompanyPolicyDao {
 	public int saveUpdatePolicyHistory(CompanyPolicyModHistory history) {
 		return session.insert("cpolicy.saveUpdatePolicyHistory", history);
 	}
+
+	@Override
+	public int deletePolicy(Long policyId) {
+		return session.delete("cpolicy.deletePolicy", policyId);
+	}
 }

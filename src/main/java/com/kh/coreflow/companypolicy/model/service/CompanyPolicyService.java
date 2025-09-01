@@ -12,4 +12,6 @@ public interface CompanyPolicyService {
 
 	int updatePolicy(CompanyPolicyModHistory history);
 
+	int deletePolicy(Long policyId);
+
 }

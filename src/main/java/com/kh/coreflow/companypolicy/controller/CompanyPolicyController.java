@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins="http://localhost:5173", exposedHeaders="Location")
+//@CrossOrigin(origins="http://localhost:5173", exposedHeaders="Location")
 @RequestMapping("/cpolicies")
 @Tag(name="Company Policy API", description="회사 규정 API")
 public class CompanyPolicyController {
@@ -91,6 +92,24 @@ public class CompanyPolicyController {
 		history.setPolicyId(policyId);
 		
 		int result = service.updatePolicy(history);
+		
+		if (result > 0) {
+			return ResponseEntity.noContent().build();
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	@DeleteMapping("/{policyId}")
+	@Operation(summary="규정 삭제.", description="해당 규정을 삭제함.")
+	@ApiResponses({
+		@ApiResponse(responseCode="204", description="삭제 성공."),
+		@ApiResponse(responseCode="400", description="삭제 실패.")
+	})
+	public ResponseEntity<Void> deletePolicy(
+			@PathVariable Long policyId
+			) {
+		int result = service.deletePolicy(policyId);
 		
 		if (result > 0) {
 			return ResponseEntity.noContent().build();

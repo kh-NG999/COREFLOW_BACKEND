@@ -33,4 +33,9 @@ public class CompanyPolicyServiceImpl implements CompanyPolicyService {
 		
 		return result;
 	}
+
+	@Override
+	public int deletePolicy(Long policyId) {
+		return dao.deletePolicy(policyId);
+	}
 }

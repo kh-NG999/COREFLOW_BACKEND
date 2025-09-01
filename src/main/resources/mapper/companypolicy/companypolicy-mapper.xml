@@ -23,4 +23,8 @@
 		insert into COMPANY_POLICY_MOD_HISTORY(policy_id, user_no, mod_content)
 		values(#{policyId}, #{userNo}, #{modContent})
 	</insert>
+	
+	<delete id="deletePolicy">
+		delete from company_policy where policy_id = #{policyId}
+	</delete>
 </mapper>

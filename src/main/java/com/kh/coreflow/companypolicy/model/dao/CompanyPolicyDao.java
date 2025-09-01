@@ -14,4 +14,6 @@ public interface CompanyPolicyDao {
 
 	int saveUpdatePolicyHistory(CompanyPolicyModHistory history);
 
+	int deletePolicy(Long policyId);
+
 }
