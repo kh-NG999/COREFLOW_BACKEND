@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-//@CrossOrigin(origins="http://localhost:5173", exposedHeaders="Location")
 @RequestMapping("/cpolicies")
 @Tag(name="Company Policy API", description="회사 규정 API")
 public class CompanyPolicyController {
