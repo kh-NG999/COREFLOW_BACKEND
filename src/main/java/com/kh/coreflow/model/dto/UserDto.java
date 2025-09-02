@@ -90,6 +90,9 @@ public class UserDto {
 	public static class UserUpdate{
 		private int userNo;
 		private String userPwd;
+		private String phone;
+		private String address;
+		private String profile;
 	}
 	
 	@Data

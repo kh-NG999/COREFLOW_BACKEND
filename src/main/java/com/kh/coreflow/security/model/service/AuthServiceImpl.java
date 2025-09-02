@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
+import com.kh.coreflow.model.dto.UserDto;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
@@ -31,14 +32,15 @@ public class AuthServiceImpl implements AuthService{
 	
 	@Override
 	public boolean existsByEmail(String email) {
-		User user = authDao.findUserByEmail(email);
-		return user != null;
+		Optional<User> user = authDao.findUserByEmail(email);
+		return authDao.findUserByEmail(email).isPresent();
 	}
 
 	@Override
 	public AuthResult login(String email, String userPwd) {
 		// 1. 사용자 정보 조회
-				User user = authDao.findUserByEmail(email);
+				User user = authDao.findUserByEmail(email)
+						.orElseThrow(() -> new IllegalArgumentException("등록되지 않은 이메일입니다"));;
 				
 				if(!encoder.matches(userPwd, user.getUserPwd())) {
 					throw new BadCredentialsException("비밀번호 오류");
@@ -64,41 +66,45 @@ public class AuthServiceImpl implements AuthService{
 	}
 
 	@Override
-	//@Transactional
+	@Transactional
 	public AuthResult signUp(String email, String userPwd) {
 		log.info("pwd : {}",userPwd);
 		// 1) Users테이블에 데이터 추가
-				User user = User.builder()
+		User user = User.builder()
 						.email(email)
 						.name(email.split("@")[0])
 						.userPwd(encoder.encode(userPwd))
 						.build();
-				authDao.insertUser(user);
+		
+		authDao.insertUser(user);
 				
-				// 3) 권한추가
-				UserAuthority auth = UserAuthority.builder()
-													.userNo(user.getUserNo())
-													.roles(List.of("ROLE_USER"))
-													.build();
-				authDao.insertUserRole(auth);
+		// 3) 권한추가
+		UserAuthority auth = UserAuthority.builder()
+											.userNo(user.getUserNo())
+											.roles(List.of("ROLE_USER"))
+											.build();
+		authDao.insertUserRole(auth);
 				
-				//토큰 발급
-				String accessToken = jwt.createAccessToken(user.getUserNo(), 30); // 30분
-				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
+		//토큰 발급
+		String accessToken = jwt.createAccessToken(user.getUserNo(), 30); // 30분
+		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
-				user = authDao.findUserByUserNo(user.getUserNo()); // 비밀번호 제외 필요
+		user = authDao.findUserByUserNo(user.getUserNo())	// 비밀번호 제외 필요
+				.orElseThrow(() -> new RuntimeException("가입 후 사용자 정보를 조회할 수 없습니다"));
 				
-				return AuthResult.builder()
-						.accessToken(accessToken)
-						.refreshToken(refreshToken)
-						.user(user)
-						.build();
+		return AuthResult.builder()
+				.accessToken(accessToken)
+				.refreshToken(refreshToken)
+				.user(user)
+				.build();
 	}
 
 	@Override
 	public AuthResult refreshByCookie(String refreshCookie) {
 		int userNo = jwt.parseRefresh(refreshCookie);
-		User user = authDao.findUserByUserNo(userNo);
+		
+		User user = authDao.findUserByUserNo(userNo)
+				.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
 		
 		String accessToken = jwt.createAccessToken(userNo, 30);
 		
@@ -109,7 +115,7 @@ public class AuthServiceImpl implements AuthService{
 	}
 
 	@Override
-	public User findUserByUserNo(int userNo) {
+	public Optional<User> findUserByUserNo(int userNo) {
 		return authDao.findUserByUserNo(userNo);
 	}
 
@@ -130,6 +136,11 @@ public class AuthServiceImpl implements AuthService{
 
 	private String createTempPwd() {
 		return UUID.randomUUID().toString().replace("-", "").substring(0,10);
+	}
+
+	@Override
+	public Optional<User> findUserByEmail(String email) {
+		return authDao.findUserByEmail(email);
 	}
 	
 	

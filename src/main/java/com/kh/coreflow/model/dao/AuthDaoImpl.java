@@ -2,6 +2,7 @@ package com.kh.coreflow.model.dao;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,7 @@ public class AuthDaoImpl implements AuthDao{
 	private final SqlSessionTemplate session;
 	
 	@Override
-	public User findUserByEmail(String email) {
+	public Optional findUserByEmail(String email) {
 		return session.selectOne("auth.findUserByEmail" , email);
 	}
 
@@ -33,7 +34,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public User findUserByUserNo(int userNo) {
+	public Optional<User> findUserByUserNo(int userNo) {
 		return session.selectOne("auth.findUserByUserNo" , userNo);
 	}
 
