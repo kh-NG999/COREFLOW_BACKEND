@@ -15,6 +15,8 @@ public interface AuthService {
 
 	User findUserByUserNo(int userNo);
 
+	boolean findUserPwd(String name, String email);
+
 	
 	
 }

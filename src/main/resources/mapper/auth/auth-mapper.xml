@@ -34,6 +34,17 @@
         WHERE M.USER_NO = #{userNo}
     </select>
     
+    <select id="findUserPwd" parameterType="map" resultMap="UserResult">
+    	SELECT *
+    	FROM MEMBER
+    	WHERE USER_NAME = #{name} AND EMAIL = #{email}
+    </select>
+    
+    <update id="updatePwd" parameterType="map">
+    	UPDATE MEMBER
+    	SET USER_PWD = #{encodedPwd}
+    	WHERE EMAIL = #{email}
+    </update>
 	
 </mapper>
 

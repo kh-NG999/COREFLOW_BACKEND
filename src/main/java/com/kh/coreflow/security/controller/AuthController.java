@@ -1,6 +1,7 @@
 package com.kh.coreflow.security.controller;
 
 import java.time.Duration;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
+import com.kh.coreflow.model.dto.UserDto.FindPwdRequest;
 import com.kh.coreflow.model.dto.UserDto.LoginRequest;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.security.model.provider.JWTProvider;
@@ -81,6 +83,13 @@ public class AuthController {
 		//쿠키가 있으면 쿠키를 검증하여 새로운 accessToken생성
 		AuthResult result = service.refreshByCookie(refreshCookie);
 		return ResponseEntity.ok(result);
+	}
+	
+	@PostMapping("/find-pwd")
+	public ResponseEntity<?> findUserPwd(@RequestBody FindPwdRequest request){
+		boolean result = service.findUserPwd(request.getName(), request.getEmail());
+		return result ? ResponseEntity.ok("임시 비밀번호가 메일로 발송되었습니다.")
+				: ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계정정보가 존재하지 않습니다");
 	}
 	
 	@PostMapping("/logout")

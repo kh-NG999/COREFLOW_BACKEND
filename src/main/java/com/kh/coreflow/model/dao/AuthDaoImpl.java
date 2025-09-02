@@ -1,11 +1,13 @@
 package com.kh.coreflow.model.dao;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
-import com.kh.coreflow.model.dto.UserDto.UserCredential;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,22 @@ public class AuthDaoImpl implements AuthDao{
 	@Override
 	public User findUserByUserNo(int userNo) {
 		return session.selectOne("auth.findUserByUserNo" , userNo);
+	}
+
+	@Override
+	public User findUserPwd(String name, String email) {
+		Map<String, String> param = new HashMap<>();
+		param.put("name", name);
+		param.put("email", email);
+		return session.selectOne("auth.findUserPwd", param);
+	}
+
+	@Override
+	public void updatePwd(String email, String encodedPwd) {
+		Map<String, String> param = new HashMap<>();
+		param.put("email", email);
+		param.put("encodedPwd", encodedPwd);
+		session.update("auth.updatePwd", param);
 	}
 
 	

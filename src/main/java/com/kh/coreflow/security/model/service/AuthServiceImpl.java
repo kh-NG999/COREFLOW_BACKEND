@@ -1,12 +1,15 @@
 package com.kh.coreflow.security.model.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.User;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthServiceImpl implements AuthService{
 	
 	private final AuthDao authDao;
+	private final MailService mailService;
 	private final PasswordEncoder encoder;
 	private final JWTProvider jwt;
 	
@@ -107,6 +111,25 @@ public class AuthServiceImpl implements AuthService{
 	@Override
 	public User findUserByUserNo(int userNo) {
 		return authDao.findUserByUserNo(userNo);
+	}
+
+	@Override
+	public boolean findUserPwd(String name, String email) {
+		User user = authDao.findUserPwd(name, email);
+		if(user == null) {
+			throw new IllegalArgumentException("해당 정보와 일치하는 계정이 없습니다");
+		}
+		
+		String tempPwd = createTempPwd();
+		String encodedPwd = encoder.encode(tempPwd);
+		authDao.updatePwd(user.getEmail(), encodedPwd);
+		mailService.sendTempPwd(user, tempPwd);
+		
+		return true;
+	}
+
+	private String createTempPwd() {
+		return UUID.randomUUID().toString().replace("-", "").substring(0,10);
 	}
 	
 	

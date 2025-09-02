@@ -78,6 +78,15 @@ public class UserDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
+	public static class FindPwdRequest {
+		private String email;
+		private String name;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
 	public static class UserUpdate{
 		private int userNo;
 		private String userPwd;

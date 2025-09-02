@@ -13,6 +13,10 @@ public interface AuthDao {
 	void insertUserRole(UserAuthority auth);
 
 	User findUserByUserNo(int userNo);
+
+	User findUserPwd(String name, String email);
+
+	void updatePwd(String email, String encodedPwd);
 	
 	
 }

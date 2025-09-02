@@ -17,7 +17,7 @@ public class MailService {
 	public void sendTemporaryPassword(User user, String tempPassword) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
-        message.setSubject("CoreFlow 계정 임시 비밀번호 안내");
+        message.setSubject("CoreFlow 계정 생성 안내");
         message.setText(String.format(
         	    "안녕하세요, %s사원님의 계정이 생성되었습니다.\n임시 비밀번호는 아래와 같습니다.\n\n%s\n\n로그인 후 반드시 비밀번호를 변경해주세요.",
         	    user.getName(), tempPassword
@@ -25,4 +25,16 @@ public class MailService {
 
         mailSender.send(message);
     }
+	
+	public void sendTempPwd(User user, String tempPwd) {
+		SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("CoreFlow 계정 임시 비밀번호 안내");
+        message.setText(String.format(
+        	    "안녕하세요, %s사원님의 계정이 생성되었습니다.\n임시 비밀번호는 아래와 같습니다.\n\n%s\n\n로그인 후 반드시 비밀번호를 변경해주세요.",
+        	    user.getName(), tempPwd
+        	));
+
+        mailSender.send(message);
+	}
 }
