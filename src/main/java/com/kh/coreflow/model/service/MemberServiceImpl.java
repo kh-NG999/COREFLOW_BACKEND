@@ -13,6 +13,12 @@ import com.kh.coreflow.model.dto.MemberDto.Position;
 
 public interface MemberServiceImpl {
 
+	List<Department> deptList();
+
+	List<Department> deptDetailList(int parentId);
+	
+	List<Position> posiList();
+	
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
 	MemberResponse memberDetail(int userNo);
@@ -22,11 +28,5 @@ public interface MemberServiceImpl {
 	int memberUpdate(MemberPatch member);
 
 	int memberDelete(int userNo);
-
-	List<Department> deptList();
-
-	List<Department> deptDetailList(int parentId);
-	
-	List<Position> posiList();
 
 }

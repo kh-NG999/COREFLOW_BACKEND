@@ -18,7 +18,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService implements MemberServiceImpl{
 	private final MemberDaoImpl dao;
+	
+	@Override
+	public List<Department> deptList() {
+		return dao.deptList();
+	}
 
+	@Override
+	public List<Department> deptDetailList(int parentId) {
+		return dao.deptDetailList(parentId);
+	}
+
+	@Override
+	public List<Position> posiList() {
+		return dao.posiList();
+	}
+	
 	@Override
 	public List<MemberResponse> memberList(Map<String, String> searchParams) {
 		return dao.memberList(searchParams);
@@ -42,20 +57,5 @@ public class MemberService implements MemberServiceImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return dao.memberDelete(userNo);
-	}
-
-	@Override
-	public List<Department> deptList() {
-		return dao.deptList();
-	}
-
-	@Override
-	public List<Department> deptDetailList(int parentId) {
-		return dao.deptDetailList(parentId);
-	}
-
-	@Override
-	public List<Position> posiList() {
-		return dao.posiList();
 	}
 }

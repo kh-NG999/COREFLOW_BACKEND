@@ -20,6 +20,21 @@ public class MemberDao implements MemberDaoImpl{
 	private final SqlSessionTemplate session;
 
 	@Override
+	public List<Department> deptList() {
+		return session.selectList("member.deptList");
+	}
+
+	@Override
+	public List<Department> deptDetailList(int parentId) {
+		return session.selectList("member.deptDetailList",parentId);
+	}
+	
+	@Override
+	public List<Position> posiList() {
+		return session.selectList("member.posiList");
+	}
+	
+	@Override
 	public List<MemberResponse> memberList(Map<String, String> searchParams) {
 		return session.selectList("member.memberList",searchParams);
 	}
@@ -42,21 +57,6 @@ public class MemberDao implements MemberDaoImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return session.update("member.memberDelete",userNo);
-	}
-
-	@Override
-	public List<Department> deptList() {
-		return session.selectList("member.deptList");
-	}
-
-	@Override
-	public List<Department> deptDetailList(int parentId) {
-		return session.selectList("member.deptDetailList",parentId);
-	}
-	
-	@Override
-	public List<Position> posiList() {
-		return session.selectList("member.posiList");
 	}
 	
 }

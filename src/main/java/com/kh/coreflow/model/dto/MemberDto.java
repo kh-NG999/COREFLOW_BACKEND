@@ -11,6 +11,23 @@ public class MemberDto {
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
+	public static class Department{
+		private int depId;
+		private String depName;
+		private int parentId;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Position{
+		private int posId;
+		private String posName;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class MemberResponse{
 		private int userNo;
 		private String userName;
@@ -63,20 +80,4 @@ public class MemberDto {
 		private Date updateDate;
 	}
 	
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Department{
-		private int depId;
-		private String depName;
-		private int parentId;
-	}
-	
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Position{
-		private int posId;
-		private String posName;
-	}
 }

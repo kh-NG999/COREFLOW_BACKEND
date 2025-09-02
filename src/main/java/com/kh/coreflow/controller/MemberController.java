@@ -54,8 +54,8 @@ public class MemberController {
 			@PathVariable int parentId
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
-		log.debug("deptDetailList : {}",deptDetailList);
-		System.out.println(deptDetailList);
+//		log.debug("deptDetailList : {}",deptDetailList);
+//		System.out.println(deptDetailList);
 		
 		if(deptDetailList != null && !deptDetailList.isEmpty()) {
 			return ResponseEntity.ok(deptDetailList);

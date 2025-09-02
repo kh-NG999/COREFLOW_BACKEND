@@ -53,8 +53,13 @@
 				AND USER_NAME LIKE '%' || #{userName} || '%'
 			</if>
 			<if test="depName != null and depName != ''">
-				AND DEP_NAME = #{depName}
-			</if>
+	            AND DEP_ID IN (
+	                SELECT DEP_ID
+	                FROM DEPARTMENT
+	                START WITH DEP_NAME = #{depName}
+	                CONNECT BY PRIOR DEP_ID = PARENT_ID
+	            )
+	        </if>
 			<if test="posName != null and posName != ''">
 				AND POS_NAME = #{posName}
 			</if>
