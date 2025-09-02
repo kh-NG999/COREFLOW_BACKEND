@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cpolicy">
+	<select id="getPolicies" resultType="com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto$CompanyPolicy">
+		select * from company_policy
+		order by policy_id
+	</select>
+	
+	<insert id="addPolicy">
+		<selectKey keyProperty="policyId" resultType="long" order="BEFORE">
+			select "ISEQ$$_75875".nextval from dual		
+		</selectKey>
+		insert into company_policy(policy_id, title, content, creator_user_no) values(#{policyId}, #{title}, #{content}, #{creatorUserNo})
+	</insert>
+	
+	<update id="updatePolicy">
+		update company_policy
+		set content = #{modContent}, mod_user_no = #{userNo}, last_modified_at = sysdate
+		where policy_id = #{policyId}
+	</update>
+	
+	<insert id="saveUpdatePolicyHistory">
+		insert into COMPANY_POLICY_MOD_HISTORY(policy_id, user_no, mod_content)
+		values(#{policyId}, #{userNo}, #{modContent})
+	</insert>
+	
+	<delete id="deletePolicy">
+		delete from company_policy where policy_id = #{policyId}
+	</delete>
+</mapper>
