@@ -1,16 +1,16 @@
-package com.kh.coreflow.model.service;
+package com.kh.coreflow.humanmanagement.model.service;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.kh.coreflow.model.dao.MemberDaoImpl;
-import com.kh.coreflow.model.dto.MemberDto.Department;
-import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
-import com.kh.coreflow.model.dto.MemberDto.Position;
+import com.kh.coreflow.humanmanagement.model.dao.MemberDaoImpl;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 

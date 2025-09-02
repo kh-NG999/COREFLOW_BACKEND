@@ -1,15 +1,13 @@
-package com.kh.coreflow.model.service;
+package com.kh.coreflow.humanmanagement.model.service;
 
 import java.util.List;
 import java.util.Map;
 
-import com.kh.coreflow.model.dto.MemberDto.Department;
-import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
-import com.kh.coreflow.model.dto.MemberDto.Position;
-
-
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
 public interface MemberServiceImpl {
 

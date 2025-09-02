@@ -1,4 +1,4 @@
-package com.kh.coreflow.model.dao;
+package com.kh.coreflow.humanmanagement.model.dao;
 
 import java.util.List;
 import java.util.Map;
@@ -6,11 +6,11 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.kh.coreflow.model.dto.MemberDto.Department;
-import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
-import com.kh.coreflow.model.dto.MemberDto.Position;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,5 +58,4 @@ public class MemberDao implements MemberDaoImpl{
 	public int memberDelete(int userNo) {
 		return session.update("member.memberDelete",userNo);
 	}
-	
 }

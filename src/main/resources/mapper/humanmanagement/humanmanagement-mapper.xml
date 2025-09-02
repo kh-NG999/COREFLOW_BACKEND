@@ -3,7 +3,7 @@
 <mapper namespace="member">
 
 	<!-- 부모 부서 조회 -->
-	<select id="deptList" resultType="com.kh.coreflow.model.dto.MemberDto$Department">
+	<select id="deptList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
 		SELECT
 			DEP_ID,
 			DEP_NAME,
@@ -13,7 +13,7 @@
 	</select>
 	
 	<!-- 자식 부서 조회 -->
-	<select id="deptDetailList" resultType="com.kh.coreflow.model.dto.MemberDto$Department">
+	<select id="deptDetailList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
 		SELECT
 			DEP_ID,
 			DEP_NAME,
@@ -23,7 +23,7 @@
 	</select>
 	
 	<!-- 직위 조회 -->
-	<select id="posiList" resultType="com.kh.coreflow.model.dto.MemberDto$Position">
+	<select id="posiList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Position">
 		SELECT
 			POS_ID,
 			POS_NAME
@@ -31,7 +31,7 @@
 	</select>
 	
 	<!-- 사원 조회 -->
-	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.model.dto.MemberDto$MemberResponse">
+	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
 		SELECT
 			USER_NO,
 			USER_NAME,
@@ -67,7 +67,7 @@
 	</select>
 	
 	<!-- 사원 상세 조회 -->
-	<select id="memberDetail" resultType="com.kh.coreflow.model.dto.MemberDto$MemberResponse">
+	<select id="memberDetail" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
 		SELECT
 			USER_NO,
 			USER_NAME,
@@ -91,7 +91,6 @@
 		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
 			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
 		</selectKey>
-		
 		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENTION, UPDATE_DATE)
 		SELECT
 			#{userNo},

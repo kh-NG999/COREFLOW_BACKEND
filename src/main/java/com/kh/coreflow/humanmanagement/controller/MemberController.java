@@ -1,4 +1,4 @@
-package com.kh.coreflow.controller;
+package com.kh.coreflow.humanmanagement.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.coreflow.model.dto.MemberDto.Department;
-import com.kh.coreflow.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.model.dto.MemberDto.MemberPost;
-import com.kh.coreflow.model.dto.MemberDto.MemberResponse;
-import com.kh.coreflow.model.dto.MemberDto.Position;
-import com.kh.coreflow.model.service.MemberServiceImpl;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+import com.kh.coreflow.humanmanagement.model.service.MemberServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,6 @@ public class MemberController {
 	@GetMapping("/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
-		
 //		log.debug("deptList : {}",deptList);
 //		System.out.println(deptList);
 		
@@ -105,7 +104,6 @@ public class MemberController {
 		MemberResponse member = service.memberDetail(userNo);
 //		log.debug("member : {}",member);
 
-		
 		if(member != null) {
 			return ResponseEntity.ok(member);
 		}else {

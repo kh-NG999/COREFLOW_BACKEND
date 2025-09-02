@@ -1,4 +1,4 @@
-package com.kh.coreflow.model.dto;
+package com.kh.coreflow.humanmanagement.model.dto;
 
 import java.util.Date;
 
@@ -79,5 +79,4 @@ public class MemberDto {
 		private String addressDetail;
 		private Date updateDate;
 	}
-	
 }
