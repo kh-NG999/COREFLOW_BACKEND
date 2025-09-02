@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
+	SecurityFilterChain filterChain(HttpSecurity http,
 			JWTAuthenticationFilter jwtFilter) throws Exception{
 		http
 			// cors관련 빈객체 등록
@@ -77,13 +77,13 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		PasswordEncoder encoder = new BCryptPasswordEncoder();
 		return encoder;
 	}
 	
 	@Bean
-	public RestTemplate restTemplate() {
+	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 
