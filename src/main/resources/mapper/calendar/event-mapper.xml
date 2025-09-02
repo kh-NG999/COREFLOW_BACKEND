@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="event">
+  <resultMap id="EventResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$Res">
+    <id     property="eventId"        column="EVENT_ID"/>
+    <result property="calId"          column="CAL_ID"/>
+    <result property="title"          column="TITLE"/>
+    <result property="startAt"        column="START_AT"/>
+    <result property="endAt"          column="END_AT"/>
+    <result property="allDayYn"       column="ALL_DAY_YN"/>
+    <result property="locationText"   column="LOCATION_TEXT"/>
+    <result property="note"           column="NOTE"/>
+    <result property="roomId"         column="ROOM_ID"/>
+    <result property="status"         column="STATUS"/>
+    <result property="labelId"        column="LABEL_ID"/>
+    <result property="eventType"      column="EVENT_TYPE"/>
+    <result property="rrule"          column="RRULE"/>
+    <result property="exdates"        column="EXDATES"/>
+    <result property="createByUserNo" column="CREATE_BY_USER_NO"/>
+    <result property="createDate"     column="CREATE_DATE"/>
+    <result property="updateUserNo"   column="UPDATE_USER_NO"/>
+    <result property="updateDate"     column="UPDATE_DATE"/>
+  </resultMap>
+
+  <!-- 기간 조회 -->
+  <select id="selectEventsByCalendarAndPeriod" resultMap="EventResMap" parameterType="map">
+    SELECT
+      EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
+      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, EVENT_TYPE,
+      RRULE, EXDATES, CREATE_BY_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
+    FROM EVENT
+    WHERE CAL_ID = #{calendarId}
+      AND START_AT &lt; #{to}
+      AND END_AT   &gt; #{from}
+      AND STATUS  != 'DELETED'
+    ORDER BY START_AT ASC, END_AT ASC, EVENT_ID ASC
+  </select>
+
+  <!-- 회의실 겹침검사 (생성용) -->
+  <select id="countRoomConflicts" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+    FROM EVENT
+    WHERE ROOM_ID = #{roomId}
+      AND STATUS IN ('CONFIRMED','TENTATIVE')
+      AND START_AT &lt; #{endAt}
+      AND END_AT   &gt; #{startAt}
+  </select>
+
+  <!-- 회의실 겹침검사 (수정용: 자신 이벤트 제외) -->
+  <select id="countRoomConflictsExcludingSelf" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+    FROM EVENT
+    WHERE ROOM_ID = #{roomId}
+      AND STATUS IN ('CONFIRMED','TENTATIVE')
+      AND START_AT &lt; #{endAt}
+      AND END_AT   &gt; #{startAt}
+      AND EVENT_ID != #{eventId}
+  </select>
+
+  <!-- INSERT -->
+  <insert id="insertEvent" parameterType="map">
+    <selectKey keyProperty="req.eventId" resultType="long" order="BEFORE">
+      SELECT EVENT_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO EVENT (
+      EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
+      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, EVENT_TYPE,
+      RRULE, EXDATES, CREATE_BY_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
+    ) VALUES (
+      #{req.eventId}, #{req.calId}, #{req.title}, #{req.startAt}, #{req.endAt},
+      <choose>
+        <when test="req.allDay == true"> 'Y' </when>
+        <otherwise> 'N' </otherwise>
+      </choose>,
+      #{req.locationText}, #{req.note}, #{req.roomId},
+      'CONFIRMED', #{req.labelId}, #{req.eventType},
+      #{req.rrule}, #{req.exdates},
+      #{userNo}, SYSTIMESTAMP, #{userNo}, SYSTIMESTAMP
+    )
+  </insert>
+
+  <!-- UPDATE -->
+  <update id="updateEvent" parameterType="map">
+    UPDATE EVENT
+       SET TITLE            = #{req.title},
+           START_AT         = #{req.startAt},
+           END_AT           = #{req.endAt},
+           ALL_DAY_YN       = <choose><when test="req.allDay == true">'Y'</when><otherwise>'N'</otherwise></choose>,
+           LOCATION_TEXT    = #{req.locationText},
+           NOTE             = #{req.note},
+           ROOM_ID          = #{req.roomId},
+           EVENT_TYPE       = #{req.eventType},
+           LABEL_ID         = #{req.labelId},
+           RRULE            = #{req.rrule},
+           EXDATES          = #{req.exdates},
+           UPDATE_USER_NO   = #{userNo},
+           UPDATE_DATE      = SYSTIMESTAMP
+     WHERE EVENT_ID         = #{eventId}
+       AND STATUS          != 'DELETED'
+  </update>
+
+  <!-- 논리삭제 -->
+  <update id="logicalDeleteEvent" parameterType="map">
+    UPDATE EVENT
+       SET STATUS        = 'DELETED',
+           UPDATE_USER_NO= #{userNo},
+           UPDATE_DATE   = SYSTIMESTAMP
+     WHERE EVENT_ID      = #{eventId}
+  </update>
+
+    
+    
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="calendar">
+
+	<!-- 내가 볼 수 있는 캘린더 목록 -->
+	  <select id="selectVisibleCalendars"
+	          parameterType="map"
+	          resultType="com.kh.coreflow.calendar.model.dto.CalendarDto$CalendarSummaryDTO">
+	    WITH MY_ORG AS (
+	      SELECT DEPT_ID, POS_ID FROM USER_HR WHERE USER_NO = #{me}
+	    )
+	    SELECT
+	      c.CAL_ID   AS CAL_ID,
+	      c.CAL_NAME AS CAL_NAME,
+	      c.COLOR    AS COLOR,
+	      CASE WHEN c.OWNER_USER_NO = #{me} OR c.SCOPE = 'PERSONAL' THEN 1 ELSE 0 END AS IS_PERSONAL,
+	      CASE WHEN c.OWNER_USER_NO = #{me} AND c.SCOPE = 'PERSONAL' THEN 1 ELSE 0 END AS DEFAULT_FOR_ME
+	    FROM CALENDAR c
+	    LEFT JOIN CALENDAR_MEMBER cm ON cm.CAL_ID = c.CAL_ID AND cm.USER_NO = #{me}
+	    LEFT JOIN MY_ORG mo ON 1=1
+	    LEFT JOIN CALENDAR_DEPT_SHARE cds ON cds.CAL_ID = c.CAL_ID AND cds.DEPT_ID = mo.DEPT_ID
+	    LEFT JOIN CALENDAR_POS_SHARE cps ON cps.CAL_ID = c.CAL_ID AND cps.POS_ID = mo.POS_ID
+	    WHERE c.DELETED_YN = 'N'
+	      AND ( c.OWNER_USER_NO = #{me}
+	         OR cm.USER_NO IS NOT NULL
+	         OR cds.DEPT_ID IS NOT NULL
+	         OR cps.POS_ID IS NOT NULL )
+	    ORDER BY c.CAL_NAME
+	  </select>
+	
+	  <!-- 기간 내 이벤트 (start < to AND end > from) -->
+	  <!--
+	  <select id="selectEventsInRange"
+	          parameterType="map"
+	          resultType="com.kh.coreflow.calendar.model.dto.EventDto$EventRowDTO">
+	    SELECT
+	      e.EVENT_ID AS EVENT_ID,
+	      e.CAL_ID   AS CAL_ID,
+	      e.TITLE    AS TITLE,
+	      TO_CHAR(e.START_AT, 'YYYY-MM-DD"T"HH24:MI:SS.FF3TZH:TZM') AS START_AT,
+	      TO_CHAR(e.END_AT,   'YYYY-MM-DD"T"HH24:MI:SS.FF3TZH:TZM') AS END_AT,
+	      e.ALL_DAY_YN AS ALL_DAY_YN
+	    FROM EVENT e
+	    WHERE e.CAL_ID = #{calId}
+	      AND e.DELETED_YN = 'N'
+	      AND e.START_AT <  TO_TIMESTAMP_TZ(#{toIso},   'YYYY-MM-DD"T"HH24:MI:SS.FFTZH:TZM')
+	      AND e.END_AT   >  TO_TIMESTAMP_TZ(#{fromIso}, 'YYYY-MM-DD"T"HH24:MI:SS.FFTZH:TZM')
+	    ORDER BY e.START_AT
+	  </select>
+	  -->
+	
+	  <!-- 캘린더 접근 가능 여부(권한 체크) -->
+	  <select id="existsCalendarAccess"
+	          parameterType="map"
+	          resultType="int">
+	    WITH MY_ORG AS (
+	      SELECT DEPT_ID, POS_ID FROM USER_HR WHERE USER_NO = #{me}
+	    )
+	    SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS HAS_ACCESS
+	    FROM (
+	      SELECT 1
+	      FROM CALENDAR c
+	      LEFT JOIN CALENDAR_MEMBER cm ON cm.CAL_ID = c.CAL_ID AND cm.USER_NO = #{me}
+	      LEFT JOIN MY_ORG mo ON 1=1
+	      LEFT JOIN CALENDAR_DEPT_SHARE cds ON cds.CAL_ID = c.CAL_ID AND cds.DEPT_ID = mo.DEPT_ID
+	      LEFT JOIN CALENDAR_POS_SHARE cps ON cps.CAL_ID = c.CAL_ID AND cps.POS_ID = mo.POS_ID
+	      WHERE c.CAL_ID = #{calId}
+	        AND c.DELETED_YN = 'N'
+	        AND ( c.OWNER_USER_NO = #{me}
+	           OR cm.USER_NO IS NOT NULL
+	           OR cds.DEPT_ID IS NOT NULL
+	           OR cps.POS_ID IS NOT NULL )
+	    )
+	  </select>
+		
+		
+    
+    
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
