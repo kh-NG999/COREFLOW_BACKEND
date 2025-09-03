@@ -43,12 +43,15 @@
 			ADDRESS_DETAIL,
 			UPDATE_DATE,
 			DEP_NAME,
-			POS_NAME
+			POS_NAME,
+			STATUS
 		FROM MEMBER
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITIONS USING(POS_ID)
 		<where>
-			STATUS = 'T'
+			<if test="status != null and status != ''">
+				STATUS = #{status}
+			</if>
 			<if test="userName != null and userName != ''">
 				AND USER_NAME LIKE '%' || #{userName} || '%'
 			</if>
@@ -79,7 +82,8 @@
 			ADDRESS_DETAIL,
 			UPDATE_DATE,
 			DEP_NAME,
-			POS_NAME
+			POS_NAME,
+			STATUS
 		FROM MEMBER M
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITIONS USING(POS_ID)
@@ -126,16 +130,17 @@
 			<if test="posName != null and posName != ''">
 				POS_ID = (SELECT POS_ID FROM POSITIONS WHERE POS_NAME = #{posName}),
 			</if>
+			<if test="status != null and status != '' ">
+				STATUS = #{status},
+			</if>
 			UPDATE_DATE = SYSDATE
 		</set>
 		WHERE USER_NO = #{userNo}
 	</update>
 	
 	<!-- 회원 정보 삭제 -->
-	<update id="memberDelete">
-		UPDATE MEMBER SET
-			STATUS = 'F',
-			UPDATE_DATE = SYSDATE
+	<delete id="memberDelete">
+		DELETE FROM MEMBER
 		WHERE USER_NO = #{userNo}
-	</update>
+	</delete>
 </mapper>

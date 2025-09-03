@@ -42,6 +42,7 @@ public class MemberDto {
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
+		private String status;
 	}
 	
 	@Data
@@ -59,6 +60,7 @@ public class MemberDto {
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
+		private String status;
 	}
 	
 	@Data
@@ -78,5 +80,6 @@ public class MemberDto {
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
+		private String status;
 	}
 }
