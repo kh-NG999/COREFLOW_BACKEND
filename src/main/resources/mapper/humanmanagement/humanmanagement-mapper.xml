@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+
+	<!-- 부모 부서 조회 -->
+	<select id="deptList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
+		SELECT
+			DEP_ID,
+			DEP_NAME,
+			PARENT_ID
+		FROM DEPARTMENT
+		WHERE PARENT_ID IS NULL
+	</select>
+	
+	<!-- 자식 부서 조회 -->
+	<select id="deptDetailList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
+		SELECT
+			DEP_ID,
+			DEP_NAME,
+			PARENT_ID
+		FROM DEPARTMENT
+		WHERE PARENT_ID = #{parentId}
+	</select>
+	
+	<!-- 직위 조회 -->
+	<select id="posiList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Position">
+		SELECT
+			POS_ID,
+			POS_NAME
+		FROM POSITIONS
+	</select>
+	
+	<!-- 사원 조회 -->
+	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
+		SELECT
+			USER_NO,
+			USER_NAME,
+			EMAIL,
+			HIRE_DATE,
+			PHONE,
+			EXTENTION,
+			ADDRESS,
+			ADDRESS_DETAIL,
+			UPDATE_DATE,
+			DEP_NAME,
+			POS_NAME
+		FROM MEMBER
+		LEFT JOIN DEPARTMENT USING(DEP_ID)
+		LEFT JOIN POSITIONS USING(POS_ID)
+		<where>
+			STATUS = 'T'
+			<if test="userName != null and userName != ''">
+				AND USER_NAME LIKE '%' || #{userName} || '%'
+			</if>
+			<if test="depName != null and depName != ''">
+	            AND DEP_ID IN (
+	                SELECT DEP_ID
+	                FROM DEPARTMENT
+	                START WITH DEP_NAME = #{depName}
+	                CONNECT BY PRIOR DEP_ID = PARENT_ID
+	            )
+	        </if>
+			<if test="posName != null and posName != ''">
+				AND POS_NAME = #{posName}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 사원 상세 조회 -->
+	<select id="memberDetail" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
+		SELECT
+			USER_NO,
+			USER_NAME,
+			EMAIL,
+			HIRE_DATE,
+			PHONE,
+			EXTENTION,
+			ADDRESS,
+			ADDRESS_DETAIL,
+			UPDATE_DATE,
+			DEP_NAME,
+			POS_NAME
+		FROM MEMBER M
+		LEFT JOIN DEPARTMENT USING(DEP_ID)
+		LEFT JOIN POSITIONS USING(POS_ID)
+		WHERE USER_NO = #{userNo}
+	</select>
+	
+	<!-- 사원 등록 -->
+	<insert id="memberInsert">
+		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
+			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENTION, UPDATE_DATE)
+		SELECT
+			#{userNo},
+			D.DEP_ID,
+			P.POS_ID,
+			#{email},
+			#{userName},
+			#{phone},
+			#{address},
+			#{addressDetail},
+			#{extention},
+			#{updateDate}
+		FROM DEPARTMENT D
+		JOIN POSITIONS P
+		WHERE D.DEP_NAME = #{depName} AND
+			  P.POS_NAME = #{posName}
+	</insert>
+	
+	<!-- 사원 정보 수정 -->
+	<update id="memberUpdate">
+		UPDATE MEMBER
+		<set>
+			<if test="userName != null and userName != ''">USER_NAME = #{userName},</if>
+			<if test="email != null and email != ''">EMAIL = #{email},</if>
+			<if test="hireDate != null">HIRE_DATE = #{hireDate},</if>
+			<if test="phone != null and phone != ''">PHONE = #{phone},</if>
+			<if test="extention != null and extention != ''">EXTENTION = #{extention},</if>
+			<if test="address != null and address != ''">ADDRESS = #{address},</if>
+			<if test="addressDetail != null and addressDetail != ''">ADDRESS_DETAIL = #{addressDetail},</if>
+			<if test="depName != null and depName != ''">
+				DEP_ID = (SELECT DEP_ID FROM DEPARTMENT WHERE DEP_NAME = #{depName}),
+			</if>
+			<if test="posName != null and posName != ''">
+				POS_ID = (SELECT POS_ID FROM POSITIONS WHERE POS_NAME = #{posName}),
+			</if>
+			UPDATE_DATE = SYSDATE
+		</set>
+		WHERE USER_NO = #{userNo}
+	</update>
+	
+	<!-- 회원 정보 삭제 -->
+	<update id="memberDelete">
+		UPDATE MEMBER SET
+			STATUS = 'F',
+			UPDATE_DATE = SYSDATE
+		WHERE USER_NO = #{userNo}
+	</update>
+</mapper>
