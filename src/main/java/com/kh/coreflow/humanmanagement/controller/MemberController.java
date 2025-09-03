@@ -37,7 +37,7 @@ public class MemberController {
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
 //		log.debug("deptList : {}",deptList);
-//		System.out.println(deptList);
+//		System.out.println("부모 부서 : "+deptList);
 		
 		if(deptList != null && !deptList.isEmpty()) {
 			return ResponseEntity.ok(deptList);
@@ -54,7 +54,7 @@ public class MemberController {
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
 //		log.debug("deptDetailList : {}",deptDetailList);
-//		System.out.println(deptDetailList);
+//		System.out.println("자식 부서 : "+deptDetailList);
 		
 		if(deptDetailList != null && !deptDetailList.isEmpty()) {
 			return ResponseEntity.ok(deptDetailList);
@@ -69,7 +69,7 @@ public class MemberController {
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
 //		log.debug("posiList : {}",posiList);
-//		System.out.println(posiList);
+//		System.out.println("직위 : "+posiList);
 		
 		if(posiList != null) {
 			return ResponseEntity.ok(posiList);
