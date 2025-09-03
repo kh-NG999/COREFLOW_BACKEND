@@ -86,5 +86,5 @@ public class SecurityConfig {
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
+	
 }
