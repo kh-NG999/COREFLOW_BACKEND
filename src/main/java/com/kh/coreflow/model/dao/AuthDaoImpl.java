@@ -19,8 +19,10 @@ public class AuthDaoImpl implements AuthDao{
 	private final SqlSessionTemplate session;
 	
 	@Override
-	public Optional findUserByEmail(String email) {
-		return session.selectOne("auth.findUserByEmail" , email);
+	public Optional<User> findUserByEmail(String email) {
+		User user = session.selectOne("auth.findUserByEmail" , email);
+		Optional<User> optionalUser = Optional.ofNullable(user);
+		return optionalUser;
 	}
 
 	@Override
@@ -35,7 +37,9 @@ public class AuthDaoImpl implements AuthDao{
 
 	@Override
 	public Optional<User> findUserByUserNo(int userNo) {
-		return session.selectOne("auth.findUserByUserNo" , userNo);
+		User user = session.selectOne("auth.findUserByUserNo" , userNo);
+		Optional<User> optionalUser = Optional.ofNullable(user);
+		return optionalUser;
 	}
 
 	@Override

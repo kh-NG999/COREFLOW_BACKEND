@@ -2,6 +2,7 @@ package com.kh.coreflow.security.controller;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -113,7 +114,7 @@ public class AuthController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<User> getUserInfo(HttpServletRequest req){
+	public ResponseEntity<Optional<User>> getUserInfo(HttpServletRequest req){
 		
 		// 1. 요청 헤더에서 jwt토큰 추출
 		String jwtToken = resolveAccessToken(req);
@@ -125,7 +126,7 @@ public class AuthController {
 		int userNo = jwt.getUserNo(jwtToken);
 		
 		// 사용자 정보 조회
-		User user = service.findUserByUserNo(userNo);
+		Optional<User> user = service.findUserByUserNo(userNo);
 		if(user == null) {
 			return ResponseEntity.notFound().build();
 		}
