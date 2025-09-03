@@ -107,10 +107,6 @@
 		    <scope>runtime</scope>
 		</dependency>
 		
-<<<<<<< HEAD
-		
-=======
->>>>>>> main
 	</dependencies>
 
 	<build>

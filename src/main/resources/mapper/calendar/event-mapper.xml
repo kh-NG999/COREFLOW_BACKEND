@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="event">
+
   <resultMap id="EventResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$Res">
     <id     property="eventId"        column="EVENT_ID"/>
     <result property="calId"          column="CAL_ID"/>
@@ -22,7 +23,7 @@
     <result property="updateDate"     column="UPDATE_DATE"/>
   </resultMap>
 
-  <!-- 기간 조회 -->
+  <!-- 기간 내 이벤트: (start < to) AND (end > from) -->
   <select id="selectEventsByCalendarAndPeriod" resultMap="EventResMap" parameterType="map">
     SELECT
       EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
@@ -32,7 +33,7 @@
     WHERE CAL_ID = #{calendarId}
       AND START_AT &lt; #{to}
       AND END_AT   &gt; #{from}
-      AND STATUS  != 'DELETED'
+      AND STATUS   &lt;&gt; 'DELETED'
     ORDER BY START_AT ASC, END_AT ASC, EVENT_ID ASC
   </select>
 
@@ -54,7 +55,7 @@
       AND STATUS IN ('CONFIRMED','TENTATIVE')
       AND START_AT &lt; #{endAt}
       AND END_AT   &gt; #{startAt}
-      AND EVENT_ID != #{eventId}
+      AND EVENT_ID &lt;&gt; #{eventId}
   </select>
 
   <!-- INSERT -->
@@ -82,21 +83,21 @@
   <!-- UPDATE -->
   <update id="updateEvent" parameterType="map">
     UPDATE EVENT
-       SET TITLE            = #{req.title},
-           START_AT         = #{req.startAt},
-           END_AT           = #{req.endAt},
-           ALL_DAY_YN       = <choose><when test="req.allDay == true">'Y'</when><otherwise>'N'</otherwise></choose>,
-           LOCATION_TEXT    = #{req.locationText},
-           NOTE             = #{req.note},
-           ROOM_ID          = #{req.roomId},
-           EVENT_TYPE       = #{req.eventType},
-           LABEL_ID         = #{req.labelId},
-           RRULE            = #{req.rrule},
-           EXDATES          = #{req.exdates},
-           UPDATE_USER_NO   = #{userNo},
-           UPDATE_DATE      = SYSTIMESTAMP
-     WHERE EVENT_ID         = #{eventId}
-       AND STATUS          != 'DELETED'
+       SET TITLE          = #{req.title},
+           START_AT       = #{req.startAt},
+           END_AT         = #{req.endAt},
+           ALL_DAY_YN     = <choose><when test="req.allDay == true">'Y'</when><otherwise>'N'</otherwise></choose>,
+           LOCATION_TEXT  = #{req.locationText},
+           NOTE           = #{req.note},
+           ROOM_ID        = #{req.roomId},
+           EVENT_TYPE     = #{req.eventType},
+           LABEL_ID       = #{req.labelId},
+           RRULE          = #{req.rrule},
+           EXDATES        = #{req.exdates},
+           UPDATE_USER_NO = #{userNo},
+           UPDATE_DATE    = SYSTIMESTAMP
+     WHERE EVENT_ID       = #{eventId}
+       AND STATUS        &lt;&gt; 'DELETED'
   </update>
 
   <!-- 논리삭제 -->
@@ -108,32 +109,4 @@
      WHERE EVENT_ID      = #{eventId}
   </update>
 
-    
-    
 </mapper>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -6,59 +6,73 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import com.kh.coreflow.calendar.model.dao.CalendarDao;
 import com.kh.coreflow.calendar.model.dao.EventDao;
 import com.kh.coreflow.calendar.model.dto.EventDto;
 import com.kh.coreflow.common.exception.ConflictException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
     private final EventDao eventDao;
+    private final CalendarDao calendarDao;
+
+    private static final DateTimeFormatter ISO_LOCAL = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Override
-    public List<EventDto.Res> getEvents(Long calendarId, LocalDateTime from, LocalDateTime to) {
-        if (from == null || to == null || !from.isBefore(to))
-            throw new IllegalArgumentException("from/to 기간이 유효하지 않습니다.");
+    public List<EventDto.Res> getEvents(Long userNo, Long calendarId, String fromIso, String toIso) {
+        if (!calendarDao.existsCalendarAccess(userNo, calendarId)) {
+            throw new SecurityException("해당 캘린더 조회 권한이 없습니다.");
+        }
+        Timestamp from = (fromIso == null || fromIso.isEmpty()) ? Timestamp.valueOf("1900-01-01 00:00:00")
+                : Timestamp.valueOf(LocalDateTime.parse(fromIso, ISO_LOCAL));
+        Timestamp to = (toIso == null || toIso.isEmpty()) ? Timestamp.valueOf("2999-12-31 23:59:59")
+                : Timestamp.valueOf(LocalDateTime.parse(toIso, ISO_LOCAL));
+
         return eventDao.selectEventsByCalendarAndPeriod(calendarId, from, to);
     }
 
-    @Override
     @Transactional
-    public Long createEvent(Long userNo, EventDto.Create req) {
-        validateReq(req);
-        // 회의실 예약인 경우에만 겹침검사
+    @Override
+    public Long createEvent(Long userNo, EventDto.Req req) {
+        if (!calendarDao.existsCalendarAccess(userNo, req.getCalId())) {
+            throw new SecurityException("해당 캘린더 생성 권한이 없습니다.");
+        }
         if (req.getRoomId() != null) {
             int conflicts = eventDao.countRoomConflicts(req.getRoomId(), req.getStartAt(), req.getEndAt());
-            if (conflicts > 0) throw new ConflictException("해당 시간대에 이미 회의실 예약이 있습니다.");
+            if (conflicts > 0) throw new ConflictException("회의실 시간이 겹칩니다.");
         }
-        eventDao.insertEvent(userNo, req); // selectKey로 req.eventId 채워짐
-        return req.getEventId();
+        return eventDao.insertEvent(userNo, req);
     }
 
-    @Override
     @Transactional
-    public void updateEvent(Long userNo, Long eventId, EventDto.Create req) {
-        validateReq(req);
+    @Override
+    public void updateEvent(Long userNo, Long eventId, EventDto.Req req) {
+        if (!calendarDao.existsCalendarAccess(userNo, req.getCalId())) {
+            throw new SecurityException("해당 캘린더 수정 권한이 없습니다.");
+        }
         if (req.getRoomId() != null) {
             int conflicts = eventDao.countRoomConflictsExcludingSelf(eventId, req.getRoomId(), req.getStartAt(), req.getEndAt());
-            if (conflicts > 0) throw new ConflictException("해당 시간대에 이미 회의실 예약이 있습니다.");
+            if (conflicts > 0) throw new ConflictException("회의실 시간이 겹칩니다.");
         }
-        eventDao.updateEvent(userNo, eventId, req);
+        int rows = eventDao.updateEvent(userNo, eventId, req);
+        if (rows == 0) throw new IllegalStateException("수정 대상이 없거나 삭제된 일정입니다.");
     }
 
-    @Override
     @Transactional
+    @Override
     public void deleteEvent(Long userNo, Long eventId) {
-        eventDao.logicalDeleteEvent(userNo, eventId);
-    }
-
-    private void validateReq(EventDto.Create req) {
-        if (req.getCalId() == null) throw new IllegalArgumentException("calId 필수");
-        if (req.getTitle() == null || req.getTitle().isBlank()) throw new IllegalArgumentException("title 필수");
-        if (req.getStartAt() == null || req.getEndAt() == null || !req.getStartAt().isBefore(req.getEndAt()))
-            throw new IllegalArgumentException("startAt/endAt가 유효하지 않습니다.");
+        int rows = eventDao.logicalDeleteEvent(userNo, eventId);
+        if (rows == 0) throw new IllegalStateException("삭제 대상이 없거나 이미 삭제되었습니다.");
     }
 }
