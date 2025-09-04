@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
-import com.kh.coreflow.model.dto.UserDto;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;

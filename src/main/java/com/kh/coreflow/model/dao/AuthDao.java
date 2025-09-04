@@ -1,5 +1,6 @@
 package com.kh.coreflow.model.dao;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.kh.coreflow.model.dto.UserDto.User;
@@ -18,6 +19,8 @@ public interface AuthDao {
 	User findUserPwd(String name, String email);
 
 	void updatePwd(String email, String encodedPwd);
+
+	void updateUserPartial(Map<String, Object> updates);
 	
 	
 }

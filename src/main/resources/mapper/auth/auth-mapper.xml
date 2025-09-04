@@ -45,6 +45,16 @@
     	SET USER_PWD = #{encodedPwd}
     	WHERE EMAIL = #{email}
     </update>
+    
+    <update id="updateUserPartial" parameterType="map">
+	    UPDATE USER_TB
+	    <set>
+	        <if test="phone != null">PHONE = #{phone},</if>
+	        <if test="address != null">ADDRESS = #{address},</if>
+	        <if test="profile != null">PROFILE_IMG = #{profile},</if>
+	    </set>
+	    WHERE USER_NO = #{userNo}
+	</update>
 	
 </mapper>
 

@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
-
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
 
@@ -56,6 +55,11 @@ public class AuthDaoImpl implements AuthDao{
 		param.put("email", email);
 		param.put("encodedPwd", encodedPwd);
 		session.update("auth.updatePwd", param);
+	}
+
+	@Override
+	public void updateUserPartial(Map<String, Object> updates) {
+		session.update("auth.updateUserPartial", updates);
 	}
 
 	

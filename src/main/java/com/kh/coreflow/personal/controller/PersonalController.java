@@ -1,6 +1,8 @@
 package com.kh.coreflow.personal.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,6 +39,8 @@ public class PersonalController {
 		Optional<User> user = authService.findUserByUserNo(userNo);
 		model.addAttribute("user" ,user);
 		
+		
+		
 		List<Object> mySchedule = userService.getMySchedule(userNo);
 		model.addAttribute("mySchedule" ,mySchedule);
 		
@@ -46,11 +50,33 @@ public class PersonalController {
 	@PostMapping("/update")
 	public String updateUserInfo(
 			@ModelAttribute UserDto.UserUpdate userUpdate,
-			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+			@RequestParam(value = "profile", required = false) MultipartFile profile,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			) {
-		userUpdate.setUserNo(userDetails.getUserNo());
-		userService.updateMyInfo(userUpdate, profileImage);
+		int userNo = userDetails.getUserNo();
+		
+		Map<String, Object> updates = new HashMap<>();
+		
+		if(userUpdate.getUserPwd() != null) {
+			userService.updatePassword(userNo, userUpdate.getUserPwd());
+		}
+		
+		if(userUpdate.getPhone() != null && !userUpdate.getPhone().isEmpty()) {
+	        updates.put("phone", userUpdate.getPhone());
+	    }
+	    
+	    if(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty()) {
+	        updates.put("address", userUpdate.getAddress());
+	    }
+	    
+	    if(profile != null && !profile.isEmpty()) {
+	        updates.put("profile", profile);
+	    }
+	    
+	    if(!updates.isEmpty()) {
+	        userService.updateUserPartial(userNo, updates);
+	    }
+		
 		return "redirect:/mypage";
 	}
 }

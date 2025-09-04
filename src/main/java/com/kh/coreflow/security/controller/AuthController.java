@@ -23,10 +23,7 @@ import com.kh.coreflow.model.dto.UserDto.LoginRequest;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 import com.kh.coreflow.security.model.service.AuthService;
-import com.kh.coreflow.validator.UserValidator;
-
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -127,7 +124,7 @@ public class AuthController {
 		
 		// 사용자 정보 조회
 		Optional<User> user = service.findUserByUserNo(userNo);
-		if(user == null) {
+		if(user.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
 		
