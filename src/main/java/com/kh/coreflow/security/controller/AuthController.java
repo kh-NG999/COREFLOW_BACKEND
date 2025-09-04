@@ -35,7 +35,7 @@ public class AuthController {
 
 	private final AuthService service;
 	private final JWTProvider jwt;
-	public static final String REFRESH_COOKIE = "REFRESH_TOKEN0";
+	public static final String REFRESH_COOKIE = "REFRESH_TOKEN";
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResult> login(@RequestBody LoginRequest req){

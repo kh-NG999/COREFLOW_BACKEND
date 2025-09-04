@@ -4,29 +4,21 @@
 
 	<!-- 부모 부서 조회 -->
 	<select id="deptList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
-		SELECT
-			DEP_ID,
-			DEP_NAME,
-			PARENT_ID
+		SELECT *
 		FROM DEPARTMENT
 		WHERE PARENT_ID IS NULL
 	</select>
 	
 	<!-- 자식 부서 조회 -->
 	<select id="deptDetailList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Department">
-		SELECT
-			DEP_ID,
-			DEP_NAME,
-			PARENT_ID
+		SELECT *
 		FROM DEPARTMENT
 		WHERE PARENT_ID = #{parentId}
 	</select>
 	
 	<!-- 직위 조회 -->
 	<select id="posiList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Position">
-		SELECT
-			POS_ID,
-			POS_NAME
+		SELECT *
 		FROM POSITIONS
 	</select>
 	
