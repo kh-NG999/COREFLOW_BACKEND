@@ -45,8 +45,8 @@ public class VacationController {
 			@RequestParam(value="userName", required=false) String userName
 			){
 		List<MemberChoice> memList = service.memChoice(userName);
-		log.debug("vacInfoList : {}",memList);
-		System.out.println(memList);
+//		log.debug("vacInfoList : {}",memList);
+//		System.out.println(memList);
 		
 		if(memList != null && !memList.isEmpty()) {
 			return ResponseEntity.ok(memList);
@@ -62,8 +62,8 @@ public class VacationController {
 			@PathVariable int userNo
 			){
 		List<MemberVacation> memVacation = service.memVacation(userNo);
-		log.debug("vacInfoList : {}",memVacation);
-		System.out.println(memVacation);
+//		log.debug("vacInfoList : {}",memVacation);
+//		System.out.println(memVacation);
 		
 		if(memVacation != null && !memVacation.isEmpty()) {
 			return ResponseEntity.ok(memVacation);

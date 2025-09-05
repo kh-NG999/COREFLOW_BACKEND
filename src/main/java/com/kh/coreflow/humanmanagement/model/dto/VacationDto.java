@@ -36,7 +36,7 @@ public class VacationDto {
 		private String vacName;
 		private Date vacStart;
 		private Date vacEnd;
-		private int vacAmount;
+		private float vacAmount;
 		private int status;
 	}
 }

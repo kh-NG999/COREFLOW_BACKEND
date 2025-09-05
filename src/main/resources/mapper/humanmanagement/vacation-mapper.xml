@@ -25,17 +25,14 @@
 	<!-- 검색 사원 휴가 내역 조회 -->
 	<select id="memVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 		SELECT
-			USER_NO,
-			VAC_NAME,
-			VAC_START,
-			VAC_END,
-			VAC_AMOUNT,
-			STATUS
-		FROM VACATION
-		LEFT JOIN VACATION_TYPE USING(VAC_CODE)
-		LEFT JOIN MEMBER USING(USER_NO)
-		LEFT JOIN DEPARTMENT USING(DEP_ID)
-		LEFT JOIN POSITIONS USING(POS_ID)
-		WHERE USER_NO = #{userNo}
+			V.USER_NO,
+			T.VAC_NAME,
+			V.VAC_START,
+			V.VAC_END,
+			V.VAC_AMOUNT,
+			V.STATUS
+		FROM VACATION V
+		LEFT JOIN VACATION_TYPE T ON T.VAC_CODE = V.VAC_CODE
+		WHERE V.USER_NO = #{userNo}
 	</select>
 </mapper>
