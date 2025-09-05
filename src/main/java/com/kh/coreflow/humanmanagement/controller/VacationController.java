@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
@@ -40,8 +41,10 @@ public class VacationController {
 	// 검색 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/vacation/member")
-	public ResponseEntity<List<MemberChoice>> memberChoice(){
-		List<MemberChoice> memList = service.memChoice();
+	public ResponseEntity<List<MemberChoice>> memberChoice(
+			@RequestParam(value="userName", required=false) String userName
+			){
+		List<MemberChoice> memList = service.memChoice(userName);
 		log.debug("vacInfoList : {}",memList);
 		System.out.println(memList);
 		

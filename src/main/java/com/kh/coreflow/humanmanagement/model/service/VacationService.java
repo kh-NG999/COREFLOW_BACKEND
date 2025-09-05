@@ -10,7 +10,7 @@ public interface VacationService {
 
 	List<VacationInfo> vacInfo();
 
-	List<MemberChoice> memChoice();
+	List<MemberChoice> memChoice(String userName);
 
 	List<MemberVacation> memVacation(int userNo);
 

@@ -21,8 +21,8 @@ public class VacationServiceImpl implements VacationService{
 	}
 
 	@Override
-	public List<MemberChoice> memChoice() {
-		return dao.memChoice();
+	public List<MemberChoice> memChoice(String userName) {
+		return dao.memChoice(userName);
 	}
 
 	@Override

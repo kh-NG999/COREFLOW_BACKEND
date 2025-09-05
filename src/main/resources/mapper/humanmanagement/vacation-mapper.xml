@@ -19,6 +19,7 @@
 		FROM MEMBER
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITIONS USING(POS_ID)
+		WHERE USER_NAME Like '%' || #{userName} || '%'
 	</select>
 	
 	<!-- 검색 사원 휴가 내역 조회 -->

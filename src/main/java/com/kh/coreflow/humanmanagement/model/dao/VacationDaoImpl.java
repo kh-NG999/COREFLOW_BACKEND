@@ -22,8 +22,8 @@ public class VacationDaoImpl implements VacationDao{
 	}
 
 	@Override
-	public List<MemberChoice> memChoice() {
-		return session.selectList("vacation.memChoice");
+	public List<MemberChoice> memChoice(String userName) {
+		return session.selectList("vacation.memChoice",userName);
 	}
 
 	@Override
