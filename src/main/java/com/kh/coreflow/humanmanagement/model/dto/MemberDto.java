@@ -38,7 +38,7 @@ public class MemberDto {
 		private int posId;
 		private String posName;
 		private String phone;
-		private String extention;
+		private String extension;
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
@@ -56,7 +56,7 @@ public class MemberDto {
 		private String depName;
 		private String posName;
 		private String phone;
-		private String extention;
+		private String extension;
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
@@ -76,7 +76,7 @@ public class MemberDto {
 		private int posId;
 		private String posName;
 		private String phone;
-		private String extention;
+		private String extension;
 		private String address;
 		private String addressDetail;
 		private Date updateDate;

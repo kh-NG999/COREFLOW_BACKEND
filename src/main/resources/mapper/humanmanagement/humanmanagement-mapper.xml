@@ -30,7 +30,7 @@
 			EMAIL,
 			HIRE_DATE,
 			PHONE,
-			EXTENTION,
+			EXTENSION,
 			ADDRESS,
 			ADDRESS_DETAIL,
 			UPDATE_DATE,
@@ -69,7 +69,7 @@
 			EMAIL,
 			HIRE_DATE,
 			PHONE,
-			EXTENTION,
+			EXTENSION,
 			ADDRESS,
 			ADDRESS_DETAIL,
 			UPDATE_DATE,
@@ -87,7 +87,7 @@
 		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
 			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
 		</selectKey>
-		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENTION, UPDATE_DATE)
+		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENSION, UPDATE_DATE)
 		SELECT
 			#{userNo},
 			D.DEP_ID,
@@ -97,7 +97,7 @@
 			#{phone},
 			#{address},
 			#{addressDetail},
-			#{extention},
+			#{extension},
 			#{updateDate}
 		FROM DEPARTMENT D
 		JOIN POSITIONS P
@@ -113,7 +113,7 @@
 			<if test="email != null and email != ''">EMAIL = #{email},</if>
 			<if test="hireDate != null">HIRE_DATE = #{hireDate},</if>
 			<if test="phone != null and phone != ''">PHONE = #{phone},</if>
-			<if test="extention != null and extention != ''">EXTENTION = #{extention},</if>
+			<if test="extension != null and extension != ''">EXTENSION = #{extension},</if>
 			<if test="address != null and address != ''">ADDRESS = #{address},</if>
 			<if test="addressDetail != null and addressDetail != ''">ADDRESS_DETAIL = #{addressDetail},</if>
 			<if test="depName != null and depName != ''">
