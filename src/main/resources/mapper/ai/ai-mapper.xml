@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ai">
+	<select id="getSessions" resultType="com.kh.coreflow.ai.model.dto.AiDto$AiChatSession">
+		select * from ai_chat_session
+		where user_no = #{userNo}
+		order by last_used_at desc
+	</select>
+	
+	<select id="countAiUsage" resultType="Integer">
+		select count(*) from ai_usage
+		where user_no = #{userNo}
+	</select>
+	
+	<insert id="insertAiUsage">
+		insert into ai_usage(user_no, model_id, tokens_used)
+		values(#{userNo}, '1', #{tokensUsed})
+	</insert>
+	
+	<update id="updateAiUsage">
+		update ai_usage
+		set last_used_at = sysdate, tokens_used = tokens_used + #{tokensUsed}
+		where user_no = #{userNo}
+	</update>
+</mapper>
