@@ -3,6 +3,7 @@ package com.kh.coreflow.humanmanagement.model.service;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
@@ -17,6 +18,9 @@ public interface VacationService {
 
 	List<MemberVacation> memVacation(Map<String, Object> params);
 
+	LoginUser loginUserProfile(int userNo);
+
 	List<MemberVacation> perVacation(Map<String, Object> params);
+
 
 }

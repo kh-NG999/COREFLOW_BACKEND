@@ -107,27 +107,25 @@ public class VacationController {
 	
 	// 로그인 회원 정보 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/user/profile/{userNo}")
+	@GetMapping("/user/profile")
 	public ResponseEntity<LoginUser> loginUserProfile(
-			@PathVariable int userNo
+			// @PathVariable int userNo
 			){
-		LoginUser loginUser = service.allVacation(userNo);
+		int userNo = 61;
+		LoginUser loginUser = service.loginUserProfile(userNo);
+		
+		if(loginUser != null) {
+			return ResponseEntity.ok(loginUser);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		
 	// 로그인 회원 휴가 내역 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/vacation/personal")
 	public ResponseEntity<List<MemberVacation>> personalVacation(
-			@
+			// @PathVariable int userNo,
 			@RequestParam int year
 			){
 		// 임시 로그인 유저

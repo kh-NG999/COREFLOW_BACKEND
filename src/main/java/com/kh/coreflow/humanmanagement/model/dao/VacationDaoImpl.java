@@ -6,6 +6,7 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
@@ -36,7 +37,12 @@ public class VacationDaoImpl implements VacationDao{
 	public List<MemberVacation> memVacation(Map<String, Object> params) {
 		return session.selectList("vacation.memVacation",params);
 	}
-
+	
+	@Override
+	public LoginUser loginUserProfile(int userNo) {
+		return session.selectOne("vacation.loginUserProfile",userNo);
+	}
+	
 	@Override
 	public List<MemberVacation> perVacation(Map<String, Object> params) {
 		return session.selectList("vacation.perVacation",params);

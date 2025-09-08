@@ -58,6 +58,20 @@
 			EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
 	</select>
 	
+	<!-- 로그인 사원 프로필 조회 -->
+	<select id="loginUserProfile" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$LoginUser">
+		SELECT
+			USER_NAME,
+			DEP_NAME,
+			POS_NAME,
+			HIRE_DATE
+		FROM MEMBER
+		LEFT JOIN DEPARTMENT USING(DEP_ID)
+		LEFT JOIN POSITIONS USING(POS_ID)
+		WHERE USER_NO = #{userNo}
+	</select>
+	
+	<!-- 로그인 사원 휴가 내역 조회 -->
 	<select id="perVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 		SELECT
 			V.USER_NO,

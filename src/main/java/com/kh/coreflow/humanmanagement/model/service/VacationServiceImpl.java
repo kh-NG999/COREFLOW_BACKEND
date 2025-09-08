@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.humanmanagement.model.dao.VacationDao;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
@@ -37,8 +38,14 @@ public class VacationServiceImpl implements VacationService{
 	}
 
 	@Override
+	public LoginUser loginUserProfile(int userNo) {
+		return dao.loginUserProfile(userNo);
+	}
+
+	@Override
 	public List<MemberVacation> perVacation(Map<String, Object> params) {
 		return dao.perVacation(params);
 	}
+
 
 }
