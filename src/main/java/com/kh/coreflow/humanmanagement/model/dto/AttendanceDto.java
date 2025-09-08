@@ -1,7 +1,5 @@
 package com.kh.coreflow.humanmanagement.model.dto;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
