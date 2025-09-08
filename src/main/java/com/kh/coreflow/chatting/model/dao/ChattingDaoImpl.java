@@ -80,4 +80,14 @@ public class ChattingDaoImpl implements ChattingDao {
 		return session.insert("chat.insertMessage",message);
 	}
 
+	@Override
+	public List<chatMessages> getMessages(int roomId) {
+		return session.selectList("chat.getMessages",roomId);
+	}
+
+	@Override
+	public List<chatRooms> getmyChattingRooms(int userNo) {
+		return session.selectList("chat.getMyChattingRooms",userNo);
+	}
+
 }

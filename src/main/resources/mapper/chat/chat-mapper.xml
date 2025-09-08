@@ -4,17 +4,21 @@
 
 
 	<select id="getMyProfile" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
-		SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM 
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
 		CHAT_PROFILE A INNER JOIN MEMBER B
 		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
 		WHERE A.USER_NO = #{userNo}
 	</select>
 
 
 	<select id="getChatProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
-		SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM 
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
 		CHAT_PROFILE A INNER JOIN MEMBER B
 		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
 		WHERE A.USER_NO != #{userNo}
 	</select>
 	
@@ -99,4 +103,17 @@
     )
 	</insert>
 	
+	<select id="getMessages" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+		SELECT A.*, B.USER_NAME FROM 
+		CHAT_MESSAGES A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+		WHERE A.ROOM_ID = #{roomId}
+	</select>
+	
+	<select id="getMyChattingRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+	SELECT A.* FROM CHAT_ROOMS A
+	INNER JOIN CHAT_ROOM_JOIN B
+	ON A.ROOM_ID = B.ROOM_ID
+	WHERE B.USER_NO = #{userNo}
+	</select>	
 </mapper>

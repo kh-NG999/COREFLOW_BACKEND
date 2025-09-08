@@ -77,7 +77,10 @@ public class ChattingServiceImpl implements ChattingService {
 	@Transactional
 	public chatRooms makePrivateChat(HashMap<String, Integer> mappingUser) {
 		chatRooms newChatRoom = new chatRooms();
-		newChatRoom.setRoomName(mappingUser.get("partnerUserNo") + "님과의 채팅");
+		int partnerNo = mappingUser.get("partnerNo");
+		User partner = authDao.findUserByUserNo(partnerNo);
+		log.info("partner : {}", partner);
+		newChatRoom.setRoomName(partner.getName() + "님과의 채팅");
 		newChatRoom.setRoomType("PRIVATE");
 		newChatRoom.setUserNo(mappingUser.get("userNo"));
 		int answer = chattingDao.makePrivateChat(newChatRoom);
@@ -99,6 +102,16 @@ public class ChattingServiceImpl implements ChattingService {
 	public int insertMessage(chatMessages message) {
 		return chattingDao.insertMessage(message);
 		
+	}
+
+	@Override
+	public List<chatMessages> getMessages(int roomId) {
+		return chattingDao.getMessages(roomId);
+	}
+
+	@Override
+	public List<chatRooms> getmyChattingRooms(int userNo) {
+		return chattingDao.getmyChattingRooms(userNo);
 	}
 
 }

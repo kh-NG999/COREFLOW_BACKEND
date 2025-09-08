@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
@@ -36,6 +37,7 @@ public class ChattingController {
 			@AuthenticationPrincipal int userNo
 			){
 		chatProfile profile = chattingService.getMyProfile(userNo);
+		log.info("profile : {}",profile);
 		return ResponseEntity.ok(profile);
 	}
 	
@@ -103,4 +105,24 @@ public class ChattingController {
 		return ResponseEntity.ok(resultRoom);
 	}
 	
+	@GetMapping("/room/{roomId}/messages")
+	public ResponseEntity<List<chatMessages>> getMessages(
+			@PathVariable("roomId") int roomId,
+			@AuthenticationPrincipal int userNo
+			){
+		log.info("userNo : {}",userNo);
+		log.info("Room Id : {}",roomId);
+		List<chatMessages> list = chattingService.getMessages(roomId);
+		log.info("messageList : {}",list);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	@GetMapping("/myChattingRooms")
+	public ResponseEntity<List<chatRooms>> myChattingRooms(
+			@AuthenticationPrincipal int userNo
+			){
+		List<chatRooms> list = chattingService.getmyChattingRooms(userNo);
+		return ResponseEntity.ok(list);
+	}
 }

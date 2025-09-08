@@ -1,15 +1,16 @@
 package com.kh.coreflow.chatting.model.websocket;
 
+import java.security.Principal;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
 import org.springframework.stereotype.Controller;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.service.ChattingService;
-import com.kh.coreflow.model.dto.UserDto.User;
+import com.kh.coreflow.security.model.provider.JWTProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class StompController {
 	
+	@Autowired
 	private final ChattingService service;
+	
+	@Autowired
+	private final JWTProvider jwtProvider;
 
     //들어오는 메시지를 처리
     @MessageMapping("/chat/enter/{roomNo}")
@@ -54,11 +59,12 @@ public class StompController {
     @SendTo("/topic/room/{roomNo}")
     public chatMessages handleMessage(
             @DestinationVariable int roomNo,
-            @AuthenticationPrincipal User user,
+            Principal principal,
             chatMessages message
     ) {
-    	message.setUserName(user.getName());
-    	message.setUserNo(user.getUserNo());
+    	int userNo = Integer.parseInt(principal.getName());
+    	log.info("user : {}",userNo);
+    	message.setUserNo(userNo);
     	log.info("message : {}",message);
     	int result = service.insertMessage(message);
     	if(result >0)

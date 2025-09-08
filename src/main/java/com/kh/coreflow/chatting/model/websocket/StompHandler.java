@@ -9,7 +9,9 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -24,20 +26,26 @@ public class StompHandler implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        //StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
+        StompHeaderAccessor accessor = MessageHeaderAccessor
+                .getAccessor(message, StompHeaderAccessor.class);
+        
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             // 2. 헤더에서 토큰 추출 ("Bearer " 제거 포함)
             String authHeader = accessor.getFirstNativeHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String jwtToken = authHeader.substring(7);
-                log.info("STOMP JWT Token: {}", jwtToken);
                 
                 
                 //3. 토큰 유효성 검증
                 if (jwtProvider.validateToken(jwtToken)) {
                     //4. 토큰으로부터 Authentication 객체 생성 (기존 로직과 동일)
                     Authentication authentication = jwtProvider.getAuthentication(jwtToken);
+                    
+
+    				SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     log.info("STOMP Auth: {}", authentication.getPrincipal());
                     //5. STOMP 세션에 사용자 정보 저장

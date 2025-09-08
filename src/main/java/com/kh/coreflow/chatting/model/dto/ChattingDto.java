@@ -62,6 +62,7 @@ public class ChattingDto {
 		private String roomType;
 		private String status;
 		private Date createdAt;
+		private String lastMessage;
 	}
 	
 	@Data
