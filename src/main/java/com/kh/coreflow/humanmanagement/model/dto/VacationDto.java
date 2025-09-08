@@ -33,10 +33,22 @@ public class VacationDto {
 	@AllArgsConstructor
 	public static class MemberVacation{
 		private int userNo;
+		private String userName;
 		private String vacName;
 		private Date vacStart;
 		private Date vacEnd;
 		private float vacAmount;
 		private int status;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class LoginUser{
+		private int userNo;
+		private String userName;
+		private String depName;
+		private String posName;
+		private Date hireDate;
 	}
 }

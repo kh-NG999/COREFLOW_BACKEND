@@ -1,6 +1,7 @@
 package com.kh.coreflow.humanmanagement.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -21,12 +22,23 @@ public class VacationServiceImpl implements VacationService{
 	}
 
 	@Override
+	public List<MemberVacation> allVacation(Map<String, Object> params) {
+		return dao.allVacation(params);
+	}
+	
+	@Override
 	public List<MemberChoice> memChoice(String userName) {
 		return dao.memChoice(userName);
 	}
 
 	@Override
-	public List<MemberVacation> memVacation(int userNo) {
-		return dao.memVacation(userNo);
+	public List<MemberVacation> memVacation(Map<String, Object> params) {
+		return dao.memVacation(params);
 	}
+
+	@Override
+	public List<MemberVacation> perVacation(Map<String, Object> params) {
+		return dao.perVacation(params);
+	}
+
 }

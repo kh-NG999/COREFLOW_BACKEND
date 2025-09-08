@@ -1,6 +1,7 @@
 package com.kh.coreflow.humanmanagement.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
@@ -10,7 +11,12 @@ public interface VacationDao {
 
 	List<VacationInfo> vacInfo();
 
+	List<MemberVacation> allVacation(Map<String, Object> params);
+	
 	List<MemberChoice> memChoice(String userName);
 
-	List<MemberVacation> memVacation(int userNo);
+	List<MemberVacation> memVacation(Map<String, Object> params);
+
+	List<MemberVacation> perVacation(Map<String, Object> params);
+
 }

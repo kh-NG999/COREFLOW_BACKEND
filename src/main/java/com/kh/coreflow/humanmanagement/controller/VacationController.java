@@ -1,6 +1,8 @@
 package com.kh.coreflow.humanmanagement.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
@@ -38,6 +41,27 @@ public class VacationController {
 		}
 	}
 	
+	// 모든 사원 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/vacation")
+	public ResponseEntity<List<MemberVacation>> allVacation(
+			@RequestParam int year,
+			@RequestParam int month
+			){
+		String formattedMonth = String.format("%02d", month);
+		Map<String, Object> params = new HashMap<>();
+		params.put("year", year);
+		params.put("month", formattedMonth);
+		
+		List<MemberVacation> allVacation = service.allVacation(params);
+		
+		if(allVacation != null && !allVacation.isEmpty()) {
+			return ResponseEntity.ok(allVacation); 
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
 	// 검색 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/vacation/member")
@@ -59,14 +83,64 @@ public class VacationController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/vacation/member/{userNo}")
 	public ResponseEntity<List<MemberVacation>> MemberVacation(
-			@PathVariable int userNo
+			@PathVariable int userNo,
+			@RequestParam int year,
+			@RequestParam int month
 			){
-		List<MemberVacation> memVacation = service.memVacation(userNo);
+		String formattedMonth = String.format("%02d", month);
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("year", year);
+		params.put("month", formattedMonth);
+		
+		List<MemberVacation> memVacation = service.memVacation(params);
+		
 //		log.debug("vacInfoList : {}",memVacation);
 //		System.out.println(memVacation);
 		
 		if(memVacation != null && !memVacation.isEmpty()) {
 			return ResponseEntity.ok(memVacation);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 로그인 회원 정보 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/user/profile/{userNo}")
+	public ResponseEntity<LoginUser> loginUserProfile(
+			@PathVariable int userNo
+			){
+		LoginUser loginUser = service.allVacation(userNo);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// 로그인 회원 휴가 내역 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/vacation/personal")
+	public ResponseEntity<List<MemberVacation>> personalVacation(
+			@
+			@RequestParam int year
+			){
+		// 임시 로그인 유저
+		int userNo = 61;
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("year", year);
+		
+		List<MemberVacation> perVacation =service.perVacation(params);
+		
+		if(perVacation != null && !perVacation.isEmpty()) {
+			return ResponseEntity.ok(perVacation);
 		}else {
 			return ResponseEntity.noContent().build();
 		}

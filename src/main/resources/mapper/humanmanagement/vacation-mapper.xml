@@ -7,6 +7,24 @@
 		FROM VACATION_BASIC
 	</select>
 	
+	<!-- 모든 사원 검색 -->
+	<select id="allVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
+	SELECT
+		V.USER_NO,
+		M.USER_NAME,
+		T.VAC_NAME,
+		V.VAC_START,
+		V.VAC_END,
+		V.VAC_AMOUNT,
+		V.STATUS
+	FROM VACATION V
+	LEFT JOIN MEMBER M ON M.USER_NO = V.USER_NO
+	LEFT JOIN VACATION_TYPE T ON T.VAC_CODE = V.VAC_CODE
+	WHERE
+		EXTRACT(YEAR FROM V.VAC_START) = #{year} AND
+		EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
+	</select>
+	
 	<!-- 사원 검색 -->
 	<select id="memChoice" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberChoice">
 		SELECT 
@@ -25,13 +43,36 @@
 	<select id="memVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 		SELECT
 			V.USER_NO,
+			M.USER_NAME,
 			T.VAC_NAME,
 			V.VAC_START,
 			V.VAC_END,
 			V.VAC_AMOUNT,
 			V.STATUS
 		FROM VACATION V
+		LEFT JOIN MEMBER M ON M.USER_NO = V.USER_NO
 		LEFT JOIN VACATION_TYPE T ON T.VAC_CODE = V.VAC_CODE
-		WHERE V.USER_NO = #{userNo}
+		WHERE
+			V.USER_NO = #{userNo} AND
+			EXTRACT(YEAR FROM V.VAC_START) = #{year} AND
+			EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
+	</select>
+	
+	<select id="perVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
+		SELECT
+			V.USER_NO,
+			M.USER_NAME,
+			M.HIRE_DATE,
+			T.VAC_NAME,
+			V.VAC_START,
+			V.VAC_END,
+			V.VAC_AMOUNT,
+			V.STATUS
+		FROM VACATION V
+		LEFT JOIN MEMBER M ON M.USER_NO = V.USER_NO
+		LEFT JOIN VACATION_TYPE T ON T.VAC_CODE = V.VAC_CODE
+		WHERE
+			V.USER_NO = #{userNo} AND
+			EXTRACT(YEAR FROM V.VAC_START) = #{year}
 	</select>
 </mapper>
