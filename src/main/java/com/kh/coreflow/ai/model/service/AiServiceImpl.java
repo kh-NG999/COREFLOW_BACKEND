@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.ai.model.dao.AiDao;
+import com.kh.coreflow.ai.model.dto.AiDto.AiChatHistory;
 import com.kh.coreflow.ai.model.dto.AiDto.AiChatSession;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,21 @@ public class AiServiceImpl implements AiService {
 	@Override
 	public int updateSession(Long sessionId) {
 		return dao.updateSession(sessionId);
+	}
+
+	@Override
+	public int insertHistory(Map<String, Object> map) {
+		return dao.insertHistory(map);
+	}
+
+	@Override
+	public List<AiChatHistory> getHistories(Long sessionId) {
+		return dao.getHistories(sessionId);
+	}
+
+	@Override
+	public int deleteChatSession(Long sessionId) {
+		return dao.deleteChatSession(sessionId);
 	}
 }
 

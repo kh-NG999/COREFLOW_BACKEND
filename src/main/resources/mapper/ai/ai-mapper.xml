@@ -24,8 +24,11 @@
 	</update>
 	
 	<insert id="insertSession">
-		insert into ai_chat_session(user_no, model_id, title)
-		values(#{userNo}, '1', #{title})
+		<selectKey keyProperty="sessionId" resultType="long" order="BEFORE">
+			select "ISEQ$$_75867".nextval from dual
+		</selectKey>
+		insert into ai_chat_session(session_id, user_no, model_id, title)
+		values(#{sessionId} ,#{userNo}, '1', #{title})
 	</insert>
 	
 	<update id="updateSession">
@@ -33,6 +36,21 @@
 		set last_used_at = sysdate
 		where session_id = #{sessionId}
 	</update>
+	
+	<insert id="insertHistory">
+		insert into ai_chat_history(user_no, session_id, role, content)
+		values(#{userNo}, #{sessionId}, #{role}, #{content})
+	</insert>
+	
+	<select id="getHistories" resultType="com.kh.coreflow.ai.model.dto.AiDto$AiChatHistory">
+		select * from ai_chat_history
+		where session_id = #{sessionId}
+		order by history_id
+	</select>
+	
+	<delete id="deleteChatSession">
+		delete from ai_chat_session where session_id = #{sessionId}
+	</delete>
 </mapper>
 
 

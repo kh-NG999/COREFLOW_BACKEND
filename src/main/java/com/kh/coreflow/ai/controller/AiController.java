@@ -6,14 +6,19 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.coreflow.ai.model.dto.AiDto.AiChatHistory;
 import com.kh.coreflow.ai.model.dto.AiDto.AiChatSession;
+import com.kh.coreflow.ai.model.dto.AiDto.AiUsage;
 import com.kh.coreflow.ai.model.service.AiService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,13 +71,13 @@ public class AiController {
 	@PostMapping("/insertAiUsage")
 	public ResponseEntity<Void> insertAiUsage(
 			Authentication auth,
-			Long tokensUsed
+			@RequestBody AiUsage usage
 			) {
 		Long userNo = Long.parseLong(auth.getPrincipal().toString());
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
-		map.put("tokensUsed", tokensUsed);
+		map.put("tokensUsed", usage.getTokensUsed());
 		
 		int result = service.insertAiUsage(map);
 		
@@ -86,13 +91,13 @@ public class AiController {
 	@PatchMapping("/updateAiUsage")
 	public ResponseEntity<Void> updateAiUsage(
 			Authentication auth,
-			Long tokensUsed
+			@RequestBody AiUsage usage
 			) {
 		Long userNo = Long.parseLong(auth.getPrincipal().toString());
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
-		map.put("tokensUsed", tokensUsed);
+		map.put("tokensUsed", usage.getTokensUsed());
 		
 		int result = service.updateAiUsage(map);
 		
@@ -106,20 +111,20 @@ public class AiController {
 	@PostMapping("/sessions")
 	public ResponseEntity<Long> insertSession(
 			Authentication auth,
-			String title
+			@RequestBody AiChatSession chatSession
 			) {
 		Long userNo = Long.parseLong(auth.getPrincipal().toString());
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
-		map.put("sessionNo", 0L);
-		map.put("title", title);
+		map.put("sessionId", 0L);
+		map.put("title", chatSession.getTitle());
 		
 		int result = service.insertSession(map);
-		System.out.println(map.get("sessionNo"));
+		System.out.println(map.get("sessionId"));
 		
 		if (result > 0) {
-			return ResponseEntity.ok(Long.parseLong(map.get("sessionNo").toString()));
+			return ResponseEntity.ok(Long.parseLong(map.get("sessionId").toString()));
 		} else {
 			return ResponseEntity.badRequest().build();
 		}
@@ -135,6 +140,54 @@ public class AiController {
 			return ResponseEntity.noContent().build();
 		} else {
 			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@GetMapping("/{sessionId}/histories")
+	public ResponseEntity<List<AiChatHistory>> getHistories(
+			@PathVariable Long sessionId
+			) {
+		List<AiChatHistory> list = service.getHistories(sessionId);
+		
+		if (list != null) {
+			return ResponseEntity.ok(list);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@PostMapping("/{sessionId}/histories")
+	public ResponseEntity<Void> insertHistory(
+			Authentication auth,
+			@PathVariable Long sessionId,
+			@RequestBody AiChatHistory history
+			) {
+		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Map<String, Object> map = new HashMap<>();
+		map.put("userNo", userNo);
+		map.put("sessionId", sessionId);
+		map.put("role", history.getRole());
+		map.put("content", history.getContent());
+		
+		int result = service.insertHistory(map);
+		
+		if (result > 0) {
+			return ResponseEntity.noContent().build();
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	@DeleteMapping("/{sessionId}")
+	public ResponseEntity<Void> deleteChatSession(
+			@PathVariable Long sessionId
+			) {
+		int result = service.deleteChatSession(sessionId);
+		
+		if (result > 0) {
+			return ResponseEntity.noContent().build();
+		} else {
+			return ResponseEntity.badRequest().build();
 		}
 	}
 }

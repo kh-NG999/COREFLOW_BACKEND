@@ -6,6 +6,7 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kh.coreflow.ai.model.dto.AiDto.AiChatHistory;
 import com.kh.coreflow.ai.model.dto.AiDto.AiChatSession;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,21 @@ public class AiDaoImpl implements AiDao {
 	@Override
 	public int updateSession(Long sessionId) {
 		return session.update("ai.updateSession", sessionId);
+	}
+
+	@Override
+	public int insertHistory(Map<String, Object> map) {
+		return session.insert("ai.insertHistory", map);
+	}
+
+	@Override
+	public List<AiChatHistory> getHistories(Long sessionId) {
+		return session.selectList("ai.getHistories", sessionId);
+	}
+
+	@Override
+	public int deleteChatSession(Long sessionId) {
+		return session.delete("ai.deleteChatSession", sessionId);
 	}
 }
 
