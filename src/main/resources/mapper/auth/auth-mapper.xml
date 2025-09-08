@@ -4,21 +4,24 @@
 	
 	<resultMap id="UserResult" type="com.kh.coreflow.model.dto.UserDto$User" autoMapping="true">
 		<id property="userNo" column="USER_NO" />
-		<result property="name" column="USER_NAME"/>
+	</resultMap>
+	
+	<resultMap id="userAuthorityMap" type="com.kh.coreflow.model.dto.UserDto$UserAuthority">
+		<id property="userNo" column="USER_NO"/>
+	    <result property="roles" column="AUTHORITY" typeHandler="com.kh.coreflow.model.typehandler.RolesTypeHandler"/>
 	</resultMap>
 	
 	<!-- 로그인용 -->
-	<select id="findUserByEmail" resultMap="UserResult">
-		SELECT USER_NO, EMAIL, USER_PWD, AUTHORITY
-		FROM MEMBER
-		LEFT JOIN AUTHORITY AU USING(USER_NO)
-		WHERE UPPER(EMAIL) = UPPER(#{email})
+	<select id="findUserByEmail" resultType="com.kh.coreflow.model.dto.UserDto$User">
+	    SELECT DISTINCT USER_NO, EMAIL, USER_PWD, USER_NAME
+	    FROM MEMBER
+	    WHERE UPPER(EMAIL) = UPPER(#{email})
 	</select>
 	
 	<!-- 자동 회원가입 -->
 	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="userNo" keyColumn="USER_NO">
 		INSERT INTO MEMBER(EMAIL, USER_NAME, USER_PWD)
-		VALUES (#{email}, #{name}, #{userPwd})
+		VALUES (#{email}, #{userName}, #{userPwd})
 	</insert>
 	<insert id="insertUserRole">
     	INSERT ALL
@@ -30,16 +33,15 @@
 	</insert>
 	
 	<select id="findUserByUserNo" resultMap="UserResult">
-        SELECT M.*, AUTHORITY
+        SELECT M.*
         FROM MEMBER M
-        JOIN AUTHORITY UA ON M.USER_NO = UA.USER_NO
         WHERE M.USER_NO = #{userNo}
     </select>
     
     <select id="findUserPwd" parameterType="map" resultMap="UserResult">
     	SELECT *
     	FROM MEMBER
-    	WHERE USER_NAME = #{name} AND EMAIL = #{email}
+    	WHERE USER_NAME = #{userName} AND EMAIL = #{email}
     </select>
     
     <update id="updatePwd" parameterType="map">
@@ -83,6 +85,12 @@
 		</set>
 		WHERE REF_ID = #{userNo}
 	</update>
+	
+	<select id="findUserAuthorityByUserNo" resultType="string">
+	    SELECT AUTHORITY
+	    FROM AUTHORITY
+	    WHERE USER_NO = #{userNo}
+	</select>
 	
 </mapper>
 

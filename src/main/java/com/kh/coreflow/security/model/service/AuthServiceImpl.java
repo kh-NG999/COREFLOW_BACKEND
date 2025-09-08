@@ -31,7 +31,6 @@ public class AuthServiceImpl implements AuthService{
 	
 	@Override
 	public boolean existsByEmail(String email) {
-		Optional<User> user = authDao.findUserByEmail(email);
 		return authDao.findUserByEmail(email).isPresent();
 	}
 
@@ -46,13 +45,21 @@ public class AuthServiceImpl implements AuthService{
 				}
 				
 				// 2. 토큰 발급
-				String accessToken = jwt.createAccessToken(user.getUserNo(), 30);
+				int userNo = user.getUserNo();
+				UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
+				if (userAuth == null) {
+				    throw new IllegalArgumentException("권한 정보 없음");
+				}
+				log.info("권한 조회: userNo={} roles={}", userNo, userAuth.getRoles());
+
+				String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30);
 				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7);
+				log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 				
 				User userNoPassword = User.builder()
 										.userNo(user.getUserNo())
 										.email(user.getEmail())
-										.name(user.getName())
+										.userName(user.getUserName())
 										.profile(user.getProfile())
 										.roles(user.getRoles())
 										.build();
@@ -71,7 +78,7 @@ public class AuthServiceImpl implements AuthService{
 		// 1) Users테이블에 데이터 추가
 		User user = User.builder()
 						.email(email)
-						.name(email.split("@")[0])
+						.userName(email.split("@")[0])
 						.userPwd(encoder.encode(userPwd))
 						.build();
 		
@@ -83,9 +90,15 @@ public class AuthServiceImpl implements AuthService{
 											.roles(List.of("ROLE_USER"))
 											.build();
 		authDao.insertUserRole(auth);
-				
+		
 		//토큰 발급
-		String accessToken = jwt.createAccessToken(user.getUserNo(), 30); // 30분
+		int userNo = user.getUserNo();
+		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
+		if (userAuth == null) {
+		    throw new IllegalArgumentException("권한 정보 없음");
+		}
+
+		String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30); // 30분
 		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
 		user = authDao.findUserByUserNo(user.getUserNo())	// 비밀번호 제외 필요
@@ -104,8 +117,12 @@ public class AuthServiceImpl implements AuthService{
 		
 		User user = authDao.findUserByUserNo(userNo)
 				.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
-		
-		String accessToken = jwt.createAccessToken(userNo, 30);
+		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
+		if (userAuth == null) {
+		    throw new IllegalArgumentException("권한 정보 없음");
+		}
+
+		String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30);
 		
 		return AuthResult.builder()
 				.accessToken(accessToken)

@@ -1,6 +1,7 @@
 package com.kh.coreflow.model.dao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -88,6 +89,16 @@ public class AuthDaoImpl implements AuthDao{
 		session.update("auth.updateAddress", param);
 	}
 
+	@Override
+	public UserAuthority findUserAuthorityByUserNo(int userNo) {
+	    List<String> roles = session.selectList("auth.findUserAuthorityByUserNo", userNo);
+	    if (roles.isEmpty()) return null;
+
+	    return UserAuthority.builder()
+	            .userNo(userNo)
+	            .roles(roles)
+	            .build();
+	}
 	
 	
 }

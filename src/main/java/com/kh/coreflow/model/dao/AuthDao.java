@@ -29,5 +29,9 @@ public interface AuthDao {
 	int checkProfileImage(int userNo);
 	
 	void insertProfileImage(Map<String, Object> imageUpdate);
+
+	UserAuthority findUserAuthorityByUserNo(int userNo);
+
+
 	
 }

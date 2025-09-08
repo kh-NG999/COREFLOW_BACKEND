@@ -2,8 +2,10 @@ package com.kh.coreflow.security.filter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -41,10 +43,16 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			
 			log.debug("userNo : {}", userNo);
 			
-			UsernamePasswordAuthenticationToken authToken
-			= new UsernamePasswordAuthenticationToken(userNo, null,
-				List.of(new SimpleGrantedAuthority("ROLE_USER"))	
-			);
+			List<String> roles = jwt.getRoles(token); // JWTProvider에서 역할 리스트 반환
+			
+			List<GrantedAuthority> authorities = roles.stream() // 읽어온 권한 리스트를 GrantedAuthority로 변환
+				    .map(SimpleGrantedAuthority::new)
+				    .collect(Collectors.toList());
+			
+			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
+		    	= new UsernamePasswordAuthenticationToken(userNo, null, authorities);
+			SecurityContextHolder.getContext().setAuthentication(authToken);
+			
 			// 인증처리 끝
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			}catch (ExpiredJwtException e) {

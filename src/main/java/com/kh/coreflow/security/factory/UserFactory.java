@@ -24,11 +24,11 @@ public class UserFactory {
      * INCOMPLETE 상태의 임시 계정을 생성
      * 수정 필요
      */
-    public static User createIncompleteUser(String email, String name, int deptId, int posId) {
+    public static User createIncompleteUser(String email, String userName, int deptId, int posId) {
         return User.builder()
                 .email(email)
                 .userPwd(generateRandomPassword(10)) // 서버에서 자동 생성
-                .name(name)    	// 프론트 입력값
+                .userName(userName)    	// 프론트 입력값
                 .deptId(deptId) // 프론트 select-option
                 .posId(posId)   // 프론트 select-option
                 .profile("/images/default-profile.png")	// 기본 프로필

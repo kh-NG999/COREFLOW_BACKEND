@@ -36,7 +36,7 @@ public class UserDto {
 		private int userNo;
 		private String userPwd;
 		private String email;
-		private String name;
+		private String userName; // 전부 바꿔주기
 		private int deptId;
 		private int posId;
 		private String profile;
@@ -59,7 +59,7 @@ public class UserDto {
 		private int userNo;
 		private String userPwd;
 		private String email;
-		private String name;
+		private String userName;
 		private int deptId;
 		private int posId;
 		private String profile;
@@ -80,7 +80,7 @@ public class UserDto {
 	@Builder
 	public static class FindPwdRequest {
 		private String email;
-		private String name;
+		private String userName;
 	}
 	
 	@Data
@@ -112,5 +112,5 @@ public class UserDto {
 		private int userNo;
 		private List<String> roles;
 	}
-	
+	 
 }

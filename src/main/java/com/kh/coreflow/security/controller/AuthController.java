@@ -96,7 +96,7 @@ public class AuthController {
 	
 	@PostMapping("/find-pwd")
 	public ResponseEntity<?> findUserPwd(@RequestBody FindPwdRequest request){
-		boolean result = service.findUserPwd(request.getName(), request.getEmail());
+		boolean result = service.findUserPwd(request.getUserName(), request.getEmail());
 		return result ? ResponseEntity.ok("임시 비밀번호가 메일로 발송되었습니다.")
 				: ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 계정정보가 존재하지 않습니다");
 	}
@@ -181,7 +181,7 @@ public class AuthController {
     }
 
 	private String resolveAccessToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
+		String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
