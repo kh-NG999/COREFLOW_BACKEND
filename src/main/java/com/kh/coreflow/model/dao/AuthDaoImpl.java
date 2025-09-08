@@ -58,8 +58,34 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void updateUserPartial(Map<String, Object> updates) {
-		session.update("auth.updateUserPartial", updates);
+	public int checkProfileImage(int userNo) {
+		return session.selectOne("auth.checkProfileImage", userNo);
+	}
+	
+	@Override
+	public void insertProfileImage(Map<String, Object> imageUpdate) {
+		session.insert("auth.insertProfileImage", imageUpdate);
+	}
+	
+	@Override
+	public void updateProfileImage(Map<String, Object> imageUpdate) {
+		session.update("auth.updateProfileImage", imageUpdate);
+	}
+
+	@Override
+	public void updatePhone(int userNo, String string) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userNo", userNo);
+		param.put("string", string);
+		session.update("auth.updatePhone", param);
+	}
+
+	@Override
+	public void updateAddress(int userNo, String string) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userNo", userNo);
+		param.put("string", string);
+		session.update("auth.updateAddress", param);
 	}
 
 	

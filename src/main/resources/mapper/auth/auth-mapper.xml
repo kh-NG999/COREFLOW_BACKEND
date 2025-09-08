@@ -4,7 +4,9 @@
 	
 	<resultMap id="UserResult" type="com.kh.coreflow.model.dto.UserDto$User" autoMapping="true">
 		<id property="userNo" column="USER_NO" />
+		<result property="name" column="USER_NAME"/>
 	</resultMap>
+	
 	<!-- 로그인용 -->
 	<select id="findUserByEmail" resultMap="UserResult">
 		SELECT USER_NO, EMAIL, USER_PWD, AUTHORITY
@@ -28,7 +30,7 @@
 	</insert>
 	
 	<select id="findUserByUserNo" resultMap="UserResult">
-        SELECT M.USER_NO as USER_NO, EMAIL, USER_PWD, AUTHORITY
+        SELECT M.*, AUTHORITY
         FROM MEMBER M
         JOIN AUTHORITY UA ON M.USER_NO = UA.USER_NO
         WHERE M.USER_NO = #{userNo}
@@ -46,14 +48,40 @@
     	WHERE EMAIL = #{email}
     </update>
     
-    <update id="updateUserPartial" parameterType="map">
-	    UPDATE USER_TB
-	    <set>
-	        <if test="phone != null">PHONE = #{phone},</if>
-	        <if test="address != null">ADDRESS = #{address},</if>
-	        <if test="profile != null">PROFILE_IMG = #{profile},</if>
-	    </set>
-	    WHERE USER_NO = #{userNo}
+    <update id="updatePhone" parameterType="map">
+    	UPDATE MEMBER
+    	SET PHONE = #{string}
+    	WHERE USER_NO = #{userNo}
+    </update>
+    
+    <update id="updateAddress" parameterType="map">
+    	UPDATE MEMBER
+    	SET ADDRESS = #{string}
+    	WHERE USER_NO = #{userNo}
+    </update>
+    
+    <select id="checkProfileImage" resultType="int">
+    	SELECT COUNT(*) 
+	    FROM IMAGE
+	    WHERE REF_ID = #{userNo}
+    </select>
+    
+    <insert id="insertProfileImage" parameterType="map">
+    	INSERT INTO IMAGE 
+    		(IMG_ID, IMAGE_CODE, ORIGIN_NAME, CHANGE_NAME, IMG_ORDER, CREATE_DATE, REF_ID)
+    	VALUES 
+    		(IMAGE_SEQ.NEXTVAL, 'P', #{originName}, #{changeName}, 1, #{currentTime}, #{userNo})
+    </insert>
+	
+	<update id="updateProfileImage" parameterType="map">
+		UPDATE IMAGE
+		<set>
+			IMG_ID = IMAGE_SEQ.NEXTVAL,
+			ORIGIN_NAME = #{originName},
+			CHANGE_NAME = #{changeName},
+        	CREATE_DATE = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+		</set>
+		WHERE REF_ID = #{userNo}
 	</update>
 	
 </mapper>

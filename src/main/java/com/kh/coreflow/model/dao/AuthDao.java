@@ -20,7 +20,14 @@ public interface AuthDao {
 
 	void updatePwd(String email, String encodedPwd);
 
-	void updateUserPartial(Map<String, Object> updates);
+	void updatePhone(int userNo, String string);
+
+	void updateAddress(int userNo, String string);
+
+	void updateProfileImage(Map<String, Object> imageUpdate);
+
+	int checkProfileImage(int userNo);
 	
+	void insertProfileImage(Map<String, Object> imageUpdate);
 	
 }

@@ -22,6 +22,7 @@ public class UserFactory {
     /**
      * 프론트에서 받은 기본 정보(name, deptId, posId, email)를 기반으로
      * INCOMPLETE 상태의 임시 계정을 생성
+     * 수정 필요
      */
     public static User createIncompleteUser(String email, String name, int deptId, int posId) {
         return User.builder()

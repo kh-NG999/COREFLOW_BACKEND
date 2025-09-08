@@ -1,5 +1,9 @@
 package com.kh.coreflow.personal.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,8 @@ import com.kh.coreflow.personal.model.service.UserService;
 import com.kh.coreflow.security.CustomUserDetails;
 import com.kh.coreflow.security.model.service.AuthService;
 
+import jakarta.servlet.ServletContext;
+
 @Controller
 @RequestMapping("/mypage")
 public class PersonalController {
@@ -39,46 +45,13 @@ public class PersonalController {
 		Optional<User> user = authService.findUserByUserNo(userNo);
 		model.addAttribute("user" ,user);
 		
-		
-		
 		List<Object> mySchedule = userService.getMySchedule(userNo);
 		model.addAttribute("mySchedule" ,mySchedule);
 		
 		return "/mypage";
 	}
 	
-	@PostMapping("/update")
-	public String updateUserInfo(
-			@ModelAttribute UserDto.UserUpdate userUpdate,
-			@RequestParam(value = "profile", required = false) MultipartFile profile,
-			@AuthenticationPrincipal CustomUserDetails userDetails
-			) {
-		int userNo = userDetails.getUserNo();
-		
-		Map<String, Object> updates = new HashMap<>();
-		
-		if(userUpdate.getUserPwd() != null) {
-			userService.updatePassword(userNo, userUpdate.getUserPwd());
-		}
-		
-		if(userUpdate.getPhone() != null && !userUpdate.getPhone().isEmpty()) {
-	        updates.put("phone", userUpdate.getPhone());
-	    }
-	    
-	    if(userUpdate.getAddress() != null && !userUpdate.getAddress().isEmpty()) {
-	        updates.put("address", userUpdate.getAddress());
-	    }
-	    
-	    if(profile != null && !profile.isEmpty()) {
-	        updates.put("profile", profile);
-	    }
-	    
-	    if(!updates.isEmpty()) {
-	        userService.updateUserPartial(userNo, updates);
-	    }
-		
-		return "redirect:/mypage";
-	}
+	
 }
 
 

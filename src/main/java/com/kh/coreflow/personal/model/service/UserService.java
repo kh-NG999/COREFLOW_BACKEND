@@ -1,7 +1,6 @@
 package com.kh.coreflow.personal.model.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,8 +12,13 @@ public interface UserService {
 
 	void updateMyInfo(UserUpdate userUpdate, MultipartFile profile);
 
-	void updatePassword(int userNo, String userPwd);
+	void updatePassword(int userNo, String userPwd, String string);
 
-	void updateUserPartial(int userNo, Map<String, Object> updates);
+	void updatePhone(int userNo, String string);
 
+	void updateAddress(int userNo, String string);
+
+	String updateProfileImage(int userNo, MultipartFile file);
+	
+	
 }
