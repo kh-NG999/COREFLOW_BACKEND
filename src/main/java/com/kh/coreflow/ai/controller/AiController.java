@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -99,6 +100,41 @@ public class AiController {
 			return ResponseEntity.noContent().build();
 		} else {
 			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	@PostMapping("/sessions")
+	public ResponseEntity<Long> insertSession(
+			Authentication auth,
+			String title
+			) {
+		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userNo", userNo);
+		map.put("sessionNo", 0L);
+		map.put("title", title);
+		
+		int result = service.insertSession(map);
+		System.out.println(map.get("sessionNo"));
+		
+		if (result > 0) {
+			return ResponseEntity.ok(Long.parseLong(map.get("sessionNo").toString()));
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	@PatchMapping("/sessions/{sessionId}")
+	public ResponseEntity<Void> updateSession(
+			@PathVariable Long sessionId
+			) {
+		int result = service.updateSession(sessionId);
+		
+		if (result > 0) {
+			return ResponseEntity.noContent().build();
+		} else {
+			return ResponseEntity.notFound().build();
 		}
 	}
 }

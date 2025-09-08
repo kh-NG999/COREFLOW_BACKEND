@@ -34,6 +34,16 @@ public class AiServiceImpl implements AiService {
 	public int updateAiUsage(Map<String, Object> map) {
 		return dao.updateAiUsage(map);
 	}
+
+	@Override
+	public int insertSession(Map<String, Object> map) {
+		return dao.insertSession(map);
+	}
+
+	@Override
+	public int updateSession(Long sessionId) {
+		return dao.updateSession(sessionId);
+	}
 }
 
 

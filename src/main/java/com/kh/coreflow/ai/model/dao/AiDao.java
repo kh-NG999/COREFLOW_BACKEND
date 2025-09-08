@@ -15,4 +15,8 @@ public interface AiDao {
 
 	int updateAiUsage(Map<String, Object> map);
 
+	int insertSession(Map<String, Object> map);
+
+	int updateSession(Long sessionId);
+
 }

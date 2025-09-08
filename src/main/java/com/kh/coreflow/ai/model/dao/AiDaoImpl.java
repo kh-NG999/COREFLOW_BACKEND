@@ -34,6 +34,16 @@ public class AiDaoImpl implements AiDao {
 	public int updateAiUsage(Map<String, Object> map) {
 		return session.update("ai.updateAiUsage", map);
 	}
+
+	@Override
+	public int insertSession(Map<String, Object> map) {
+		return session.insert("ai.insertSession", map);
+	}
+
+	@Override
+	public int updateSession(Long sessionId) {
+		return session.update("ai.updateSession", sessionId);
+	}
 }
 
 

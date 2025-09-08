@@ -22,4 +22,24 @@
 		set last_used_at = sysdate, tokens_used = tokens_used + #{tokensUsed}
 		where user_no = #{userNo}
 	</update>
+	
+	<insert id="insertSession">
+		insert into ai_chat_session(user_no, model_id, title)
+		values(#{userNo}, '1', #{title})
+	</insert>
+	
+	<update id="updateSession">
+		update ai_chat_session
+		set last_used_at = sysdate
+		where session_id = #{sessionId}
+	</update>
 </mapper>
+
+
+
+
+
+
+
+
+
