@@ -56,6 +56,6 @@ public class MemberDao implements MemberDaoImpl{
 
 	@Override
 	public int memberDelete(int userNo) {
-		return session.update("member.memberDelete",userNo);
+		return session.delete("member.memberDelete",userNo);
 	}
 }

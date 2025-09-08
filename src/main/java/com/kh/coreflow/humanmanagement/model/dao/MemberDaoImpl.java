@@ -26,5 +26,4 @@ public interface MemberDaoImpl {
 	int memberUpdate(MemberPatch member);
 
 	int memberDelete(int userNo);
-
 }
