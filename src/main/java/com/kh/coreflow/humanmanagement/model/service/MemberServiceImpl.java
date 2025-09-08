@@ -26,5 +26,4 @@ public interface MemberServiceImpl {
 	int memberUpdate(MemberPatch member);
 
 	int memberDelete(int userNo);
-
 }
