@@ -50,6 +50,7 @@ public class SecurityConfig {
 						-> auth
 						.requestMatchers("/auth/login","/auth/signup","/auth/logout","/auth/refresh").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
+						.requestMatchers("/api/approvals/documents").permitAll()
 						.requestMatchers("/**").authenticated()
 					);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

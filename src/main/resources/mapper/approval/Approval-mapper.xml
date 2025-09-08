@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="approvalMapper">
+
+    <!-- 결재문서 등록 -->
+    <insert id="insertApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto" useGeneratedKeys="true" keyProperty="approvalId">
+        INSERT INTO approval (user_no, approval_title, approval_detail, approval_type, approval_status, start_date)
+        VALUES (#{userNo}, #{approvalTitle}, #{approvalDetail}, #{approvalType}, #{approvalStatus}, #{startDate})
+    </insert>
+
+    <!-- 문서 상세조회 -->
+    <select id="findById" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT *
+        FROM approval
+        WHERE approval_id = #{id}
+    </select>
+
+    <!-- 문서 상태 변경 -->
+    <update id="updateApprovalStatus" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        UPDATE approval
+        SET approval_status = #{approvalStatus},
+            end_date = CASE WHEN #{approvalStatus} IN (1,2) THEN NOW() ELSE end_date END
+        WHERE approval_id = #{approvalId}
+    </update>
+
+    <!-- 결재선 등록 -->
+    <insert id="insertApprovalLine" parameterType="com.kh.coreflow.approval.model.dto.ApprovalLineDto" useGeneratedKeys="true" keyProperty="lineId">
+        INSERT INTO approval_line (approval_id, approval_no, line_order, line_status)
+        VALUES (#{approvalId}, #{approvalNo}, #{lineOrder}, #{lineStatus})
+    </insert>
+
+    <!-- 결재선 조회 -->
+    <select id="findLinesByApprovalId" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+        SELECT *
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+        ORDER BY line_order
+    </select>
+
+    <!-- 결재선 상태 변경 -->
+    <update id="updateApprovalLineStatus" parameterType="map">
+        UPDATE approval_line
+        SET line_status = #{lineStatus}
+        WHERE line_id = #{lineId}
+    </update>
+
+    <!-- 특정 결재자 대기 중인 결재선 조회 -->
+    <select id="findWaitingLinesByApprover" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+        SELECT *
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+          AND approval_no = #{approverNo}
+          AND line_status = #{lineStatus}
+        ORDER BY line_order
+    </select>
+
+    <!-- 결재선 번호 기준 조회 (순차 결재 다음 결재자 활성화용) -->
+    <select id="findLineByApprovalIdAndOrder" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+        SELECT *
+        FROM approval_line
+        WHERE approval_id = #{approvalId}
+          AND line_order = #{lineOrder}
+    </select>
+
+    <!-- 첨부파일 등록 -->
+    <insert id="insertApprovalFile" parameterType="com.kh.coreflow.approval.model.dto.ApprovalFileDto" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO approval_file (approval_id, file_name, file_path)
+        VALUES (#{approvalId}, #{fileName}, #{filePath})
+    </insert>
+
+    <!-- 첨부파일 조회 -->
+    <select id="findFileByApprovalId" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalFileDto">
+        SELECT *
+        FROM approval_file
+        WHERE approval_id = #{approvalId}
+    </select>
+
+    <!-- 작성자 기준 결재문서 조회 -->
+    <select id="selectApprovalsByWriter" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT *
+        FROM approval
+        WHERE user_no = #{userNo}
+        ORDER BY start_date DESC
+    </select>
+
+    <!-- 현재 결재자 승인 대기 문서 조회 -->
+    <select id="selectPendingApprovalsByApprover" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT a.*
+        FROM approval a
+        JOIN approval_line l ON a.approval_id = l.approval_id
+        WHERE l.approval_no = #{approverNo}
+          AND l.line_status = 'WAITING'
+        ORDER BY a.start_date DESC
+    </select>
+
+    <!-- 검색 (예시: 제목/내용) -->
+    <select id="searchApprovals" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT *
+        FROM approval
+        WHERE approval_title LIKE CONCAT('%', #{keyword}, '%')
+           OR approval_detail LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY start_date DESC
+    </select>
+
+	<select id="selectAllApprovals" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+    SELECT approval_id, user_no, approval_title, approval_detail,
+           approval_status, start_date, end_date
+    FROM approval
+    ORDER BY start_date DESC
+	</select>
+
+</mapper>
