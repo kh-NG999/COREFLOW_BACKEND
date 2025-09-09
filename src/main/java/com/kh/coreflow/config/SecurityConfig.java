@@ -48,7 +48,7 @@ public class SecurityConfig {
 							management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 					.authorizeHttpRequests(auth 
 						-> auth
-						.requestMatchers("/auth/login","/auth/signup","/auth/logout","/auth/refresh").permitAll()
+						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
 						.requestMatchers("/**").authenticated()
 					);
@@ -61,10 +61,10 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		// 허용 Origin설정
-		config.setAllowedOrigins(List.of("http://localhost:5173"));
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
 		
 		// 허용 메서드
-		config.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE"));
+		config.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setExposedHeaders(List.of("Location", "Authorization"));
 		config.setAllowCredentials(true); // 세션, 쿠키 허용
@@ -86,5 +86,5 @@ public class SecurityConfig {
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
+	
 }

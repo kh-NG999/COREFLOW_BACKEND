@@ -1,11 +1,14 @@
 package com.kh.coreflow.model.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
-
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
-import com.kh.coreflow.model.dto.UserDto.UserCredential;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +19,10 @@ public class AuthDaoImpl implements AuthDao{
 	private final SqlSessionTemplate session;
 	
 	@Override
-	public User findUserByEmail(String email) {
-		return session.selectOne("auth.findUserByEmail" , email);
+	public Optional<User> findUserByEmail(String email) {
+		User user = session.selectOne("auth.findUserByEmail" , email);
+		Optional<User> optionalUser = Optional.ofNullable(user);
+		return optionalUser;
 	}
 
 	@Override
@@ -31,10 +36,69 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public User findUserByUserNo(int userNo) {
-		return session.selectOne("auth.findUserByUserNo" , userNo);
+	public Optional<User> findUserByUserNo(int userNo) {
+		User user = session.selectOne("auth.findUserByUserNo" , userNo);
+		Optional<User> optionalUser = Optional.ofNullable(user);
+		return optionalUser;
 	}
 
+	@Override
+	public User findUserPwd(String name, String email) {
+		Map<String, String> param = new HashMap<>();
+		param.put("name", name);
+		param.put("email", email);
+		return session.selectOne("auth.findUserPwd", param);
+	}
+
+	@Override
+	public void updatePwd(String email, String encodedPwd) {
+		Map<String, String> param = new HashMap<>();
+		param.put("email", email);
+		param.put("encodedPwd", encodedPwd);
+		session.update("auth.updatePwd", param);
+	}
+
+	@Override
+	public int checkProfileImage(int userNo) {
+		return session.selectOne("auth.checkProfileImage", userNo);
+	}
+	
+	@Override
+	public void insertProfileImage(Map<String, Object> imageUpdate) {
+		session.insert("auth.insertProfileImage", imageUpdate);
+	}
+	
+	@Override
+	public void updateProfileImage(Map<String, Object> imageUpdate) {
+		session.update("auth.updateProfileImage", imageUpdate);
+	}
+
+	@Override
+	public void updatePhone(int userNo, String string) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userNo", userNo);
+		param.put("string", string);
+		session.update("auth.updatePhone", param);
+	}
+
+	@Override
+	public void updateAddress(int userNo, String string) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("userNo", userNo);
+		param.put("string", string);
+		session.update("auth.updateAddress", param);
+	}
+
+	@Override
+	public UserAuthority findUserAuthorityByUserNo(int userNo) {
+	    List<String> roles = session.selectList("auth.findUserAuthorityByUserNo", userNo);
+	    if (roles.isEmpty()) return null;
+
+	    return UserAuthority.builder()
+	            .userNo(userNo)
+	            .roles(roles)
+	            .build();
+	}
 	
 	
 }

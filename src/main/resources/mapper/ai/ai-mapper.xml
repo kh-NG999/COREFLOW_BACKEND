@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ai">
+	<select id="getSessions" resultType="com.kh.coreflow.ai.model.dto.AiDto$AiChatSession">
+		select * from ai_chat_session
+		where user_no = #{userNo}
+		order by last_used_at desc
+	</select>
+	
+	<select id="countAiUsage" resultType="Integer">
+		select count(*) from ai_usage
+		where user_no = #{userNo}
+	</select>
+	
+	<insert id="insertAiUsage">
+		insert into ai_usage(user_no, model_id, tokens_used)
+		values(#{userNo}, '1', #{tokensUsed})
+	</insert>
+	
+	<update id="updateAiUsage">
+		update ai_usage
+		set last_used_at = sysdate, tokens_used = tokens_used + #{tokensUsed}
+		where user_no = #{userNo}
+	</update>
+	
+	<insert id="insertSession">
+		<selectKey keyProperty="sessionId" resultType="long" order="BEFORE">
+			select "ISEQ$$_75867".nextval from dual
+		</selectKey>
+		insert into ai_chat_session(session_id, user_no, model_id, title)
+		values(#{sessionId} ,#{userNo}, '1', #{title})
+	</insert>
+	
+	<update id="updateSession">
+		update ai_chat_session
+		set last_used_at = sysdate
+		where session_id = #{sessionId}
+	</update>
+	
+	<insert id="insertHistory">
+		insert into ai_chat_history(user_no, session_id, role, content)
+		values(#{userNo}, #{sessionId}, #{role}, #{content})
+	</insert>
+	
+	<select id="getHistories" resultType="com.kh.coreflow.ai.model.dto.AiDto$AiChatHistory">
+		select * from ai_chat_history
+		where session_id = #{sessionId}
+		order by history_id
+	</select>
+	
+	<delete id="deleteChatSession">
+		delete from ai_chat_session where session_id = #{sessionId}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+
+
