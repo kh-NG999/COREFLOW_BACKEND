@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,16 @@ public class VacationDaoImpl implements VacationDao{
 	@Override
 	public List<MemberVacation> perVacation(Map<String, Object> params) {
 		return session.selectList("vacation.perVacation",params);
+	}
+
+	@Override
+	public List<VacType> vacType() {
+		return session.selectList("vacation.vacType");
+	}
+
+	@Override
+	public int putPerVac(Map<String, Object> params) {
+		return session.insert("vacation.putPerVac",params);
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 
 public interface VacationDao {
@@ -22,4 +23,7 @@ public interface VacationDao {
 	
 	List<MemberVacation> perVacation(Map<String, Object> params);
 
+	List<VacType> vacType();
+
+	int putPerVac(Map<String, Object> params);
 }

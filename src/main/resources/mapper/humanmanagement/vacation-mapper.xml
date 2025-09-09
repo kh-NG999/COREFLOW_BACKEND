@@ -71,6 +71,14 @@
 		WHERE USER_NO = #{userNo}
 	</select>
 	
+	<!-- 휴가 종류 조회 -->
+	<select id="vacType" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$VacType">
+		SELECT
+			VAC_CODE,
+			VAC_NAME
+		FROM VACATION_TYPE
+	</select>
+	
 	<!-- 로그인 사원 휴가 내역 조회 -->
 	<select id="perVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 		SELECT
@@ -89,4 +97,9 @@
 			V.USER_NO = #{userNo} AND
 			EXTRACT(YEAR FROM V.VAC_START) = #{year}
 	</select>
+	
+	<insert id="putPerVac" parameterType="map">
+		INSERT INTO VACATION(VAC_CODE, USER_NO, VAC_START, VAC_END, VAC_AMOUNT)
+		VALUES(#{putVacation.vacCode}, #{userNo}, #{putVacation.vacStart}, #{putVacation.vacEnd},#{putVacation.vacAmount})
+	</insert>
 </mapper>

@@ -1,59 +1,59 @@
-package com.kh.coreflow.humanmanagement.model.dao;
+package com.kh.coreflow.humanmanagement.model.service;
 
 import java.util.List;
 import java.util.Map;
 
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
+import com.kh.coreflow.humanmanagement.model.dao.MemberDao;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 
-@Repository
+@Service
 @RequiredArgsConstructor
-public class MemberDaoImpl implements MemberDao{
-	private final SqlSessionTemplate session;
-
+public class MemberServiceImple implements MemberService{
+	private final MemberDao dao;
+	
 	@Override
 	public List<Department> deptList() {
-		return session.selectList("member.deptList");
+		return dao.deptList();
 	}
 
 	@Override
 	public List<Department> deptDetailList(int parentId) {
-		return session.selectList("member.deptDetailList",parentId);
+		return dao.deptDetailList(parentId);
 	}
-	
+
 	@Override
 	public List<Position> posiList() {
-		return session.selectList("member.posiList");
+		return dao.posiList();
 	}
 	
 	@Override
 	public List<MemberResponse> memberList(Map<String, Object> params) {
-		return session.selectList("member.memberList",params);
+		return dao.memberList(params);
 	}
 
 	@Override
 	public MemberResponse memberDetail(Map<String, Object> params) {
-		return session.selectOne("member.memberDetail",params);
+		return dao.memberDetail(params);
 	}
 
 	@Override
 	public int memberInsert(Map<String, Object> params) {
-		return session.insert("member.memberInsert",params);
+		return dao.memberInsert(params);
 	}
 	
 	@Override
 	public int memberUpdate(Map<String, Object> params) {
-		return session.update("member.memberUpdate",params);
+		return dao.memberUpdate(params);
 	}
 
 	@Override
 	public int memberDelete(Map<String, Object> params) {
-		return session.delete("member.memberDelete",params);
+		return dao.memberDelete(params);
 	}
 }

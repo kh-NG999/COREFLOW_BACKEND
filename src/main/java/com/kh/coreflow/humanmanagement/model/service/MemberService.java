@@ -3,59 +3,25 @@ package com.kh.coreflow.humanmanagement.model.service;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
-import com.kh.coreflow.humanmanagement.model.dao.MemberDaoImpl;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
-import lombok.RequiredArgsConstructor;
+public interface MemberService {
 
-@Service
-@RequiredArgsConstructor
-public class MemberService implements MemberServiceImpl{
-	private final MemberDaoImpl dao;
+	List<Department> deptList();
+
+	List<Department> deptDetailList(int parentId);
 	
-	@Override
-	public List<Department> deptList() {
-		return dao.deptList();
-	}
-
-	@Override
-	public List<Department> deptDetailList(int parentId) {
-		return dao.deptDetailList(parentId);
-	}
-
-	@Override
-	public List<Position> posiList() {
-		return dao.posiList();
-	}
+	List<Position> posiList();
 	
-	@Override
-	public List<MemberResponse> memberList(Map<String, String> searchParams) {
-		return dao.memberList(searchParams);
-	}
+	List<MemberResponse> memberList(Map<String, Object> params);
 
-	@Override
-	public MemberResponse memberDetail(int userNo) {
-		return dao.memberDetail(userNo);
-	}
+	MemberResponse memberDetail(Map<String, Object> params);
 
-	@Override
-	public int memberInsert(MemberPost member) {
-		return dao.memberInsert(member);
-	}
+	int memberInsert(Map<String, Object> params);
 	
-	@Override
-	public int memberUpdate(MemberPatch member) {
-		return dao.memberUpdate(member);
-	}
+	int memberUpdate(Map<String, Object> params);
 
-	@Override
-	public int memberDelete(int userNo) {
-		return dao.memberDelete(userNo);
-	}
+	int memberDelete(Map<String, Object> params);
 }

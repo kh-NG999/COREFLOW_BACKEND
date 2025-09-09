@@ -41,22 +41,22 @@
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITIONS USING(POS_ID)
 		<where>
-			<if test="status != null and status != ''">
-				STATUS = #{status}
+			<if test="searchParams.status != null and searchParams.status != ''">
+				STATUS = #{searchParams.status}
 			</if>
-			<if test="userName != null and userName != ''">
-				AND USER_NAME LIKE '%' || #{userName} || '%'
+			<if test="searchParams.userName != null and searchParams.userName != ''">
+				AND USER_NAME LIKE '%' || #{searchParams.userName} || '%'
 			</if>
-			<if test="depName != null and depName != ''">
+			<if test="searchParams.depName != null and searchParams.depName != ''">
 	            AND DEP_ID IN (
 	                SELECT DEP_ID
 	                FROM DEPARTMENT
-	                START WITH DEP_NAME = #{depName}
+	                START WITH DEP_NAME = #{searchParams.depName}
 	                CONNECT BY PRIOR DEP_ID = PARENT_ID
 	            )
 	        </if>
-			<if test="posName != null and posName != ''">
-				AND POS_NAME = #{posName}
+			<if test="searchParams.posName != null and searchParams.posName != ''">
+				AND POS_NAME = #{searchParams.posName}
 			</if>
 		</where>
 	</select>

@@ -51,4 +51,22 @@ public class VacationDto {
 		private String posName;
 		private Date hireDate;
 	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class VacType{
+		private int vacCode;
+		private String vacName;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PutVacation{
+		private int vacCode;
+		private Date vacStart;
+		private Date vacEnd;
+		private float vacAmount;
+	}
 }

@@ -3,59 +3,25 @@ package com.kh.coreflow.humanmanagement.model.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.stereotype.Repository;
-
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
-import lombok.RequiredArgsConstructor;
+public interface MemberDao {
 
-@Repository
-@RequiredArgsConstructor
-public class MemberDao implements MemberDaoImpl{
-	private final SqlSessionTemplate session;
+	List<Department> deptList();
 
-	@Override
-	public List<Department> deptList() {
-		return session.selectList("member.deptList");
-	}
-
-	@Override
-	public List<Department> deptDetailList(int parentId) {
-		return session.selectList("member.deptDetailList",parentId);
-	}
+	List<Department> deptDetailList(int parentId);
 	
-	@Override
-	public List<Position> posiList() {
-		return session.selectList("member.posiList");
-	}
+	List<Position> posiList();
+
+	List<MemberResponse> memberList(Map<String, Object> params);
+
+	MemberResponse memberDetail(Map<String, Object> params);
+
+	int memberInsert(Map<String, Object> params);
 	
-	@Override
-	public List<MemberResponse> memberList(Map<String, String> searchParams) {
-		return session.selectList("member.memberList",searchParams);
-	}
+	int memberUpdate(Map<String, Object> params);
 
-	@Override
-	public MemberResponse memberDetail(int userNo) {
-		return session.selectOne("member.memberDetail",userNo);
-	}
-
-	@Override
-	public int memberInsert(MemberPost member) {
-		return session.insert("member.memberInsert",member);
-	}
-	
-	@Override
-	public int memberUpdate(MemberPatch member) {
-		return session.update("member.memberUpdate",member);
-	}
-
-	@Override
-	public int memberDelete(int userNo) {
-		return session.delete("member.memberDelete",userNo);
-	}
+	int memberDelete(Map<String, Object> params);
 }

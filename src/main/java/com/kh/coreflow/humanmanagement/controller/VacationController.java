@@ -5,15 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.PutVacation;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 import com.kh.coreflow.humanmanagement.model.service.VacationService;
 
@@ -143,4 +149,46 @@ public class VacationController {
 			return ResponseEntity.noContent().build();
 		}
 	}
+	
+	// 휴가 종류 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/vacation/type")
+	public ResponseEntity<List<VacType>> vacType() {
+		List<VacType> vacList = service.vacType();
+		
+		if(vacList != null && !vacList.isEmpty()) {
+			return ResponseEntity.ok(vacList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 로그인 회원 휴가 신청
+	@CrossOrigin(origins="http://localhost:5173")
+	@PutMapping("/vacation/personal")
+//	@PreAuthorize("ROLE_HUMAN")
+	public ResponseEntity<Void> putPerVac(
+			Authentication auth,
+			@RequestBody PutVacation putVacation
+//			@AuthenticationPrincipal int userNo
+			){
+		//auth.getPrincipal() -> userno
+		//auth.getAuthorities() -> authority list (ROLE_USER 등등)
+		
+		log.info("get info : {}",putVacation );
+		int userNo = (int)auth.getPrincipal();
+				
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("putVacation", putVacation);
+		
+		int result = service.putPerVac(params);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
 }

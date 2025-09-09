@@ -9,6 +9,7 @@ import com.kh.coreflow.humanmanagement.model.dao.VacationDao;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.LoginUser;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberChoice;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.MemberVacation;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,14 @@ public class VacationServiceImpl implements VacationService{
 		return dao.perVacation(params);
 	}
 
+	@Override
+	public List<VacType> vacType() {
+		return dao.vacType();
+	}
+	
+	@Override
+	public int putPerVac(Map<String, Object> params) {
+		return dao.putPerVac(params);
+	}
 
 }

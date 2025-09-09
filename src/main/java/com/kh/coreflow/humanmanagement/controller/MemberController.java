@@ -1,10 +1,12 @@
 package com.kh.coreflow.humanmanagement.controller;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +22,7 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
-import com.kh.coreflow.humanmanagement.model.service.MemberServiceImpl;
+import com.kh.coreflow.humanmanagement.model.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 public class MemberController {
-	private final MemberServiceImpl service;
+	private final MemberService service;
 	
 	// 부모 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
@@ -82,9 +84,14 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/members")
 	public ResponseEntity<List<MemberResponse>> memberList(
+			@AuthenticationPrincipal int loginUserNo,
 			@RequestParam Map<String,String> searchParams
-			){		
-		List<MemberResponse> memberList = service.memberList(searchParams);
+			){
+		Map<String,Object> params = new HashMap<>();
+		params.put("loginUserNo", loginUserNo);
+		params.put("searchParams", searchParams);
+		
+		List<MemberResponse> memberList = service.memberList(params);
 //		log.debug("memberList : {}",memberList);
 //		System.out.println(memberList);
 		
@@ -99,25 +106,36 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
+			@AuthenticationPrincipal int loginUserNo,
 			@PathVariable int userNo
 			){
-		MemberResponse member = service.memberDetail(userNo);
+		Map<String,Object> params = new HashMap<>();
+		params.put("loginUserNo", loginUserNo);
+		params.put("userNo", userNo);
+		
+		MemberResponse member = service.memberDetail(params);
 //		log.debug("member : {}",member);
 
 		if(member != null) {
 			return ResponseEntity.ok(member);
 		}else {
 			return ResponseEntity.notFound().build();
-		}		
+		}
+		
 	}
 	
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/members")
 	public ResponseEntity<Void> memberInsert(
-			@RequestBody MemberPost member 
+			@AuthenticationPrincipal int loginUserNo,
+			@RequestBody MemberPost member
 			){
-		int result = service.memberInsert(member);
+		Map<String, Object> params = new HashMap<>();
+		params.put("loginUserNo", loginUserNo);
+		params.put("member", member);
+		
+		int result = service.memberInsert(params);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/members")).build();
@@ -130,11 +148,16 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
+			@AuthenticationPrincipal int loginUserNo,
 			@PathVariable int userNo,
 			@RequestBody MemberPatch member
-			){		
-		member.setUserNo(userNo);
-		int result = service.memberUpdate(member);
+			){
+		Map<String,Object> params = new HashMap<>();
+		params.put("loginUserNo", loginUserNo);
+		params.put("userNo", userNo);
+		params.put("member", member);
+
+		int result = service.memberUpdate(params);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
@@ -147,9 +170,14 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@DeleteMapping("members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
+			@AuthenticationPrincipal int loginUserNo,
 			@PathVariable int userNo
 			) {
-		int result = service.memberDelete(userNo);
+		Map<String,Object> params = new HashMap<>();
+		params.put("loginUserNo", loginUserNo);
+		params.put("userNo", userNo);
+		
+		int result = service.memberDelete(params);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
