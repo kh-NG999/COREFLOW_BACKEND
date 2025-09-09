@@ -36,18 +36,14 @@ public class UserDto {
 		private int userNo;
 		private String userPwd;
 		private String email;
-		private String name;
-		private int deptId;
+		private String userName; // 전부 바꿔주기
+		private int depId;
 		private int posId;
 		private String profile;
-		
-		@Builder.Default
-		private List<String> roles = List.of("ROLE_USER");
+		private List<String> roles;
 		private Date hireDate;
 		private String phone;
 		private String address;
-		
-		@Builder.Default
 		private String status = "INCOMPLETE";
 	}
 	
@@ -59,7 +55,7 @@ public class UserDto {
 		private int userNo;
 		private String userPwd;
 		private String email;
-		private String name;
+		private String userName;
 		private int deptId;
 		private int posId;
 		private String profile;
@@ -78,9 +74,21 @@ public class UserDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
+	public static class FindPwdRequest {
+		private String email;
+		private String userName;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
 	public static class UserUpdate{
 		private int userNo;
 		private String userPwd;
+		private String phone;
+		private String address;
+		private String profile;
 	}
 	
 	@Data
@@ -101,4 +109,13 @@ public class UserDto {
 		private List<String> roles;
 	}
 	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class UserDeptcode {
+		private int userNo;
+		private int depId;
+	}
+	 
 }
