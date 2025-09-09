@@ -15,7 +15,7 @@ public interface AuthService {
 
 	AuthResult refreshByCookie(String refreshCookie);
 
-	Optional<User> findUserByUserNo(int userNo);
+	Optional<User> findUserByUserNo(Long userNo);
 
 	boolean findUserPwd(String name, String email);
 

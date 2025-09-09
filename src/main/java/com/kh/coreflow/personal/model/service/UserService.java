@@ -8,17 +8,17 @@ import com.kh.coreflow.model.dto.UserDto.UserUpdate;
 
 public interface UserService {
 
-	List<Object> getMySchedule(int userNo);
+	List<Object> getMySchedule(Long userNo);
 
 	void updateMyInfo(UserUpdate userUpdate, MultipartFile profile);
 
-	void updatePassword(int userNo, String userPwd, String string);
+	void updatePassword(Long userNo, String userPwd, String string);
 
-	void updatePhone(int userNo, String string);
+	void updatePhone(Long userNo, String string);
 
-	void updateAddress(int userNo, String string);
+	void updateAddress(Long userNo, String string);
 
-	String updateProfileImage(int userNo, MultipartFile file);
+	String updateProfileImage(Long userNo, MultipartFile file);
 	
 	
 }

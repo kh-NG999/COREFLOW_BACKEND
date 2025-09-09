@@ -39,14 +39,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			try {
 			// 2) 토큰에서 userNo추출
 			String token = header.substring(7).trim();
-			int userNo = jwt.getUserNo(token);
+			Long userNo = jwt.getUserNo(token);
 			// 3) 토큰에서 권한 추출
 			List<String> roles = jwt.getRoles(token); // JWTProvider에서 역할 리스트 반환
 			List<GrantedAuthority> authorities = roles.stream() // 읽어온 권한 리스트를 GrantedAuthority로 변환
 				    .map(SimpleGrantedAuthority::new)
 				    .collect(Collectors.toList());
 			// 4) 권한에서 부서코드 추출
-			int depId = jwt.getDeptcode(token);
+			Long depId = jwt.getDeptcode(token);
 			
 			UserDeptcode principal =  UserDeptcode.builder()
 			        .userNo(userNo)
