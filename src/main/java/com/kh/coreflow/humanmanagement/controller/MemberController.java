@@ -108,7 +108,7 @@ public class MemberController {
 			Authentication auth,
 			@PathVariable int userNo
 			){
-		int depId = ((UserDeptcode)auth.getPrincipal()).getDepId();
+		Long depId = ((UserDeptcode)auth.getPrincipal()).getDepId();
 		log.info("depId : {}", depId);
 		Map<String,Object> params = new HashMap<>();
 		params.put("depId", depId);
