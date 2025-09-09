@@ -175,7 +175,7 @@ public class VacationController {
 		//auth.getPrincipal() -> userno
 		//auth.getAuthorities() -> authority list (ROLE_USER 등등)
 		
-		log.info("get info : {}",putVacation );
+//		log.info("get info : {}",putVacation );
 		int userNo = (int)auth.getPrincipal();
 				
 		Map<String, Object> params = new HashMap<>();

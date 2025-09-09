@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.humanmanagement.model.dao.MemberDao;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
@@ -33,8 +35,8 @@ public class MemberServiceImple implements MemberService{
 	}
 	
 	@Override
-	public List<MemberResponse> memberList(Map<String, Object> params) {
-		return dao.memberList(params);
+	public List<MemberResponse> memberList(Map<String, String> searchParams) {
+		return dao.memberList(searchParams);
 	}
 
 	@Override
@@ -43,17 +45,17 @@ public class MemberServiceImple implements MemberService{
 	}
 
 	@Override
-	public int memberInsert(Map<String, Object> params) {
-		return dao.memberInsert(params);
+	public int memberInsert(MemberPost member) {
+		return dao.memberInsert(member);
 	}
 	
 	@Override
-	public int memberUpdate(Map<String, Object> params) {
-		return dao.memberUpdate(params);
+	public int memberUpdate(MemberPatch member) {
+		return dao.memberUpdate(member);
 	}
 
 	@Override
-	public int memberDelete(Map<String, Object> params) {
-		return dao.memberDelete(params);
+	public int memberDelete(int userNo) {
+		return dao.memberDelete(userNo);
 	}
 }

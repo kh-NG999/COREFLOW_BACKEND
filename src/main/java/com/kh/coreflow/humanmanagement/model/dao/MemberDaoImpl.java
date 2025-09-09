@@ -7,6 +7,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
@@ -33,8 +35,8 @@ public class MemberDaoImpl implements MemberDao{
 	}
 	
 	@Override
-	public List<MemberResponse> memberList(Map<String, Object> params) {
-		return session.selectList("member.memberList",params);
+	public List<MemberResponse> memberList(Map<String, String> searchParams) {
+		return session.selectList("member.memberList",searchParams);
 	}
 
 	@Override
@@ -43,17 +45,17 @@ public class MemberDaoImpl implements MemberDao{
 	}
 
 	@Override
-	public int memberInsert(Map<String, Object> params) {
-		return session.insert("member.memberInsert",params);
+	public int memberInsert(MemberPost member) {
+		return session.insert("member.memberInsert",member);
 	}
 	
 	@Override
-	public int memberUpdate(Map<String, Object> params) {
-		return session.update("member.memberUpdate",params);
+	public int memberUpdate(MemberPatch member) {
+		return session.update("member.memberUpdate",member);
 	}
 
 	@Override
-	public int memberDelete(Map<String, Object> params) {
-		return session.delete("member.memberDelete",params);
+	public int memberDelete(int userNo) {
+		return session.delete("member.memberDelete",userNo);
 	}
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
@@ -15,13 +17,13 @@ public interface MemberService {
 	
 	List<Position> posiList();
 	
-	List<MemberResponse> memberList(Map<String, Object> params);
+	List<MemberResponse> memberList(Map<String, String> searchParams);
 
 	MemberResponse memberDetail(Map<String, Object> params);
 
-	int memberInsert(Map<String, Object> params);
+	int memberInsert(MemberPost member);
 	
-	int memberUpdate(Map<String, Object> params);
+	int memberUpdate(MemberPatch member);
 
-	int memberDelete(Map<String, Object> params);
+	int memberDelete(int userNo);
 }

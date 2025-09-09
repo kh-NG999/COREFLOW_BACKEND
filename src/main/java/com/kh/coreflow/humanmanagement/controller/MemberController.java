@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 import com.kh.coreflow.humanmanagement.model.service.MemberService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,14 +87,9 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/members")
 	public ResponseEntity<List<MemberResponse>> memberList(
-			@AuthenticationPrincipal int loginUserNo,
 			@RequestParam Map<String,String> searchParams
-			){
-		Map<String,Object> params = new HashMap<>();
-		params.put("loginUserNo", loginUserNo);
-		params.put("searchParams", searchParams);
-		
-		List<MemberResponse> memberList = service.memberList(params);
+			){		
+		List<MemberResponse> memberList = service.memberList(searchParams);
 //		log.debug("memberList : {}",memberList);
 //		System.out.println(memberList);
 		
@@ -105,15 +103,19 @@ public class MemberController {
 	// 사원 상세 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<MemberResponse> memberDetail(
-			@AuthenticationPrincipal int loginUserNo,
+			Authentication auth,
 			@PathVariable int userNo
 			){
+		int depId = ((UserDeptcode)auth.getPrincipal()).getDepId();
+		log.info("depId : {}", depId);
 		Map<String,Object> params = new HashMap<>();
-		params.put("loginUserNo", loginUserNo);
+		params.put("depId", depId);
 		params.put("userNo", userNo);
-		
+				
 		MemberResponse member = service.memberDetail(params);
+		
 //		log.debug("member : {}",member);
 
 		if(member != null) {
@@ -121,21 +123,15 @@ public class MemberController {
 		}else {
 			return ResponseEntity.notFound().build();
 		}
-		
 	}
 	
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/members")
 	public ResponseEntity<Void> memberInsert(
-			@AuthenticationPrincipal int loginUserNo,
 			@RequestBody MemberPost member
 			){
-		Map<String, Object> params = new HashMap<>();
-		params.put("loginUserNo", loginUserNo);
-		params.put("member", member);
-		
-		int result = service.memberInsert(params);
+		int result = service.memberInsert(member);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/members")).build();
@@ -148,16 +144,13 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
-			@AuthenticationPrincipal int loginUserNo,
 			@PathVariable int userNo,
 			@RequestBody MemberPatch member
 			){
-		Map<String,Object> params = new HashMap<>();
-		params.put("loginUserNo", loginUserNo);
-		params.put("userNo", userNo);
-		params.put("member", member);
-
-		int result = service.memberUpdate(params);
+		member.setUserNo(userNo);
+		log.info("userNo : {}",userNo);
+		log.info("member : {}",member);
+		int result = service.memberUpdate(member);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
@@ -170,14 +163,9 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@DeleteMapping("members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
-			@AuthenticationPrincipal int loginUserNo,
 			@PathVariable int userNo
 			) {
-		Map<String,Object> params = new HashMap<>();
-		params.put("loginUserNo", loginUserNo);
-		params.put("userNo", userNo);
-		
-		int result = service.memberDelete(params);
+		int result = service.memberDelete(userNo);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
