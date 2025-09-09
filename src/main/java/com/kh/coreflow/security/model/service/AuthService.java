@@ -1,5 +1,7 @@
 package com.kh.coreflow.security.model.service;
 
+import java.util.Optional;
+
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.User;
 
@@ -13,7 +15,11 @@ public interface AuthService {
 
 	AuthResult refreshByCookie(String refreshCookie);
 
-	User findUserByUserNo(int userNo);
+	Optional<User> findUserByUserNo(int userNo);
+
+	boolean findUserPwd(String name, String email);
+
+	Optional<User> findUserByEmail(String email);
 
 	
 	
