@@ -53,6 +53,7 @@ public class SecurityConfig {
 						.requestMatchers("/vacation/**").hasRole("ADMIN")
 						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
+						.requestMatchers("/ws/**").permitAll()
 						.requestMatchers("/**").authenticated()
 					);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

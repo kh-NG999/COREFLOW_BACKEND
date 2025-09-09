@@ -1,0 +1,58 @@
+package com.kh.coreflow.chatting.model.websocket;
+
+
+import com.kh.coreflow.security.model.provider.JWTProvider;
+
+
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class StompHandler implements ChannelInterceptor {
+	
+	private final JWTProvider jwtProvider;
+
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
+        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            // 2. 헤더에서 토큰 추출 ("Bearer " 제거 포함)
+            String authHeader = accessor.getFirstNativeHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String jwtToken = authHeader.substring(7);
+                log.info("STOMP JWT Token: {}", jwtToken);
+                
+                
+                //3. 토큰 유효성 검증
+                if (jwtProvider.validateToken(jwtToken)) {
+                    //4. 토큰으로부터 Authentication 객체 생성 (기존 로직과 동일)
+                    Authentication authentication = jwtProvider.getAuthentication(jwtToken);
+
+                    log.info("STOMP Auth: {}", authentication.getPrincipal());
+                    //5. STOMP 세션에 사용자 정보 저장
+                    accessor.setUser(authentication);
+                } else {
+                    // 유효하지 않으면 예외 발생
+                    throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+                }
+            } else {
+                // 토큰이 없으면 예외 발생
+                throw new IllegalArgumentException("Authorization 헤더가 없거나 형식이 올바르지 않습니다.");
+            }
+        }
+        return message;
+    }
+    
+    
+}

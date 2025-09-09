@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="chat">
+
+
+	<select id="getMyProfile" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+		WHERE A.USER_NO = #{userNo}
+	</select>
+
+
+	<select id="getChatProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+		WHERE A.USER_NO != #{userNo}
+	</select>
+	
+	<insert id="insertMyProfile" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		INSERT INTO CHAT_PROFILE (
+			USER_NO, STATUS
+		) VALUES (
+			#{userNo},
+			'O'
+		)
+	</insert>
+	
+	<select id="getFavoriteProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT D.FAVORITE_USER_NO AS USER_NO, C.USER_NAME, C.STATUS FROM
+		( 
+			SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM
+			CHAT_PROFILE A INNER JOIN "MEMBER" B
+			ON A.USER_NO = B.USER_NO
+		) C INNER JOIN USER_FAVORITE D
+		ON C.USER_NO = D.FAVORITE_USER_NO
+		WHERE D.USER_NO = #{userNo}
+	</select>
+	
+	<insert id="insertFavoriteProfiles" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$userFavorite">
+		INSERT INTO USER_FAVORITE (
+			USER_NO,
+			FAVORITE_USER_NO
+		) VALUES (
+			#{userNo},
+			#{favoriteUserNo}
+		)
+	</insert>
+	
+	<delete id="deleteFavoriteProfiles" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$userFavorite">
+		DELETE FROM USER_FAVORITE
+		WHERE USER_NO = #{userNo} AND
+		FAVORITE_USER_NO = #{favoriteUserNo}
+	</delete>
+	
+	<select id="findPrivateChatIdByUserNo" parameterType="map" resultType="String">
+		SELECT MY.ROOM_ID
+		FROM CHAT_ROOM_JOIN MY 
+		LEFT JOIN CHAT_ROOM_JOIN OTHER ON MY.ROOM_ID = OTHER.ROOM_ID
+		WHERE OTHER.USER_NO = #{partnerNo} AND MY.USER_NO = #{userNo}
+	</select>
+	
+	<select id="openPrivateChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT * FROM CHAT_ROOMS
+		WHERE ROOM_ID=#{roomId}
+	</select>
+	
+	<insert id="makePrivateChat" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
+		INSERT INTO CHAT_ROOMS (
+			USER_NO, ROOM_NAME, ROOM_TYPE
+		) VALUES (
+			#{userNo}, #{roomName}, #{roomType}
+		)
+	</insert>
+	
+	<insert id="makePrivateChatJoin" parameterType="map" >
+		INSERT ALL
+		INTO CHAT_ROOM_JOIN( USER_NO, ROOM_ID )
+			VALUES (#{userNo}, #{roomId})
+		INTO CHAT_ROOM_JOIN( USER_NO, ROOM_ID )
+			VALUES (#{partnerNo}, #{roomId})
+		SELECT * FROM DUAL
+	</insert>
+	
+	<insert id="insertMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages" >
+		INSERT INTO CHAT_MESSAGES (
+        ROOM_ID,
+        USER_NO,
+        MESSAGE_TEXT,
+        IS_FILE,
+        TYPE
+    ) VALUES (
+        #{roomId},
+        #{userNo},
+        #{messageText},
+        'F',
+        #{type}
+    )
+	</insert>
+	
+</mapper>
