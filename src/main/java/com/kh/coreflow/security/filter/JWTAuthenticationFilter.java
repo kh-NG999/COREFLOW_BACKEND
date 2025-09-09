@@ -50,7 +50,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			
 			UserDeptcode principal =  UserDeptcode.builder()
 			        .userNo(userNo)
-			        .deptId(depId)
+			        .depId(depId)
 			        .build();
 			
 			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용

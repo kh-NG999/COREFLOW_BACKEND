@@ -115,7 +115,7 @@ public class UserDto {
 	@Builder
 	public static class UserDeptcode {
 		private int userNo;
-		private int deptId;
+		private int depId;
 	}
 	 
 }
