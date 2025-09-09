@@ -11,6 +11,7 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+import com.kh.coreflow.member.model.dto.DepartmentDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,4 +59,6 @@ public class MemberService implements MemberServiceImpl{
 	public int memberDelete(int userNo) {
 		return dao.memberDelete(userNo);
 	}
+
+	
 }

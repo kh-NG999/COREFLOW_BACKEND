@@ -24,6 +24,7 @@ import com.kh.coreflow.approval.model.dto.ApprovalDto;
 import com.kh.coreflow.approval.model.dto.ApprovalFileDto;
 import com.kh.coreflow.approval.model.dto.ApprovalLineDto;
 import com.kh.coreflow.approval.model.service.ApprovalService;
+import com.kh.coreflow.security.model.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,16 +35,17 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/approvals")
+@RequestMapping("/api.approvals")
 @CrossOrigin(origins = "*")
 @Tag(name = "Approval API", description = "")
 public class ApprovalController {
 	
 	private final ApprovalService service;
+	private final AuthService authService;
 	
 	// 문서작성
 	@Operation(summary = "결재문서 작성")
-	@PostMapping
+	@PostMapping("")
     public ResponseEntity<Integer> submitApproval(@RequestBody ApprovalDto approval,
                                                   Principal principal) {
         int userNo = getUserNoFromPrincipal(principal); // DB에서 userNo 조회
@@ -55,10 +57,11 @@ public class ApprovalController {
     @Operation(summary = "결재 처리 (승인/반려)")
     @PostMapping("/{id}/process")
     public ResponseEntity<String> processApproval(@PathVariable("id") int approvalId,
-                                                  @RequestParam int approverUserId,
+                                                  Principal principal,
                                                   @RequestParam String action) {
-        try {
-            service.processApproval(approvalId, approverUserId, action);
+    	try {
+            int approverUserNo = getUserNoFromPrincipal(principal);
+            service.processApproval(approvalId, approverUserNo, action);
             return ResponseEntity.ok("SUCCESS");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -68,7 +71,9 @@ public class ApprovalController {
     // 문서 상세 조회
     @Operation(summary = "결재문서 상세 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<ApprovalDto> getApproval(@PathVariable int id) {
+    public ResponseEntity<ApprovalDto> getApproval(@PathVariable int id,
+    												Principal principal) {
+    	int userNo = getUserNoFromPrincipal(principal);
         ApprovalDto approval = service.getApproval(id);
         return ResponseEntity.ok(approval);
     }
@@ -83,7 +88,7 @@ public class ApprovalController {
 	}
 	
 	@Operation(summary = "모든 문서 목록 조회")
-	@GetMapping("/documents")
+	@GetMapping("")
     public ResponseEntity<?> getDocuments(@AuthenticationPrincipal Object principal) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
@@ -98,22 +103,6 @@ public class ApprovalController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
-	
-	// 결재라인 조회
-//	@Operation(summary = "특정 결재 문서의 결재선 조회")
-//	@GetMapping("/{id}/lines")
-//	public ResponseEntity<List<ApprovalLineDto>> getApprovalLines(@PathVariable int id) {
-//		List<ApprovalLineDto> lines = service.getApprovalLines(id);
-//		return ResponseEntity.ok(lines);
-//	}
-	
-	// 첨부파일 조회
-//	@Operation(summary = "특정 결재 문서의 첨부파일 조회")
-//	@GetMapping("/{id}/files")
-//	public ResponseEntity<List<ApprovalFileDto>> getApprovalFiles(@PathVariable int id) {
-//		List<ApprovalFileDto> files = service.getApprovalFiles(id);
-//		return ResponseEntity.ok(files);
-//	}
 
     // Principal 객체에서 사용자 번호를 가져오는 유틸리티 메서드 (구현 필요)
     private int getUserNoFromPrincipal(Principal principal) {
