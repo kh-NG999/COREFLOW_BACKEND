@@ -1,6 +1,11 @@
 package com.kh.coreflow.calendar.model.dto;
 
-import lombok.*;
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class CalendarDto {
 
@@ -22,14 +27,14 @@ public class CalendarDto {
 	@Builder
 	public static class DetailRes {
 		private Long calId;
-		private String calName;
-		private String color;
-		private String defaultRole; // NONE / READER / CONTRIBUTOR / EDITOR
-		private Long ownerUserNo;
-		private Long deptId;
-		private String deletedYn; // 'Y'/'N'
-		private java.sql.Timestamp createDate;
-		private java.sql.Timestamp updateDate;
+        private Long depId;
+        private Long ownerUserNo;
+        private String calName;
+        private String color;
+        private String defaultRole;
+        private String deletedYn;
+        private Date createDate;
+        private Date updateDate;
 	}
 
 	@Data
@@ -40,9 +45,20 @@ public class CalendarDto {
 		private String name;
 		private String color;
 		private String defaultRole; // 기본 공유 권한
-		private Long deptId; // 선택
+		private Long depId; // 선택
 	}
 
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	 public static class CreateRes {
+        private Long calId;
+        private String name;           // = CAL_NAME
+        private String color;
+        private String defaultRole;
+    }
+	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor

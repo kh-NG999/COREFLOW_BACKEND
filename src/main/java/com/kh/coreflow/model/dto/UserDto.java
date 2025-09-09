@@ -13,6 +13,7 @@ public class UserDto {
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
+	@Builder
 	public static class LoginRequest {
 		private String email;
 		private String Password;

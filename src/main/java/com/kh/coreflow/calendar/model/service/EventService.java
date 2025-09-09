@@ -8,4 +8,10 @@ public interface EventService {
     Long createEvent(Long userNo, EventDto.Req req);
     void updateEvent(Long userNo, Long eventId, EventDto.Req req);
     void deleteEvent(Long userNo, Long eventId);
+    
+    //라벨
+    List<EventDto.LabelRes> labelList();
+    Long labelCreate(EventDto.LabelReq req);
+    void labelUpdate(Long labelId, EventDto.LabelReq req);
+    void labelDelete(Long labelId);
 }

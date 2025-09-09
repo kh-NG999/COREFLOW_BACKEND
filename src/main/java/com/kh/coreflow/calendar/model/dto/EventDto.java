@@ -1,6 +1,11 @@
 package com.kh.coreflow.calendar.model.dto;
 
-import lombok.*;
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class EventDto {
 
@@ -24,6 +29,8 @@ public class EventDto {
 		private String eventType; // MEETING/PERSONAL/OOO 등
 		private String rrule;
 		private String exdates;
+		private List<Long> attendeeUserNos;
+		private List<Long> shareUserNos;
 	}
 
 	@Data
@@ -49,5 +56,18 @@ public class EventDto {
 		private java.sql.Timestamp createDate;
 		private Long updateUserNo;
 		private java.sql.Timestamp updateDate;
+	}
+	
+	@Data @NoArgsConstructor @AllArgsConstructor @Builder
+	public static class LabelRes {
+	    private Long labelId;
+	    private String labelName;
+	    private String labelColor; // "#RRGGBB"
+	}
+
+	@Data @NoArgsConstructor @AllArgsConstructor @Builder
+	public static class LabelReq {
+	    private String labelName;
+	    private String labelColor;
 	}
 }

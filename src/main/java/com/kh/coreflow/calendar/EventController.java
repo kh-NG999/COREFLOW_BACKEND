@@ -1,15 +1,27 @@
 package com.kh.coreflow.calendar;
 
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import com.kh.coreflow.calendar.model.dto.EventDto;
 import com.kh.coreflow.calendar.model.service.EventService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import java.util.List;
 
 /** 최종 URL: /api/events/... */
 @RestController
@@ -18,47 +30,111 @@ import java.util.List;
 @Slf4j
 public class EventController {
 
-    private final EventService eventService;
+	private final EventService eventService;
+    public record EventIdResponse(Long eventId) {}
 
-    // 기간 내 일정 조회
+
     @GetMapping
-    public ResponseEntity<List<EventDto.Res>> events(
-            @RequestHeader(value = "X-User-No", required = false, defaultValue = "0") Long userNo,
+    public ResponseEntity<List<EventDto.Res>> list(
+            @AuthenticationPrincipal Integer me,
             @RequestParam Long calendarId,
-            @RequestParam(required = false) String from, // 'YYYY-MM-DDTHH:mm:ss'
-            @RequestParam(required = false) String to
+            @RequestParam String from,
+            @RequestParam String to
     ) {
-        return ResponseEntity.ok(eventService.getEvents(userNo, calendarId, from, to));
+        if (me == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(eventService.getEvents(me.longValue(), calendarId, from, to));
     }
 
-    // 일정 생성
     @PostMapping
-    public ResponseEntity<Long> create(
-            @RequestHeader(value = "X-User-No", required = false, defaultValue = "0") Long userNo,
+    public ResponseEntity<EventIdResponse> create(
+            @AuthenticationPrincipal Integer me,
             @Valid @RequestBody EventDto.Req req
     ) {
-        Long id = eventService.createEvent(userNo, req);
-        return ResponseEntity.ok(id);
+        if (me == null) return ResponseEntity.status(401).build();
+
+        Long id = eventService.createEvent(me.longValue(), req);
+
+        // ✅ 현재 요청(/api/events) 기준으로 Location: /api/events/{id} 생성
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
+
+        return ResponseEntity
+                .created(location)                // 201 Created + Location 헤더
+                .body(new EventIdResponse(id));   // { "eventId": 123 }
     }
 
-    // 일정 수정
     @PutMapping("/{eventId}")
     public ResponseEntity<Void> update(
-            @RequestHeader(value = "X-User-No", required = false, defaultValue = "0") Long userNo,
+            @AuthenticationPrincipal Integer me,
             @PathVariable Long eventId,
             @Valid @RequestBody EventDto.Req req
     ) {
-        eventService.updateEvent(userNo, eventId, req);
+        if (me == null) return ResponseEntity.status(401).build();
+        eventService.updateEvent(me.longValue(), eventId, req);
         return ResponseEntity.noContent().build();
     }
 
-    // 일정 삭제(논리삭제)
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> delete(
-            @RequestHeader(value = "X-User-No", required = false, defaultValue = "0") Long userNo,
+            @AuthenticationPrincipal Integer me,
             @PathVariable Long eventId
     ) {
-        eventService.deleteEvent(userNo, eventId);
+        if (me == null) return ResponseEntity.status(401).build();
+        eventService.deleteEvent(me.longValue(), eventId);
         return ResponseEntity.noContent().build();
     }
+    
+    @RestController
+    @RequestMapping("/labels") // 최종 경로: /api/labels
+    @RequiredArgsConstructor
+    class LabelController {
+
+        private final EventService eventService;
+
+        @GetMapping
+        public ResponseEntity<List<EventDto.LabelRes>> list() {
+            return ResponseEntity.ok(eventService.labelList());
+        }
+
+        @PostMapping
+        public ResponseEntity<EventDto.LabelRes> create(@RequestBody EventDto.LabelReq req) {
+            Long id = eventService.labelCreate(req);
+            return ResponseEntity.ok(new EventDto.LabelRes(id, req.getLabelName(), req.getLabelColor()));
+        }
+
+        @PutMapping("/{labelId}")
+        public ResponseEntity<EventDto.LabelRes> update(@PathVariable Long labelId,
+                                                        @RequestBody EventDto.LabelReq req) {
+            eventService.labelUpdate(labelId, req);
+            return ResponseEntity.ok(new EventDto.LabelRes(labelId, req.getLabelName(), req.getLabelColor()));
+        }
+
+        @DeleteMapping("/{labelId}")
+        public ResponseEntity<Void> delete(@PathVariable Long labelId) {
+            eventService.labelDelete(labelId);
+            return ResponseEntity.noContent().build();
+        }
+    }
+    
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,4 +12,25 @@ public interface EventDao {
     Long insertEvent(Long userNo, EventDto.Req req);
     int updateEvent(Long userNo, Long eventId, EventDto.Req req);
     int logicalDeleteEvent(Long userNo, Long eventId);
+    
+    //라벨
+    List<EventDto.LabelRes> selectAllLabels();
+    Long insertLabel(EventDto.LabelReq req);
+    int updateLabel(Long labelId, EventDto.LabelReq req);
+    int deleteLabel(Long labelId);
+
+	int batchInsertParticipants(Long eventId, List<Long> attendeeUserNos, String kind);
+
+	int deleteParticipantsByEventId(Long eventId);
+
+	int insertParticipantIfAbsent(Long eventId, Long u, String kind);
+	default int batchInsertParticipantsIfAbsent(Long eventId, List<Long> userNos, String kind) {
+	    int sum = 0;
+	    if (userNos == null) return 0;
+	    for (Long u : userNos) {
+	        sum += insertParticipantIfAbsent(eventId, u, kind);
+	    }
+	    return sum;
+	}
+
 }

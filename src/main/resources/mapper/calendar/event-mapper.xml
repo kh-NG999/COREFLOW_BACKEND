@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="event">
 
+  <!-- Event 결과 매핑 -->
   <resultMap id="EventResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$Res">
     <id     property="eventId"        column="EVENT_ID"/>
     <result property="calId"          column="CAL_ID"/>
@@ -23,8 +24,10 @@
     <result property="updateDate"     column="UPDATE_DATE"/>
   </resultMap>
 
-  <!-- 기간 내 이벤트: (start < to) AND (end > from) -->
-  <select id="selectEventsByCalendarAndPeriod" resultMap="EventResMap" parameterType="map">
+  <!-- 기간 내 이벤트 조회 -->
+  <select id="selectEventsByCalendarAndPeriod"
+          resultMap="EventResMap"
+          parameterType="map">
     SELECT
       EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
       LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, EVENT_TYPE,
@@ -37,7 +40,7 @@
     ORDER BY START_AT ASC, END_AT ASC, EVENT_ID ASC
   </select>
 
-  <!-- 회의실 겹침검사 (생성용) -->
+  <!-- 회의실 겹침검사 (생성 시) -->
   <select id="countRoomConflicts" parameterType="map" resultType="int">
     SELECT COUNT(1)
     FROM EVENT
@@ -47,7 +50,7 @@
       AND END_AT   &gt; #{startAt}
   </select>
 
-  <!-- 회의실 겹침검사 (수정용: 자신 이벤트 제외) -->
+  <!-- 회의실 겹침검사 (수정 시: 자기 자신 제외) -->
   <select id="countRoomConflictsExcludingSelf" parameterType="map" resultType="int">
     SELECT COUNT(1)
     FROM EVENT
@@ -86,7 +89,10 @@
        SET TITLE          = #{req.title},
            START_AT       = #{req.startAt},
            END_AT         = #{req.endAt},
-           ALL_DAY_YN     = <choose><when test="req.allDay == true">'Y'</when><otherwise>'N'</otherwise></choose>,
+           ALL_DAY_YN     = <choose>
+                              <when test="req.allDay == true">'Y'</when>
+                              <otherwise>'N'</otherwise>
+                            </choose>,
            LOCATION_TEXT  = #{req.locationText},
            NOTE           = #{req.note},
            ROOM_ID        = #{req.roomId},
@@ -108,5 +114,70 @@
            UPDATE_DATE   = SYSTIMESTAMP
      WHERE EVENT_ID      = #{eventId}
   </update>
+  
+  <!-- 참석자 전체 삭제 -->
+  <delete id="deleteParticipantsByEventId" parameterType="long">
+    DELETE FROM EVENT_PARTICIPANT
+    WHERE EVENT_ID = #{value}
+  </delete>
+
+  <!-- 참석자/공유자 대량 삽입(Oracle 전용 INSERT ALL) -->
+  <insert id="batchInsertParticipants" parameterType="map">
+    <if test="userNos != null and userNos.size() &gt; 0">
+      INSERT ALL
+      <foreach collection="userNos" item="u">
+        INTO EVENT_PARTICIPANT (EP_ID, EVENT_ID, USER_NO, KIND)
+        VALUES (EVENT_PARTICIPANT_SEQ.NEXTVAL, #{eventId}, #{u}, #{kind})
+      </foreach>
+      SELECT 1 FROM DUAL
+    </if>
+  </insert>
+
+  <insert id="insertParticipantIfAbsent" parameterType="map">
+    INSERT INTO EVENT_PARTICIPANT (EP_ID, EVENT_ID, USER_NO, KIND)
+    SELECT EVENT_PARTICIPANT_SEQ.NEXTVAL, #{eventId}, #{userNo}, #{kind}
+      FROM DUAL
+     WHERE NOT EXISTS (
+           SELECT 1 FROM EVENT_PARTICIPANT
+            WHERE EVENT_ID = #{eventId}
+              AND USER_NO  = #{userNo}
+              AND KIND     = #{kind}
+     )
+  </insert>
+
+  <!-- event-mapper.xml 의 <mapper namespace="event"> 안에 아래 추가 -->
+	
+	<!-- Label 매핑 -->
+	<resultMap id="LabelResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$LabelRes">
+	  <id property="labelId" column="LABEL_ID"/>
+	  <result property="labelName" column="LABEL_NAME"/>
+	  <result property="labelColor" column="LABEL_COLOR"/>
+	</resultMap>
+	
+	<select id="selectAllLabels" resultMap="LabelResMap">
+	  SELECT LABEL_ID, LABEL_NAME, LABEL_COLOR
+	    FROM LABEL
+	   ORDER BY LABEL_ID DESC
+	</select>
+	
+	<insert id="insertLabel" parameterType="map">
+	  <selectKey keyProperty="labelId" resultType="long" order="BEFORE">
+	    SELECT LABEL_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	  INSERT INTO LABEL (LABEL_ID, LABEL_NAME, LABEL_COLOR)
+	  VALUES (#{labelId}, #{req.labelName}, #{req.labelColor})
+	</insert>
+	
+	<update id="updateLabel" parameterType="map">
+	  UPDATE LABEL
+	     SET LABEL_NAME = #{req.labelName},
+	         LABEL_COLOR = #{req.labelColor}
+	   WHERE LABEL_ID = #{labelId}
+	</update>
+	
+	<delete id="deleteLabel" parameterType="long">
+	  DELETE FROM LABEL WHERE LABEL_ID = #{labelId}
+	</delete>
+
 
 </mapper>

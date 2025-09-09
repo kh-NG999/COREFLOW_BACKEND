@@ -36,7 +36,7 @@ public class CalendarDaoImpl implements CalendarDao {
         p.put("name", req.getName());
         p.put("color", req.getColor());
         p.put("defaultRole", req.getDefaultRole());
-        p.put("deptId", req.getDeptId());
+        p.put("deptId", req.getDepId());
         sql.insert("calendar.insertCalendar", p); // selectKey로 calId 채워짐
         return (Long)p.get("calId");
     }
