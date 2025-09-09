@@ -36,7 +36,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public Optional<User> findUserByUserNo(int userNo) {
+	public Optional<User> findUserByUserNo(Long userNo) {
 		User user = session.selectOne("auth.findUserByUserNo" , userNo);
 		Optional<User> optionalUser = Optional.ofNullable(user);
 		return optionalUser;
@@ -59,7 +59,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public int checkProfileImage(int userNo) {
+	public int checkProfileImage(Long userNo) {
 		return session.selectOne("auth.checkProfileImage", userNo);
 	}
 	
@@ -74,7 +74,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void updatePhone(int userNo, String string) {
+	public void updatePhone(Long userNo, String string) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
 		param.put("string", string);
@@ -82,7 +82,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void updateAddress(int userNo, String string) {
+	public void updateAddress(Long userNo, String string) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
 		param.put("string", string);
@@ -90,7 +90,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public UserAuthority findUserAuthorityByUserNo(int userNo) {
+	public UserAuthority findUserAuthorityByUserNo(Long userNo) {
 	    List<String> roles = session.selectList("auth.findUserAuthorityByUserNo", userNo);
 	    if (roles.isEmpty()) return null;
 

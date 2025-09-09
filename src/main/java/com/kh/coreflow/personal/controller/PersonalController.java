@@ -27,7 +27,7 @@ public class PersonalController {
 	
 	@GetMapping
 	public String myPage(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-		int userNo = userDetails.getUserNo();
+		Long userNo = userDetails.getUserNo();
 		Optional<User> user = authService.findUserByUserNo(userNo);
 		model.addAttribute("user" ,user);
 		
