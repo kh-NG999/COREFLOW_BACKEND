@@ -37,17 +37,13 @@ public class UserDto {
 		private String userPwd;
 		private String email;
 		private String userName; // 전부 바꿔주기
-		private int deptId;
+		private int depId;
 		private int posId;
 		private String profile;
-		
-		@Builder.Default
-		private List<String> roles = List.of("ROLE_USER");
+		private List<String> roles;
 		private Date hireDate;
 		private String phone;
 		private String address;
-		
-		@Builder.Default
 		private String status = "INCOMPLETE";
 	}
 	
@@ -111,6 +107,15 @@ public class UserDto {
 	public static class UserAuthority {
 		private int userNo;
 		private List<String> roles;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class UserDeptcode {
+		private int userNo;
+		private int deptId;
 	}
 	 
 }

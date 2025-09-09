@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -35,22 +36,25 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 		// 1) 요청 header에서 Authorization 추출
 		String header = request.getHeader("Authorization");
 		if(header != null && header.startsWith("Bearer ")) {
-			
 			try {
 			// 2) 토큰에서 userNo추출
 			String token = header.substring(7).trim();
 			int userNo = jwt.getUserNo(token);
-			
-			log.debug("userNo : {}", userNo);
-			
+			// 3) 토큰에서 권한 추출
 			List<String> roles = jwt.getRoles(token); // JWTProvider에서 역할 리스트 반환
-			
 			List<GrantedAuthority> authorities = roles.stream() // 읽어온 권한 리스트를 GrantedAuthority로 변환
 				    .map(SimpleGrantedAuthority::new)
 				    .collect(Collectors.toList());
+			// 4) 권한에서 부서코드 추출
+			int depId = jwt.getDeptcode(token);
+			
+			UserDeptcode principal =  UserDeptcode.builder()
+			        .userNo(userNo)
+			        .deptId(depId)
+			        .build();
 			
 			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
-		    	= new UsernamePasswordAuthenticationToken(userNo, null, authorities);
+		    	= new UsernamePasswordAuthenticationToken(principal, null, authorities);
 			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			// 인증처리 끝

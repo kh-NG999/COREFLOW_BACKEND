@@ -20,7 +20,6 @@ import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserUpdate;
 import com.kh.coreflow.security.model.service.AuthService;
 
-import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 
 @Service

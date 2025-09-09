@@ -44,16 +44,17 @@ public class AuthServiceImpl implements AuthService{
 					throw new BadCredentialsException("비밀번호 오류");
 				}
 				
-				// 2. 토큰 발급
 				int userNo = user.getUserNo();
 				UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 				if (userAuth == null) {
 				    throw new IllegalArgumentException("권한 정보 없음");
 				}
-				log.info("권한 조회: userNo={} roles={}", userNo, userAuth.getRoles());
+				log.info("권한 조회: userNo={} roles={} depId={}", userNo, userAuth.getRoles(), user.getDepId());
+				int depId = user.getDepId();
 
-				String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30);
-				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7);
+				// 2. 토큰 발급
+				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 				
 				User userNoPassword = User.builder()
@@ -61,7 +62,8 @@ public class AuthServiceImpl implements AuthService{
 										.email(user.getEmail())
 										.userName(user.getUserName())
 										.profile(user.getProfile())
-										.roles(user.getRoles())
+										.roles(userAuth.getRoles())
+										.depId(user.getDepId())
 										.build();
 				
 				return AuthResult.builder()
@@ -91,14 +93,15 @@ public class AuthServiceImpl implements AuthService{
 											.build();
 		authDao.insertUserRole(auth);
 		
-		//토큰 발급
 		int userNo = user.getUserNo();
 		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-
-		String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30); // 30분
+		int depId = user.getDepId();
+		
+		//토큰 발급
+		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
 		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
 		user = authDao.findUserByUserNo(user.getUserNo())	// 비밀번호 제외 필요
@@ -121,8 +124,9 @@ public class AuthServiceImpl implements AuthService{
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
+		int depId = user.getDepId();
 
-		String accessToken = jwt.createAccessToken(userNo, userAuth.getRoles(), 30);
+		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
 		
 		return AuthResult.builder()
 				.accessToken(accessToken)

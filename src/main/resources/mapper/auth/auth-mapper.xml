@@ -13,12 +13,12 @@
 	
 	<!-- 로그인용 -->
 	<select id="findUserByEmail" resultType="com.kh.coreflow.model.dto.UserDto$User">
-	    SELECT DISTINCT USER_NO, EMAIL, USER_PWD, USER_NAME
+	    SELECT DISTINCT USER_NO, EMAIL, USER_PWD, USER_NAME, DEP_ID
 	    FROM MEMBER
 	    WHERE UPPER(EMAIL) = UPPER(#{email})
 	</select>
 	
-	<!-- 자동 회원가입 -->
+	<!-- 계정생성 임시 -->
 	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="userNo" keyColumn="USER_NO">
 		INSERT INTO MEMBER(EMAIL, USER_NAME, USER_PWD)
 		VALUES (#{email}, #{userName}, #{userPwd})
