@@ -20,13 +20,7 @@ public interface ChattingDao {
 
 	int deleteFavoriteProfiles(userFavorite favUser);
 
-	chatRooms openPrivateChat(int roomId);
-
-	int makePrivateChat(chatRooms newChatRoom);
-
-	int findPrivateChatIdByUserNo(HashMap<String, Integer> mappingUser);
-
-	int makePrivateChatJoin(HashMap<String, Integer> mappingUser);
+	int makeChatRoom(chatRooms newChatRoom);
 
 	int insertMyProfile(chatProfile myProfile);
 
@@ -35,5 +29,13 @@ public interface ChattingDao {
 	List<chatMessages> getMessages(int roomId);
 
 	List<chatRooms> getmyChattingRooms(int userNo);
+
+	List<chatMessages> getLastMessagesForRooms(List<chatRooms> myRooms);
+
+	int findRoomByMember(List<Integer> privateMember);
+
+	chatRooms openChat(int roomId);
+
+	int makeChatJoin(int roomId, List<Integer> list);
 
 }

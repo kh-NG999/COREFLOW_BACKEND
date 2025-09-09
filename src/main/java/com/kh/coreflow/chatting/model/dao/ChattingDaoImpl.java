@@ -2,6 +2,7 @@ package com.kh.coreflow.chatting.model.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -12,9 +13,11 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class ChattingDaoImpl implements ChattingDao {
 	
 	private final SqlSessionTemplate session;
@@ -48,31 +51,10 @@ public class ChattingDaoImpl implements ChattingDao {
 	public int deleteFavoriteProfiles(userFavorite favUser) {
 		return session.delete("chat.deleteFavoriteProfiles",favUser);
 	}
-
-	@Override
-	public int findPrivateChatIdByUserNo(HashMap<String, Integer> mappingUser) {
-		String answer = session.selectOne("chat.findPrivateChatIdByUserNo",mappingUser);
-		int returnvalue = 0;
-		if(answer == null)
-			returnvalue=-1;
-		else
-			returnvalue=Integer.parseInt(answer);
-		return returnvalue;
-	}
 	
 	@Override
-	public chatRooms openPrivateChat(int roomId) {
-		return session.selectOne("chat.openPrivateChat",roomId);
-	}
-
-	@Override
-	public int makePrivateChat(chatRooms newChatRoom) {
-		return session.insert("chat.makePrivateChat",newChatRoom);
-	}
-
-	@Override
-	public int makePrivateChatJoin(HashMap<String, Integer> mappingUser) {
-		return session.insert("chat.makePrivateChatJoin",mappingUser);
+	public int makeChatRoom(chatRooms newChatRoom) {
+		return session.insert("chat.makeChatRoom",newChatRoom);
 	}
 
 	@Override
@@ -88,6 +70,36 @@ public class ChattingDaoImpl implements ChattingDao {
 	@Override
 	public List<chatRooms> getmyChattingRooms(int userNo) {
 		return session.selectList("chat.getMyChattingRooms",userNo);
+	}
+
+	@Override
+	public List<chatMessages> getLastMessagesForRooms(List<chatRooms> myRooms) {
+		return session.selectList("chat.selectLastMessagesForRooms",myRooms);
+	}
+
+	@Override
+	public int findRoomByMember(List<Integer> privateMember) {
+		Map<String, Object> params = new HashMap<>();
+	    
+	    params.put("userNos", privateMember);
+	    params.put("userCount", privateMember.size());
+	    
+	    Long answer = session.selectOne("chat.findRoomByMember", params);
+	    return answer.intValue();
+	}
+
+	@Override
+	public chatRooms openChat(int roomId) {
+		return session.selectOne("chat.openChat",roomId);
+	}
+
+	@Override
+	public int makeChatJoin(int roomId, List<Integer> chatRoomJoin) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("roomId", roomId);
+	    params.put("userNos", chatRoomJoin);
+	    log.info("list : {}",chatRoomJoin);
+	    return session.insert("chat.insertChatRoomJoins", params);
 	}
 
 }

@@ -2,6 +2,9 @@ package com.kh.coreflow.chatting.model.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.kh.coreflow.model.dto.UserDto.User;
@@ -62,40 +65,28 @@ public class ChattingServiceImpl implements ChattingService {
 	public int deleteFavoriteProfiles(userFavorite favUser) {
 		return chattingDao.deleteFavoriteProfiles(favUser);
 	}
-
+	
 	@Override
 	@Transactional
-	public chatRooms openPrivateChat(HashMap<String, Integer> mappingUser) {
-		int roomId = chattingDao.findPrivateChatIdByUserNo(mappingUser);
-		if(roomId==-1)
-			return null;
-		return chattingDao.openPrivateChat(roomId);
-		
-	}
-
-	@Override
-	@Transactional
-	public chatRooms makePrivateChat(HashMap<String, Integer> mappingUser) {
+	public int makeChat(int userNo, Map<String, Object> newChatParam, String type) {
 		chatRooms newChatRoom = new chatRooms();
-		int partnerNo = mappingUser.get("partnerNo");
-		User partner = authDao.findUserByUserNo(partnerNo);
-		log.info("partner : {}", partner);
-		newChatRoom.setRoomName(partner.getName() + "님과의 채팅");
-		newChatRoom.setRoomType("PRIVATE");
-		newChatRoom.setUserNo(mappingUser.get("userNo"));
-		int answer = chattingDao.makePrivateChat(newChatRoom);
-		if(answer>0) {
-			mappingUser.put("roomId", Long.valueOf(newChatRoom.getRoomId()).intValue());
-			answer = chattingDao.makePrivateChatJoin(mappingUser);
-			if(answer>0) {
-				log.info("info : {}",mappingUser);
-				int roomId = chattingDao.findPrivateChatIdByUserNo(mappingUser);
-				return chattingDao.openPrivateChat(roomId);
-			}else
-				return null;
+		newChatRoom.setRoomType(type);
+		newChatRoom.setUserNo(userNo);
+		if(type.equals("PRIVATE")) {
+			int partnerNo = (int)newChatParam.get("partner");
+			User partner = authDao.findUserByUserNo(partnerNo);
+			newChatRoom.setRoomName(partner.getName() + "님과의 채팅");
+			newChatParam.remove("partner");
+		}else {
+			newChatRoom.setRoomName((String)newChatParam.get("roomName"));
 		}
-		else
-			return null;
+		
+		int answer = chattingDao.makeChatRoom(newChatRoom);
+		if(answer>0) {
+			int roomId = Long.valueOf(newChatRoom.getRoomId()).intValue();
+			answer = chattingDao.makeChatJoin(roomId,(List<Integer>)newChatParam.get("participantUserNos"));
+		}
+		return answer;
 	}
 
 	@Override
@@ -111,7 +102,31 @@ public class ChattingServiceImpl implements ChattingService {
 
 	@Override
 	public List<chatRooms> getmyChattingRooms(int userNo) {
-		return chattingDao.getmyChattingRooms(userNo);
+		List<chatRooms> myRooms = chattingDao.getmyChattingRooms(userNo);
+
+        if (myRooms != null && !myRooms.isEmpty()) {
+            List<chatMessages> lastMessages = chattingDao.getLastMessagesForRooms(myRooms);
+            Map<Long, chatMessages> lastMessageMap = lastMessages.stream().collect(Collectors.toMap(chatMessages::getRoomId, Function.identity()));
+
+            myRooms.forEach(room -> {
+                chatMessages lastMsg = lastMessageMap.get(room.getRoomId());
+                if (lastMsg != null) {
+                    room.setLastMessage(lastMsg);
+                }
+            
+            });
+        }
+        
+        return myRooms;
+	}
+
+	@Override
+	@Transactional
+	public chatRooms openChat(List<Integer> privateMember) {
+		int roomId = chattingDao.findRoomByMember(privateMember);
+		if(roomId==-1)
+			return null;
+		return chattingDao.openChat(roomId);
 	}
 
 }

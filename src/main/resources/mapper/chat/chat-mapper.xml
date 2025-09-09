@@ -58,19 +58,22 @@
 		FAVORITE_USER_NO = #{favoriteUserNo}
 	</delete>
 	
-	<select id="findPrivateChatIdByUserNo" parameterType="map" resultType="String">
-		SELECT MY.ROOM_ID
-		FROM CHAT_ROOM_JOIN MY 
-		LEFT JOIN CHAT_ROOM_JOIN OTHER ON MY.ROOM_ID = OTHER.ROOM_ID
-		WHERE OTHER.USER_NO = #{partnerNo} AND MY.USER_NO = #{userNo}
+	<select id="findRoomByMember" parameterType="map" resultType="long">
+	    SELECT ROOM_ID FROM CHAT_ROOM_JOIN
+	    GROUP BY ROOM_ID HAVING COUNT(USER_NO) = #{userCount}
+	    AND SUM(CASE WHEN USER_NO IN
+        <foreach collection="userNos" item="userNo" open="(" separator="," close=")">
+        	#{userNo}
+        </foreach>
+        THEN 1 ELSE 0 END) = #{userCount}
 	</select>
 	
-	<select id="openPrivateChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
 		SELECT * FROM CHAT_ROOMS
 		WHERE ROOM_ID=#{roomId}
 	</select>
 	
-	<insert id="makePrivateChat" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
+	<insert id="makeChatRoom" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
 		INSERT INTO CHAT_ROOMS (
 			USER_NO, ROOM_NAME, ROOM_TYPE
 		) VALUES (
@@ -78,13 +81,12 @@
 		)
 	</insert>
 	
-	<insert id="makePrivateChatJoin" parameterType="map" >
-		INSERT ALL
-		INTO CHAT_ROOM_JOIN( USER_NO, ROOM_ID )
-			VALUES (#{userNo}, #{roomId})
-		INTO CHAT_ROOM_JOIN( USER_NO, ROOM_ID )
-			VALUES (#{partnerNo}, #{roomId})
-		SELECT * FROM DUAL
+	<insert id="insertChatRoomJoins" parameterType="map">
+    INSERT ALL
+        <foreach collection="userNos" item="userNo">
+            INTO CHAT_ROOM_JOIN(USER_NO, ROOM_ID) VALUES (#{userNo}, #{roomId})
+        </foreach>
+    SELECT * FROM DUAL
 	</insert>
 	
 	<insert id="insertMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages" >
@@ -116,4 +118,36 @@
 	ON A.ROOM_ID = B.ROOM_ID
 	WHERE B.USER_NO = #{userNo}
 	</select>	
+	
+	<select id="selectLastMessagesForRooms" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+    SELECT
+        MESSAGE_ID,
+        ROOM_ID,
+        USER_NO,
+        MESSAGE_TEXT,
+        SENT_AT,
+        IS_FILE,
+        TYPE
+    FROM (
+        SELECT
+            M.MESSAGE_ID,
+            M.ROOM_ID,
+            M.USER_NO,
+            M.MESSAGE_TEXT,
+            M.SENT_AT,
+            M.IS_FILE,
+            M.TYPE,
+            ROW_NUMBER() OVER (PARTITION BY M.ROOM_ID ORDER BY M.SENT_AT DESC) AS RN
+        FROM
+            CHAT_MESSAGES M
+        WHERE
+            M.ROOM_ID IN
+            <foreach collection="list" item="room" open="(" separator="," close=")">
+                #{room.roomId}
+            </foreach>
+    )
+    WHERE
+        RN = 1
+	</select>
+
 </mapper>

@@ -2,6 +2,7 @@ package com.kh.coreflow.chatting.model.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
@@ -20,14 +21,14 @@ public interface ChattingService {
 
 	int deleteFavoriteProfiles(userFavorite favUser);
 
-	chatRooms openPrivateChat(HashMap<String, Integer> mappingUser);
-
-	chatRooms makePrivateChat(HashMap<String, Integer> mappingUser);
-
 	int insertMessage(chatMessages message);
 
 	List<chatMessages> getMessages(int roomId);
 
 	List<chatRooms> getmyChattingRooms(int userNo);
+
+	int makeChat(int userNo, Map<String, Object> newChatParam, String string);
+
+	chatRooms openChat(List<Integer> privateMember);
 
 }

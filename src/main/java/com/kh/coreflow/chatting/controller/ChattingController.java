@@ -1,7 +1,9 @@
 package com.kh.coreflow.chatting.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
@@ -91,13 +94,19 @@ public class ChattingController {
 			@AuthenticationPrincipal int userNo,
 			@PathVariable("userNo") int partnerUserNo
 			){
-		HashMap<String,Integer> mappingUser = new HashMap<String,Integer>();
-		mappingUser.put("userNo", userNo);
-		mappingUser.put("partnerNo",partnerUserNo);
-		log.info("info:{}",mappingUser);
-		chatRooms resultRoom = chattingService.openPrivateChat(mappingUser);
+		
+		HashMap<String,Object> mappingParameter = new HashMap<String,Object>();
+		List<Integer> privateMember = new ArrayList<Integer>();
+		privateMember.add(userNo);
+		privateMember.add(partnerUserNo);
+		
+		
+		mappingParameter.put("participantUserNos",privateMember);
+		mappingParameter.put("partner", partnerUserNo);
+		chatRooms resultRoom = chattingService.openChat(privateMember);
 		if(resultRoom == null) {
-			resultRoom = chattingService.makePrivateChat(mappingUser);
+			int answer = chattingService.makeChat(userNo,mappingParameter,"PRIVATE");
+			resultRoom = chattingService.openChat(privateMember);
 			if(resultRoom==null) {
 				return ResponseEntity.badRequest().build();
 			}
@@ -124,5 +133,14 @@ public class ChattingController {
 			){
 		List<chatRooms> list = chattingService.getmyChattingRooms(userNo);
 		return ResponseEntity.ok(list);
+	}
+	
+	@PostMapping("/public")
+	public ResponseEntity<Void> MakePublicRoom(
+			@AuthenticationPrincipal int userNo,
+			@RequestBody Map<String,Object> newChatParam
+			){
+		int result = chattingService.makeChat(userNo,newChatParam,"PUBLIC");
+		return null;
 	}
 }
