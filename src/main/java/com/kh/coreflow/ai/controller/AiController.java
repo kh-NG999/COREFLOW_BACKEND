@@ -55,7 +55,6 @@ public class AiController {
 		Long userNo = Long.parseLong(auth.getPrincipal().toString());
 		
 		Integer count = service.countAiUsage(userNo);
-		System.out.println(count);
 		
 		if (count != null) {
 			if (count > 0) {
@@ -121,7 +120,6 @@ public class AiController {
 		map.put("title", chatSession.getTitle());
 		
 		int result = service.insertSession(map);
-		System.out.println(map.get("sessionId"));
 		
 		if (result > 0) {
 			return ResponseEntity.ok(Long.parseLong(map.get("sessionId").toString()));
