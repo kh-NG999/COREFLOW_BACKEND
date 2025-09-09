@@ -37,21 +37,21 @@ public class UserServiceImpl implements UserService{
 	
 	
 	@Override
-	public List<Object> getMySchedule(int userNo) {
+	public List<Object> getMySchedule(Long userNo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void updateMyInfo(UserUpdate userUpdate, MultipartFile profileImage) {
-		int userNo = userUpdate.getUserNo();
+		Long userNo = userUpdate.getUserNo();
 		
 		User user = authService.findUserByUserNo(userNo)
 				.orElseThrow(() -> new RuntimeException("에러가 발생하였습니다"));
 	}
 
 	@Override
-	public void updatePassword(int userNo, String userPwd, String string) {
+	public void updatePassword(Long userNo, String userPwd, String string) {
 		User user = authDao.findUserByUserNo(userNo)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 		String encodedPwd = encoder.encode(string);
@@ -59,18 +59,18 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void updatePhone(int userNo, String string) {
+	public void updatePhone(Long userNo, String string) {
 		authDao.updatePhone(userNo, string);
 	}
 
 	@Override
-	public void updateAddress(int userNo, String string) {
+	public void updateAddress(Long userNo, String string) {
 		authDao.updateAddress(userNo, string);
 	}
 	
 	@Override
 	@Transactional
-	public String updateProfileImage(int userNo, MultipartFile profile) {
+	public String updateProfileImage(Long userNo, MultipartFile profile) {
 		String webPath = "/resources/static/images/p/";
         String serverFolderPath = "src/main/resources/static/images/p/";
         File dir = new File(serverFolderPath);

@@ -30,7 +30,7 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(int userNo, int depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, Long depId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
@@ -42,7 +42,7 @@ public class JWTProvider {
 				.compact();
 	}
 
-	public String createRefreshToken(int userNo, int i) {
+	public String createRefreshToken(Long userNo, int i) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
@@ -52,8 +52,8 @@ public class JWTProvider {
 				.compact();
 	}
 
-	public int getUserNo(String token) {
-		return Integer.valueOf(
+	public Long getUserNo(String token) {
+		return Long.valueOf(
 				Jwts.parserBuilder()
 				.setSigningKey(key)
 				.build()
@@ -63,8 +63,8 @@ public class JWTProvider {
 				);
 	}
 
-	public int parseRefresh(String token) {
-		return Integer.valueOf(
+	public Long parseRefresh(String token) {
+		return Long.valueOf(
 				Jwts.parserBuilder()
 				.setSigningKey(refreshKey)
 				.build()
@@ -92,13 +92,13 @@ public class JWTProvider {
 	    return List.of();
 	}
 	
-	public int getDeptcode(String token) {
+	public Long getDeptcode(String token) {
 		Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-		return claims.get("depId", Integer.class);
+		return claims.get("depId", Long.class);
 	}
 	
 }
