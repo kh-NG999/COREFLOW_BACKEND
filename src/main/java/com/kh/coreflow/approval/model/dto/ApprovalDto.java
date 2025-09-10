@@ -17,9 +17,12 @@ public class ApprovalDto {
     private Date startDate;
     private Date endDate;
     private Date saveDate;		// 임시저장날짜
+    
+    private List<Integer> approverUserNo;
+    private List<Integer> ccUserNo;
 	
 	
-	private List<ApprovalLineDto> lines;
+//	private List<ApprovalLineDto> lines;
 	
 	private List<ApprovalFileDto> files;
 

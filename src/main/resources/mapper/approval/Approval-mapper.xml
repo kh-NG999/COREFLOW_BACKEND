@@ -3,9 +3,29 @@
 <mapper namespace="approvalMapper">
 
     <!-- 결재문서 등록 -->
-    <insert id="insertApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto" useGeneratedKeys="true" keyProperty="approvalId">
-        INSERT INTO approval (user_no, approval_title, approval_detail, approval_type, approval_status, start_date)
-        VALUES (#{userNo}, #{approvalTitle}, #{approvalDetail}, #{approvalType}, #{approvalStatus}, #{startDate})
+    <insert id="insertApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+    
+    <selectKey keyProperty="approvalId" resultType="int" order="BEFORE">
+    	SELECT APPROVAL_ID_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+        INSERT INTO approval (
+		approval_id,
+		user_no, 
+		approval_title, 
+		approval_detail, 
+		approval_type, 
+		approval_status, 
+		start_date
+		)
+        VALUES 
+        (
+		#{approvalId},
+		#{userNo}, 
+        #{approvalTitle}, 
+        #{approvalDetail}, 
+        #{approvalType}, 
+        #{approvalStatus}, 
+        #{startDate})
     </insert>
 
     <!-- 문서 상세조회 -->
@@ -24,9 +44,12 @@
     </update>
 
     <!-- 결재선 등록 -->
-    <insert id="insertApprovalLine" parameterType="com.kh.coreflow.approval.model.dto.ApprovalLineDto" useGeneratedKeys="true" keyProperty="lineId">
-        INSERT INTO approval_line (approval_id, approval_no, line_order, line_status)
-        VALUES (#{approvalId}, #{approvalNo}, #{lineOrder}, #{lineStatus})
+    <insert id="insertApprovalLine" parameterType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+       <selectKey keyProperty="lineId" resultType="int" order="BEFORE">
+       		SELECT APPROVAL_LINE_ID_SEQ.NEXTVAL FROM DUAL
+       </selectKey>
+        INSERT INTO approval_line (line_id, approval_id, approver_user_no, line_order, line_status)
+        VALUES (#{lineId}, #{approvalId}, #{approverUserNo}, #{lineOrder}, #{lineStatus})
     </insert>
 
     <!-- 결재선 조회 -->
@@ -63,9 +86,26 @@
     </select>
 
     <!-- 첨부파일 등록 -->
-    <insert id="insertApprovalFile" parameterType="com.kh.coreflow.approval.model.dto.ApprovalFileDto" useGeneratedKeys="true" keyProperty="fileId">
-        INSERT INTO approval_file (approval_id, file_name, file_path)
-        VALUES (#{approvalId}, #{fileName}, #{filePath})
+    <insert id="insertApprovalFile" parameterType="com.kh.coreflow.approval.model.dto.ApprovalFileDto">
+        <selectKey keyProperty="fileId" resultType="int" order="BEFORE">
+        	SELECT APPROVAL_FILE_ID_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        
+        INSERT INTO approval_file (
+        file_id, 
+        approval_id, 
+        original_file_name, 
+        saved_file_name, 
+        file_path, 
+        file_size
+    ) VALUES (
+        #{fileId},
+        #{approvalId},
+        #{originalFileName},
+        #{savedFileName},
+        #{filePath},
+        #{fileSize}
+    )
     </insert>
 
     <!-- 첨부파일 조회 -->

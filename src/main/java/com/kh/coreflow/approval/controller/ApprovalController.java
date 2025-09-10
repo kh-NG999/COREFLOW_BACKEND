@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,12 +19,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
 import com.kh.coreflow.approval.model.dto.ApprovalFileDto;
 import com.kh.coreflow.approval.model.dto.ApprovalLineDto;
 import com.kh.coreflow.approval.model.service.ApprovalService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.security.CustomUserDetails;
 import com.kh.coreflow.security.model.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api.approvals")
+@RequestMapping("/approvals")
 @CrossOrigin(origins = "*")
 @Tag(name = "Approval API", description = "")
 public class ApprovalController {
@@ -45,11 +50,19 @@ public class ApprovalController {
 	
 	// 문서작성
 	@Operation(summary = "결재문서 작성")
-	@PostMapping("")
-    public ResponseEntity<Integer> submitApproval(@RequestBody ApprovalDto approval,
-                                                  Principal principal) {
+	@PostMapping(consumes={"multipart/form-data"})
+    public ResponseEntity<?> submitApproval(
+    		@RequestPart("approvalData") ApprovalDto approval,
+    		@RequestPart(value = "files",required = false) MultipartFile file,
+                          Principal principal) {
+		
+		if (approval.getApprovalTitle() == null || approval.getApprovalTitle().trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("제목은 필수입력 항목입니다");
+		}
         int userNo = getUserNoFromPrincipal(principal); // DB에서 userNo 조회
-        int approvalId = service.submitApproval(approval, userNo);
+        
+        int approvalId = service.submitApproval(approval,file, userNo);
+        
         return ResponseEntity.ok(approvalId);
     }
 
@@ -69,14 +82,14 @@ public class ApprovalController {
     }
 
     // 문서 상세 조회
-    @Operation(summary = "결재문서 상세 조회")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApprovalDto> getApproval(@PathVariable int id,
-    												Principal principal) {
-    	int userNo = getUserNoFromPrincipal(principal);
-        ApprovalDto approval = service.getApproval(id);
-        return ResponseEntity.ok(approval);
-    }
+//    @Operation(summary = "결재문서 상세 조회")
+//    @GetMapping("/{id}")
+//    public ResponseEntity<ApprovalDto> getApproval(@PathVariable int id,
+//    												Principal principal) {
+//    	int userNo = getUserNoFromPrincipal(principal);
+//        ApprovalDto approval = service.getApproval(id);
+//        return ResponseEntity.ok(approval);
+//    }
 	
 	// 현재 로그인 유저 대기중 문서조회
     @Operation(summary = "현재 로그인 유저의 대기 중 문서 목록 조회")
@@ -106,9 +119,13 @@ public class ApprovalController {
 
     // Principal 객체에서 사용자 번호를 가져오는 유틸리티 메서드 (구현 필요)
     private int getUserNoFromPrincipal(Principal principal) {
-        // 실제 구현에서는 Principal 객체에서 userNo를 추출하는 로직이 필요합니다.
-        // 예시: String username = principal.getName();
-        //      return dao.findUserNoByUsername(username);
-        return 1; // 임시 값
+    	Authentication authentication = (Authentication) principal;
+    	
+    	UserDeptcode userDetails = (UserDeptcode) authentication.getPrincipal();        
+    	return userDetails.getUserNo();
     }
 }
+
+
+
+

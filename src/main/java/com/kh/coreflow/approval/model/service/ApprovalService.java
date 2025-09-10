@@ -1,10 +1,15 @@
 package com.kh.coreflow.approval.model.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.approval.model.dao.ApprovalDao;
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
@@ -15,32 +20,72 @@ import com.kh.coreflow.approval.model.dto.ApprovalLineDto;
 public class ApprovalService {
 
     private final ApprovalDao dao;
+    @Value("${file.upload-dir}")
+    private String uploadPath;
 
     public ApprovalService(ApprovalDao dao) {
         this.dao = dao;
     }
 
     @Transactional
-    public int submitApproval(ApprovalDto approval, int userNo) {
+    public int submitApproval(ApprovalDto approval,MultipartFile file, int userNo) {
         approval.setUserNo(userNo);
-        approval.setApprovalStatus(1);
+//        approval.setApprovalStatus(1);
         approval.setSaveDate(new Date());
         dao.insertApproval(approval);
 
-        if (approval.getLines() != null) {
-            int order = 1;
-            for (ApprovalLineDto line : approval.getLines()) {
+        // 결재선 정보
+        if (approval.getApproverUserNo() != null) {
+            for (Integer approverNo : approval.getApproverUserNo()) {
+            	ApprovalLineDto line = new ApprovalLineDto();
                 line.setApprovalId(approval.getApprovalId());
-                line.setLineOrder(order++);
-                line.setLineStatus(line.getLineOrder() == 1 ? "WAITING" : "PENDING");
+                line.setApproverUserNo(approverNo);
+                line.setLineOrder(1);
+                line.setLineStatus("WAITING");
                 dao.insertApprovalLine(line);
             }
         }
+        // 참조자 저장
+        if (approval.getCcUserNo() != null) {
+        	for (Integer ccNo : approval.getCcUserNo()) {
+        		ApprovalLineDto line = new ApprovalLineDto();
+        		line.setApprovalId(approval.getApprovalId());
+        		line.setApproverUserNo(ccNo);
+        		line.setLineOrder(2);
+        		line.setLineStatus("PENDING");
+        		dao.insertApprovalLine(line);
+        	}
+        }
 
-        if (approval.getFiles() != null) {
-            for (ApprovalFileDto file : approval.getFiles()) {
-                file.setApprovalId(approval.getApprovalId());
-                dao.insertApprovalFile(file);
+        // 파일정보
+        if (file != null && !file.isEmpty()) {
+            try {
+            	// 파일객체 생성
+            	File uploadDir = new File(uploadPath);
+            	
+            	//폴더없으면 폴더생성
+            	if (!uploadDir.exists()) {
+            		uploadDir.mkdir(); 
+            	}
+            	String uploadPath = "C:/uploads/";
+            	
+            	String originalFileName = file.getOriginalFilename();
+            	String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
+            	String uniqueFileName = UUID.randomUUID().toString() + ext;
+            	
+            	File saveFile = new File(uploadPath + uniqueFileName);
+            	file.transferTo(saveFile);
+            	
+            	ApprovalFileDto fileDto = new ApprovalFileDto();
+            	fileDto.setApprovalId(approval.getApprovalId());
+            	fileDto.setOriginalFileName(originalFileName);
+            	fileDto.setFilePath(uploadPath+ uniqueFileName);
+            	fileDto.setFileSize(file.getSize());
+            	
+            	dao.insertApprovalFile(fileDto);
+            } catch (IOException e) {
+            	e.printStackTrace();
+            	throw new RuntimeException("파일 저장 실패");
             }
         }
 
@@ -78,12 +123,12 @@ public class ApprovalService {
         }
     }
 
-    public ApprovalDto getApproval(int approvalId) {
-        ApprovalDto approval = dao.findById(approvalId);
-        approval.setLines(dao.findLinesByApprovalId(approvalId));
-        approval.setFiles(dao.findFilesByApprovalId(approvalId));
-        return approval;
-    }
+//    public ApprovalDto getApproval(int approvalId) {
+//        ApprovalDto approval = dao.findById(approvalId);
+//        approval.setLines(dao.findLinesByApprovalId(approvalId));
+//        approval.setFiles(dao.findFilesByApprovalId(approvalId));
+//        return approval;
+//    }
 
     public List<ApprovalDto> getAllDocuments() {
         return dao.selectAllApprovals();
@@ -100,6 +145,8 @@ public class ApprovalService {
     public List<ApprovalFileDto> getApprovalFiles(int approvalId){
     	return dao.findFilesByApprovalId(approvalId);
     }
+
+	
     
     
     

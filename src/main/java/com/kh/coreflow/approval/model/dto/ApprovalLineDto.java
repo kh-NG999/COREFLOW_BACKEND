@@ -9,8 +9,7 @@ import lombok.Data;
 public class ApprovalLineDto {
 	private int lineId;
     private long approvalId;
-    private int userNo; // 결재자 ID
     private int lineOrder; // 결재 순서 (1, 2, 3...)
     private String lineStatus; // WAITING(대기), PENDING(예정), APPROVED(승인), REJECTED(반려)
-    private Date processDate;
+    private int approverUserNo;
 }
