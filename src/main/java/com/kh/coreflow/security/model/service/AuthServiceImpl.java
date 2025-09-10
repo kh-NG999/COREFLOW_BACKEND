@@ -128,10 +128,28 @@ public class AuthServiceImpl implements AuthService{
 
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
 		
-		return AuthResult.builder()
-				.accessToken(accessToken)
-				.user(user)
-				.build();
+	    User userWithRoles = User.builder()
+	            .userNo(user.getUserNo())
+	            .email(user.getEmail())
+	            .userName(user.getUserName())
+	            .profile(user.getProfile())
+	            .depId(user.getDepId())
+	            .roles(userAuth.getRoles())
+	            .build();
+
+	    User userWithRole = User.builder()
+	            .userNo(user.getUserNo())
+	            .email(user.getEmail())
+	            .userName(user.getUserName())
+	            .profile(user.getProfile())
+	            .depId(user.getDepId())
+	            .roles(userAuth.getRoles())
+	            .build();
+
+	    return AuthResult.builder()
+	            .accessToken(accessToken)
+	            .user(userWithRole)
+	            .build();
 	}
 
 	@Override

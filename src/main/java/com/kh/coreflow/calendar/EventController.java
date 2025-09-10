@@ -18,6 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kh.coreflow.calendar.model.dto.EventDto;
 import com.kh.coreflow.calendar.model.service.EventService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.security.CustomUserDetails;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,23 +38,23 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventDto.Res>> list(
-            @AuthenticationPrincipal Integer me,
+            @AuthenticationPrincipal UserDeptcode me,
             @RequestParam Long calendarId,
             @RequestParam String from,
             @RequestParam String to
     ) {
         if (me == null) return ResponseEntity.status(401).build();
-        return ResponseEntity.ok(eventService.getEvents(me.longValue(), calendarId, from, to));
+        return ResponseEntity.ok(eventService.getEvents(me.getUserNo(), calendarId, from, to));
     }
 
     @PostMapping
     public ResponseEntity<EventIdResponse> create(
-            @AuthenticationPrincipal Integer me,
+            @AuthenticationPrincipal UserDeptcode me,
             @Valid @RequestBody EventDto.Req req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
 
-        Long id = eventService.createEvent(me.longValue(), req);
+        Long id = eventService.createEvent(me.getUserNo(), req);
 
         // ✅ 현재 요청(/api/events) 기준으로 Location: /api/events/{id} 생성
         URI location = ServletUriComponentsBuilder
@@ -68,22 +70,22 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     public ResponseEntity<Void> update(
-            @AuthenticationPrincipal Integer me,
+            @AuthenticationPrincipal UserDeptcode me,
             @PathVariable Long eventId,
             @Valid @RequestBody EventDto.Req req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
-        eventService.updateEvent(me.longValue(), eventId, req);
+        eventService.updateEvent(me.getUserNo(), eventId, req);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal Integer me,
+            @AuthenticationPrincipal UserDeptcode me,
             @PathVariable Long eventId
     ) {
         if (me == null) return ResponseEntity.status(401).build();
-        eventService.deleteEvent(me.longValue(), eventId);
+        eventService.deleteEvent(me.getUserNo(), eventId);
         return ResponseEntity.noContent().build();
     }
     

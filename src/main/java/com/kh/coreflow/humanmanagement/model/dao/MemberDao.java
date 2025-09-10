@@ -73,6 +73,6 @@ public class MemberDao implements MemberDaoImpl{
 	}
 	@Override
 	public List<DepartmentLite> findAll() {
-		return session.selectList("department.findAll");
+		return session.selectList("member.findAll");
 	}
 }
