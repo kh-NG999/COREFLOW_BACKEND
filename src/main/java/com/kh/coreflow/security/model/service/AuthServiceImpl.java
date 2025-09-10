@@ -126,30 +126,25 @@ public class AuthServiceImpl implements AuthService{
 		}
 		Long depId = user.getDepId();
 
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
+		// 2. 토큰 발급
+		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
+		log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 		
-	    User userWithRoles = User.builder()
-	            .userNo(user.getUserNo())
-	            .email(user.getEmail())
-	            .userName(user.getUserName())
-	            .profile(user.getProfile())
-	            .depId(user.getDepId())
-	            .roles(userAuth.getRoles())
-	            .build();
+		User userNoPassword = User.builder()
+								.userNo(user.getUserNo())
+								.email(user.getEmail())
+								.userName(user.getUserName())
+								.profile(user.getProfile())
+								.roles(userAuth.getRoles())
+								.depId(user.getDepId())
+								.build();
 
-	    User userWithRole = User.builder()
-	            .userNo(user.getUserNo())
-	            .email(user.getEmail())
-	            .userName(user.getUserName())
-	            .profile(user.getProfile())
-	            .depId(user.getDepId())
-	            .roles(userAuth.getRoles())
-	            .build();
-
-	    return AuthResult.builder()
-	            .accessToken(accessToken)
-	            .user(userWithRole)
-	            .build();
+		return AuthResult.builder()
+				.accessToken(accessToken)
+				.refreshToken(refreshToken)
+				.user(userNoPassword)
+				.build();
 	}
 
 	@Override
