@@ -39,6 +39,11 @@ public class VacationServiceImpl implements VacationService{
 	}
 
 	@Override
+	public int vacStatusUpdate(Map<String, Object> params) {
+		return dao.vacStatusUpdate(params);
+	}
+	
+	@Override
 	public LoginUser loginUserProfile(long userNo) {
 		return dao.loginUserProfile(userNo);
 	}
@@ -57,5 +62,4 @@ public class VacationServiceImpl implements VacationService{
 	public int putPerVac(Map<String, Object> params) {
 		return dao.putPerVac(params);
 	}
-
 }

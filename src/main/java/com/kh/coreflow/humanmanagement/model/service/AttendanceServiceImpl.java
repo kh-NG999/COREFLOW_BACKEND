@@ -15,8 +15,14 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceServiceImpl implements AttendanceService{
 	private final AttendanceDao dao;
 
-	public List<AttendanceInfo> attInfo(Map<String, Object> params) {
-		return dao.attInfo(params);
+	@Override
+	public List<AttendanceInfo> memAttendance(Map<String, Object> params) {
+		return dao.memAttendance(params);
+	}
+
+	@Override
+	public List<AttendanceInfo> perAttendance(Map<String, Object> params) {
+		return dao.perAttendance(params);
 	}
 
 }

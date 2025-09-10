@@ -19,6 +19,8 @@ public interface VacationDao {
 
 	List<MemberVacation> memVacation(Map<String, Object> params);
 
+	int vacStatusUpdate(Map<String, Object> params);
+	
 	LoginUser loginUserProfile(long userNo);
 	
 	List<MemberVacation> perVacation(Map<String, Object> params);

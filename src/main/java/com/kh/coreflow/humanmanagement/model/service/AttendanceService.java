@@ -7,6 +7,8 @@ import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
 
 public interface AttendanceService {
 
-	List<AttendanceInfo> attInfo(Map<String, Object> paramsLocalDate);
+	List<AttendanceInfo> memAttendance(Map<String, Object> paramsLocalDate);
+
+	List<AttendanceInfo> perAttendance(Map<String, Object> params);
 
 }

@@ -40,6 +40,11 @@ public class VacationDaoImpl implements VacationDao{
 	}
 	
 	@Override
+	public int vacStatusUpdate(Map<String, Object> params) {
+		return session.update("vacation.vacStatusUpdate",params);
+	}
+	
+	@Override
 	public LoginUser loginUserProfile(long userNo) {
 		return session.selectOne("vacation.loginUserProfile",userNo);
 	}
@@ -58,5 +63,4 @@ public class VacationDaoImpl implements VacationDao{
 	public int putPerVac(Map<String, Object> params) {
 		return session.insert("vacation.putPerVac",params);
 	}
-
 }

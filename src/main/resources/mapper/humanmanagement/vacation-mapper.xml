@@ -12,6 +12,7 @@
 	SELECT
 		V.USER_NO,
 		M.USER_NAME,
+		V.VAC_ID,
 		T.VAC_NAME,
 		V.VAC_START,
 		V.VAC_END,
@@ -44,6 +45,7 @@
 		SELECT
 			V.USER_NO,
 			M.USER_NAME,
+			V.VAC_ID,
 			T.VAC_NAME,
 			V.VAC_START,
 			V.VAC_END,
@@ -57,6 +59,13 @@
 			EXTRACT(YEAR FROM V.VAC_START) = #{year} AND
 			EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
 	</select>
+	
+	<!-- 휴가 승인 상태 업데이트 -->
+	<update id="vacStatusUpdate">
+		UPDATE VACATION
+		SET STATUS = #{putVacStatus.status}
+		WHERE VAC_ID = #{vacId}
+	</update>
 	
 	<!-- 로그인 사원 프로필 조회 -->
 	<select id="loginUserProfile" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$LoginUser">
@@ -77,6 +86,7 @@
 			VAC_CODE,
 			VAC_NAME
 		FROM VACATION_TYPE
+		WHERE VAC_CODE >= 4
 	</select>
 	
 	<!-- 로그인 사원 휴가 내역 조회 -->

@@ -34,10 +34,19 @@ public class VacationDto {
 	public static class MemberVacation{
 		private int userNo;
 		private String userName;
+		private int vacId;
 		private String vacName;
 		private Date vacStart;
 		private Date vacEnd;
 		private float vacAmount;
+		private int status;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PutVacStatus{
+		private int vacId;
 		private int status;
 	}
 	
