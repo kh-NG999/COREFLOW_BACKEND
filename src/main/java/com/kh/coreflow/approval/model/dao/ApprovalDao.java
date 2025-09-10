@@ -71,4 +71,11 @@ public class ApprovalDao {
 	public List<ApprovalDto> findPendingApprovals(int userId) {
 		return session.selectList("approvalMapper.findPendingApprovals", userId);
 	}
+	// 내문서 조회
+	public List<ApprovalDto> selectApprovalsByUserNo(int userNo) {
+		return session.selectList("approvalMapper.selectApprovalsByUserNo", userNo);
+	}
+	
+	
+	
 }

@@ -100,22 +100,25 @@ public class ApprovalController {
 		return ResponseEntity.ok(pending);
 	}
 	
-	@Operation(summary = "모든 문서 목록 조회")
-	@GetMapping("")
-    public ResponseEntity<?> getDocuments(@AuthenticationPrincipal Object principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
-        }
-        try {
-            List<ApprovalDto> documents = service.getAllDocuments();
-            return ResponseEntity.ok(documents);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "문서 가져오기 중 서버 에러 발생");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+	@Operation(summary = "내문서함 문서 조회")
+	@GetMapping("/my-documents")
+    public ResponseEntity<List<ApprovalDto>> getDocuments(Principal principal) {
+        int userNo = getUserNoFromPrincipal(principal);
+        
+        List<ApprovalDto> documents = service.getDocumentsByUser(userNo);
+        
+        return ResponseEntity.ok(documents);
     }
+	
+	@Operation(summary = "결재문서 상세 조회")
+	@GetMapping("/{id}")
+	public ResponseEntity<ApprovalDto> getApprovalDetails(@PathVariable("id") int approvalId){
+		ApprovalDto approval = service.getApprovalDetails(approvalId);
+		if (approval == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(approval);
+	}
 
     // Principal 객체에서 사용자 번호를 가져오는 유틸리티 메서드
     private int getUserNoFromPrincipal(Principal principal) {

@@ -22,9 +22,12 @@ public class ApprovalDto {
     private List<Integer> ccUserNo;
 	
 	
-//	private List<ApprovalLineDto> lines;
+	private List<ApprovalLineDto> lines;
 	
 	private List<ApprovalFileDto> files;
+
+
+	
 
 	
 	

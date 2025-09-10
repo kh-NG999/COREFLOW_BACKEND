@@ -29,7 +29,7 @@
     </insert>
 
     <!-- 문서 상세조회 -->
-    <select id="findById" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+    <select id="findById" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
         SELECT *
         FROM approval
         WHERE approval_id = #{id}
@@ -53,7 +53,7 @@
     </insert>
 
     <!-- 결재선 조회 -->
-    <select id="findLinesByApprovalId" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+    <select id="findLinesByApprovalId" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
         SELECT *
         FROM approval_line
         WHERE approval_id = #{approvalId}
@@ -109,28 +109,46 @@
     </insert>
 
     <!-- 첨부파일 조회 -->
-    <select id="findFileByApprovalId" parameterType="long" resultType="com.kh.coreflow.approval.model.dto.ApprovalFileDto">
+    <select id="findFilesByApprovalId" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalFileDto">
         SELECT *
         FROM approval_file
         WHERE approval_id = #{approvalId}
     </select>
 
     <!-- 작성자 기준 결재문서 조회 -->
-    <select id="selectApprovalsByWriter" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
-        SELECT *
-        FROM approval
-        WHERE user_no = #{userNo}
+    <select id="selectApprovalsByUserNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT 
+        	approval_id,
+        	user_no,
+        	approval_title,
+        	approval_type,
+        	approval_status,
+        	start_date
+        FROM 
+        	approval
+        WHERE 
+        	user_no = #{userNo}
         ORDER BY start_date DESC
     </select>
 
     <!-- 현재 결재자 승인 대기 문서 조회 -->
-    <select id="selectPendingApprovalsByApprover" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
-        SELECT a.*
-        FROM approval a
-        JOIN approval_line l ON a.approval_id = l.approval_id
-        WHERE l.approval_no = #{approverNo}
-          AND l.line_status = 'WAITING'
-        ORDER BY a.start_date DESC
+    <select id="selectReceivedApprovalsByUserNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+        SELECT
+        	A.approval_id,
+        	A.user_no,
+        	A.approval_title,
+        	A.approval_type,
+        	A.approval_status,
+        	A.start_date
+        FROM 
+        	approval A
+        INNER JOIN 
+        	approval_line L ON a.approval_id = l.approval_id
+        WHERE 
+        	L.approval_user_no = #{userNo}
+          AND L.line_status = 'WAITING'
+        ORDER BY 
+        A.start_date DESC
     </select>
 
     <!-- 검색 (예시: 제목/내용) -->

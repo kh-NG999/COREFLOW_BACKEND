@@ -146,6 +146,28 @@ public class ApprovalService {
     	return dao.findFilesByApprovalId(approvalId);
     }
 
+	public List<ApprovalDto> getDocumentsByUser(int userNo) {
+		return dao.selectApprovalsByUserNo(userNo);
+	}
+
+	public ApprovalDto getApprovalDetails(int approvalId) {
+		
+		ApprovalDto approval = dao.findById(approvalId);
+		
+		if(approval != null) {
+			approval.setLines(dao.findLinesByApprovalId(approvalId));
+			approval.setFiles(dao.findFilesByApprovalId(approvalId));
+		}
+		return approval;
+		
+	}
+
+	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo) {
+		return dao.selectApprovalsByUserNo(userNo);
+	}
+
+}
+
 	
     
     
@@ -154,4 +176,3 @@ public class ApprovalService {
     
     
     
-}
