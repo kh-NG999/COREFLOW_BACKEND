@@ -14,9 +14,9 @@ public class ChattingDto {
 	@AllArgsConstructor
 	@Builder
 	public static class chatMessages{
-		private long messageId;
-		private long roomId;
-		private long userNo;
+		private Long messageId;
+		private Long roomId;
+		private Long userNo;
 		private String messageText;
 		private Date sentAt;
 		private String isFile;
@@ -35,7 +35,7 @@ public class ChattingDto {
 	@AllArgsConstructor
 	@Builder
 	public static class chatProfile{
-		private long userNo;
+		private Long userNo;
 		private String userName;
 		private String status;
 	}
@@ -45,8 +45,8 @@ public class ChattingDto {
 	@AllArgsConstructor
 	@Builder
 	public static class chatRoomJoin{
-		private long userNo;
-		private long roomId;
+		private Long userNo;
+		private Long roomId;
 		private Date joinedAt;
 		private Date lastReadAt;
 	}
@@ -56,8 +56,8 @@ public class ChattingDto {
 	@AllArgsConstructor
 	@Builder
 	public static class chatRooms{
-		private long roomId;
-		private long userNo;
+		private Long roomId;
+		private Long userNo;
 		private String roomName;
 		private String roomType;
 		private String status;
@@ -70,8 +70,8 @@ public class ChattingDto {
 	@AllArgsConstructor
 	@Builder
 	public static class userFavorite{
-		private long favoriteId;
-		private long userNo;
-		private long favoriteUserNo;
+		private Long favoriteId;
+		private Long userNo;
+		private Long favoriteUserNo;
 	}
 }

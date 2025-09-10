@@ -11,11 +11,11 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 
 public interface ChattingService {
 
-	List<chatProfile> getChatProfiles(int userNo);
+	List<chatProfile> getChatProfiles(Long userNo);
 
-	chatProfile getMyProfile(int userNo);
+	chatProfile getMyProfile(Long userNo);
 
-	List<chatProfile> getFavoriteProfiles(int userNo);
+	List<chatProfile> getFavoriteProfiles(Long userNo);
 
 	int insertFavoriteProfiles(userFavorite favUser);
 
@@ -23,12 +23,14 @@ public interface ChattingService {
 
 	int insertMessage(chatMessages message);
 
-	List<chatMessages> getMessages(int roomId);
+	List<chatMessages> getMessages(Long roomId);
 
-	List<chatRooms> getmyChattingRooms(int userNo);
+	List<chatRooms> getmyChattingRooms(Long userNo);
 
-	int makeChat(int userNo, Map<String, Object> newChatParam, String string);
+	Long makeChat(Long userNo, Map<String, Object> newChatParam, String string);
 
-	chatRooms openChat(List<Integer> privateMember);
+	chatRooms openChat(List<Long> privateMember, String string);
+
+	chatRooms getRoom(Long roomId);
 
 }

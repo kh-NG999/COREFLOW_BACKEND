@@ -59,13 +59,17 @@
 	</delete>
 	
 	<select id="findRoomByMember" parameterType="map" resultType="long">
-	    SELECT ROOM_ID FROM CHAT_ROOM_JOIN
-	    GROUP BY ROOM_ID HAVING COUNT(USER_NO) = #{userCount}
-	    AND SUM(CASE WHEN USER_NO IN
-        <foreach collection="userNos" item="userNo" open="(" separator="," close=")">
-        	#{userNo}
-        </foreach>
-        THEN 1 ELSE 0 END) = #{userCount}
+		SELECT A.ROOM_ID ROOM_ID FROM
+		    (SELECT ROOM_ID FROM CHAT_ROOM_JOIN
+		    GROUP BY ROOM_ID HAVING COUNT(USER_NO) = #{userCount}
+		    AND SUM(CASE WHEN USER_NO IN
+	        <foreach collection="userNos" item="userNo" open="(" separator="," close=")">
+	        	#{userNo}
+	        </foreach>
+	        THEN 1 ELSE 0 END) = #{userCount}) A
+        INNER JOIN CHAT_ROOMS B
+		ON A.ROOM_ID = B.ROOM_ID
+		WHERE B.ROOM_TYPE = #{type}
 	</select>
 	
 	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
@@ -148,6 +152,16 @@
     )
     WHERE
         RN = 1
+	</select>
+	
+	<select id="findUserByUserNo" resultType="com.kh.coreflow.model.dto.UserDto$User">
+		SELECT * FROM
+		MEMBER WHERE USER_NO = #{userNo}
+	</select>
+	
+	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT * FROM CHAT_ROOMS
+		WHERE ROOM_ID = #{roomId}
 	</select>
 
 </mapper>

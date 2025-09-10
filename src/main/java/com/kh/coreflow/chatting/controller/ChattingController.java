@@ -22,6 +22,8 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.chatting.model.service.ChattingService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,28 +39,30 @@ public class ChattingController {
 	
 	@GetMapping("myProfile")
 	public ResponseEntity<chatProfile> myProfile(
-			@AuthenticationPrincipal int userNo
+			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		chatProfile profile = chattingService.getMyProfile(userNo);
+		log.info("userDetail : {}",userDetails);
+		chatProfile profile = chattingService.getMyProfile(user.getUserNo());
 		log.info("profile : {}",profile);
 		return ResponseEntity.ok(profile);
 	}
 	
 	@GetMapping("/user")
 	public ResponseEntity<List<chatProfile>> chatUser(
-			@AuthenticationPrincipal int userNo
+			@AuthenticationPrincipal UserDeptcode user
 			){
-		log.info("userNo : {}",userNo);
-		List<chatProfile> list = chattingService.getChatProfiles(userNo);
+		log.info("userNo : {}",user.getUserNo());
+		List<chatProfile> list = chattingService.getChatProfiles(user.getUserNo());
 		log.info("user List : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
 	@GetMapping("/favorites")
 	public ResponseEntity<List<chatProfile>> favoriteUser(
-			@AuthenticationPrincipal int userNo
+			@AuthenticationPrincipal UserDeptcode user
 			){
-		List<chatProfile> list = chattingService.getFavoriteProfiles(userNo);
+		List<chatProfile> list = chattingService.getFavoriteProfiles(user.getUserNo());
 		log.info("favUser List : {}",list);
 		return ResponseEntity.ok(list);
 	}
@@ -66,10 +70,10 @@ public class ChattingController {
 	
 	@PostMapping("/favorites")
 	public ResponseEntity<Void> insertFavorite(
-			@AuthenticationPrincipal int userNo,
+			@AuthenticationPrincipal UserDeptcode user,
 			@RequestBody userFavorite favUser
 			){
-		favUser.setUserNo(userNo);
+		favUser.setUserNo(user.getUserNo());
 		int result = chattingService.insertFavoriteProfiles(favUser);
 		
 		return null;
@@ -77,12 +81,12 @@ public class ChattingController {
 
 	@DeleteMapping("/favorites/{favUserNo}")
 	public ResponseEntity<Void> deleteFavorite(
-			@AuthenticationPrincipal int userNo,
-			@PathVariable("favUserNo") int favUserNo
+			@AuthenticationPrincipal UserDeptcode user,
+			@PathVariable("favUserNo") Long favUserNo
 			){
 		userFavorite favUser = new userFavorite();
 		log.info("info:{}",favUserNo);
-		favUser.setUserNo(userNo);
+		favUser.setUserNo(user.getUserNo());
 		favUser.setFavoriteUserNo(favUserNo);
 		int result = chattingService.deleteFavoriteProfiles(favUser);
 		
@@ -91,22 +95,22 @@ public class ChattingController {
 	
 	@GetMapping("/private/{userNo}")
 	public ResponseEntity<chatRooms> openPrivateChat(
-			@AuthenticationPrincipal int userNo,
-			@PathVariable("userNo") int partnerUserNo
+			@AuthenticationPrincipal UserDeptcode user,
+			@PathVariable("userNo") Long partnerUserNo
 			){
 		
 		HashMap<String,Object> mappingParameter = new HashMap<String,Object>();
-		List<Integer> privateMember = new ArrayList<Integer>();
-		privateMember.add(userNo);
+		List<Long> privateMember = new ArrayList<Long>();
+		privateMember.add(user.getUserNo());
 		privateMember.add(partnerUserNo);
 		
 		
 		mappingParameter.put("participantUserNos",privateMember);
 		mappingParameter.put("partner", partnerUserNo);
-		chatRooms resultRoom = chattingService.openChat(privateMember);
+		chatRooms resultRoom = chattingService.openChat(privateMember,"PRIVATE");
 		if(resultRoom == null) {
-			int answer = chattingService.makeChat(userNo,mappingParameter,"PRIVATE");
-			resultRoom = chattingService.openChat(privateMember);
+			Long answer = chattingService.makeChat(user.getUserNo(),mappingParameter,"PRIVATE");
+			resultRoom = chattingService.openChat(privateMember,"PRIVATE");
 			if(resultRoom==null) {
 				return ResponseEntity.badRequest().build();
 			}
@@ -116,10 +120,10 @@ public class ChattingController {
 	
 	@GetMapping("/room/{roomId}/messages")
 	public ResponseEntity<List<chatMessages>> getMessages(
-			@PathVariable("roomId") int roomId,
-			@AuthenticationPrincipal int userNo
+			@PathVariable("roomId") Long roomId,
+			@AuthenticationPrincipal UserDeptcode user
 			){
-		log.info("userNo : {}",userNo);
+		log.info("userNo : {}",user.getUserNo());
 		log.info("Room Id : {}",roomId);
 		List<chatMessages> list = chattingService.getMessages(roomId);
 		log.info("messageList : {}",list);
@@ -129,18 +133,28 @@ public class ChattingController {
 	
 	@GetMapping("/myChattingRooms")
 	public ResponseEntity<List<chatRooms>> myChattingRooms(
-			@AuthenticationPrincipal int userNo
+			@AuthenticationPrincipal UserDeptcode user
 			){
-		List<chatRooms> list = chattingService.getmyChattingRooms(userNo);
+		List<chatRooms> list = chattingService.getmyChattingRooms(user.getUserNo());
 		return ResponseEntity.ok(list);
 	}
 	
 	@PostMapping("/public")
-	public ResponseEntity<Void> MakePublicRoom(
-			@AuthenticationPrincipal int userNo,
+	public ResponseEntity<chatRooms> MakePublicRoom(
+			@AuthenticationPrincipal UserDeptcode user,
 			@RequestBody Map<String,Object> newChatParam
 			){
-		int result = chattingService.makeChat(userNo,newChatParam,"PUBLIC");
-		return null;
+		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
+		chatRooms returnRoom = chattingService.getRoom(roomId);
+		log.info("returnRoom : {}, roomId : {}",returnRoom, roomId);
+		return ResponseEntity.ok(returnRoom);
+	}
+	
+	@GetMapping("/room/{roomId}")
+	public ResponseEntity<chatRooms> getChatRoom(
+			@PathVariable("roomId") Long roomId
+			){
+		chatRooms getRoom = chattingService.getRoom(roomId);
+		return ResponseEntity.ok(getRoom);
 	}
 }

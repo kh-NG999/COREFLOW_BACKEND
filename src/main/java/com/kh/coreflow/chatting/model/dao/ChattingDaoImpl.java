@@ -11,6 +11,7 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
+import com.kh.coreflow.model.dto.UserDto.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,12 @@ public class ChattingDaoImpl implements ChattingDao {
 	private final SqlSessionTemplate session;
 	
 	@Override
-	public List<chatProfile> getChatProfiles(int userNo) {
+	public List<chatProfile> getChatProfiles(Long userNo) {
 		return session.selectList("chat.getChatProfiles",userNo);
 	}
 
 	@Override
-	public chatProfile getMyProfile(int userNo) {
+	public chatProfile getMyProfile(Long userNo) {
 		return session.selectOne("chat.getMyProfile",userNo);
 	}
 
@@ -38,7 +39,7 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public List<chatProfile> getFavoriteProfiles(int userNo) {
+	public List<chatProfile> getFavoriteProfiles(Long userNo) {
 		return session.selectList("chat.getFavoriteProfiles",userNo);
 	}
 
@@ -63,12 +64,12 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public List<chatMessages> getMessages(int roomId) {
+	public List<chatMessages> getMessages(Long roomId) {
 		return session.selectList("chat.getMessages",roomId);
 	}
 
 	@Override
-	public List<chatRooms> getmyChattingRooms(int userNo) {
+	public List<chatRooms> getmyChattingRooms(Long userNo) {
 		return session.selectList("chat.getMyChattingRooms",userNo);
 	}
 
@@ -78,28 +79,38 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public int findRoomByMember(List<Integer> privateMember) {
+	public Long findRoomByMember(List<Long> privateMember, String type) {
 		Map<String, Object> params = new HashMap<>();
 	    
 	    params.put("userNos", privateMember);
 	    params.put("userCount", privateMember.size());
+	    params.put("type", type);
 	    
-	    Long answer = session.selectOne("chat.findRoomByMember", params);
-	    return answer.intValue();
+	    return session.selectOne("chat.findRoomByMember", params);
 	}
 
 	@Override
-	public chatRooms openChat(int roomId) {
+	public chatRooms openChat(Long roomId) {
 		return session.selectOne("chat.openChat",roomId);
 	}
 
 	@Override
-	public int makeChatJoin(int roomId, List<Integer> chatRoomJoin) {
+	public int makeChatJoin(Long roomId, List<Long> chatRoomJoin) {
 		Map<String, Object> params = new HashMap<>();
 	    params.put("roomId", roomId);
 	    params.put("userNos", chatRoomJoin);
 	    log.info("list : {}",chatRoomJoin);
 	    return session.insert("chat.insertChatRoomJoins", params);
+	}
+
+	@Override
+	public User findUserByUserNo(Long userNo) {
+		return session.selectOne("chat.findUserByUserNo",userNo);
+	}
+
+	@Override
+	public chatRooms getRoom(Long roomId) {
+		return session.selectOne("chat.getRoom",roomId);
 	}
 
 }

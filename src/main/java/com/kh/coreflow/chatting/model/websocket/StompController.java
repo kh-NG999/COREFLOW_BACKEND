@@ -62,7 +62,8 @@ public class StompController {
             Principal principal,
             chatMessages message
     ) {
-    	int userNo = Integer.parseInt(principal.getName());
+    	log.info("principal : {}",principal);
+    	Long userNo = Long.parseLong(principal.getName());
     	log.info("user : {}",userNo);
     	message.setUserNo(userNo);
     	log.info("message : {}",message);

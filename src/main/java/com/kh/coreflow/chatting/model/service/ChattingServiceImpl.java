@@ -33,18 +33,19 @@ public class ChattingServiceImpl implements ChattingService {
 	private AuthDao authDao;
 	
 	@Override
-	public List<chatProfile> getChatProfiles(int userNo) {
+	public List<chatProfile> getChatProfiles(Long userNo) {
 		return chattingDao.getChatProfiles(userNo);
 	}
 
 	@Override
-	public chatProfile getMyProfile(int userNo) {
+	public chatProfile getMyProfile(Long userNo) {
 		chatProfile myProfile = chattingDao.getMyProfile(userNo);
+		System.out.println(userNo);
 		if(myProfile==null) {
-			User myInfo = authDao.findUserByUserNo(userNo);
+			User myInfo = chattingDao.findUserByUserNo(userNo);
 			myProfile = new chatProfile().builder()
 					.userNo(userNo)
-					.userName(myInfo.getName())
+					.userName(myInfo.getUserName())
 					.build();
 			int result = chattingDao.insertMyProfile(myProfile);
 		}
@@ -52,7 +53,7 @@ public class ChattingServiceImpl implements ChattingService {
 	}
 
 	@Override
-	public List<chatProfile> getFavoriteProfiles(int userNo) {
+	public List<chatProfile> getFavoriteProfiles(Long userNo) {
 		return chattingDao.getFavoriteProfiles(userNo);
 	}
 
@@ -68,14 +69,16 @@ public class ChattingServiceImpl implements ChattingService {
 	
 	@Override
 	@Transactional
-	public int makeChat(int userNo, Map<String, Object> newChatParam, String type) {
+	public Long makeChat(Long userNo, Map<String, Object> newChatParam, String type) {
+		Long roomId = 0L;
 		chatRooms newChatRoom = new chatRooms();
 		newChatRoom.setRoomType(type);
 		newChatRoom.setUserNo(userNo);
 		if(type.equals("PRIVATE")) {
-			int partnerNo = (int)newChatParam.get("partner");
-			User partner = authDao.findUserByUserNo(partnerNo);
-			newChatRoom.setRoomName(partner.getName() + "님과의 채팅");
+			Long partnerNo = (Long)newChatParam.get("partner");
+			User partner = chattingDao.findUserByUserNo(partnerNo);
+			log.info("partner : {}",partner);
+			newChatRoom.setRoomName(partner.getUserName() + "님과의 채팅");
 			newChatParam.remove("partner");
 		}else {
 			newChatRoom.setRoomName((String)newChatParam.get("roomName"));
@@ -83,10 +86,11 @@ public class ChattingServiceImpl implements ChattingService {
 		
 		int answer = chattingDao.makeChatRoom(newChatRoom);
 		if(answer>0) {
-			int roomId = Long.valueOf(newChatRoom.getRoomId()).intValue();
-			answer = chattingDao.makeChatJoin(roomId,(List<Integer>)newChatParam.get("participantUserNos"));
+			roomId = Long.valueOf(newChatRoom.getRoomId());
+			answer = chattingDao.makeChatJoin(roomId,(List<Long>)newChatParam.get("participantUserNos"));
+			return roomId;
 		}
-		return answer;
+		return roomId;
 	}
 
 	@Override
@@ -96,12 +100,12 @@ public class ChattingServiceImpl implements ChattingService {
 	}
 
 	@Override
-	public List<chatMessages> getMessages(int roomId) {
+	public List<chatMessages> getMessages(Long roomId) {
 		return chattingDao.getMessages(roomId);
 	}
 
 	@Override
-	public List<chatRooms> getmyChattingRooms(int userNo) {
+	public List<chatRooms> getmyChattingRooms(Long userNo) {
 		List<chatRooms> myRooms = chattingDao.getmyChattingRooms(userNo);
 
         if (myRooms != null && !myRooms.isEmpty()) {
@@ -122,11 +126,16 @@ public class ChattingServiceImpl implements ChattingService {
 
 	@Override
 	@Transactional
-	public chatRooms openChat(List<Integer> privateMember) {
-		int roomId = chattingDao.findRoomByMember(privateMember);
-		if(roomId==-1)
+	public chatRooms openChat(List<Long> privateMember,String type) {
+		Long roomId = chattingDao.findRoomByMember(privateMember,type);
+		if(roomId==null)
 			return null;
 		return chattingDao.openChat(roomId);
+	}
+
+	@Override
+	public chatRooms getRoom(Long roomId) {
+		return chattingDao.getRoom(roomId);
 	}
 
 }

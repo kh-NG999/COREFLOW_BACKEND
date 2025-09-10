@@ -7,14 +7,15 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
+import com.kh.coreflow.model.dto.UserDto.User;
 
 public interface ChattingDao {
 
-	List<chatProfile> getChatProfiles(int userNo);
+	List<chatProfile> getChatProfiles(Long userNo);
 
-	chatProfile getMyProfile(int userNo);
+	chatProfile getMyProfile(Long userNo);
 
-	List<chatProfile> getFavoriteProfiles(int userNo);
+	List<chatProfile> getFavoriteProfiles(Long userNo);
 
 	int insertFavoriteProfiles(userFavorite favUser);
 
@@ -26,16 +27,20 @@ public interface ChattingDao {
 
 	int insertMessage(chatMessages message);
 
-	List<chatMessages> getMessages(int roomId);
+	List<chatMessages> getMessages(Long roomId);
 
-	List<chatRooms> getmyChattingRooms(int userNo);
+	List<chatRooms> getmyChattingRooms(Long userNo);
 
 	List<chatMessages> getLastMessagesForRooms(List<chatRooms> myRooms);
 
-	int findRoomByMember(List<Integer> privateMember);
+	Long findRoomByMember(List<Long> privateMember, String type);
 
-	chatRooms openChat(int roomId);
+	chatRooms openChat(Long roomId);
 
-	int makeChatJoin(int roomId, List<Integer> list);
+	int makeChatJoin(Long roomId, List<Long> list);
+
+	User findUserByUserNo(Long userNo);
+
+	chatRooms getRoom(Long roomId);
 
 }
