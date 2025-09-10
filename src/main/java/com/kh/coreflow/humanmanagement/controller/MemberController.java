@@ -105,19 +105,10 @@ public class MemberController {
 	@GetMapping("/members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<MemberResponse> memberDetail(
-			Authentication auth,
 			@PathVariable int userNo
 			){
-		Long depId = ((UserDeptcode)auth.getPrincipal()).getDepId();
-		log.info("depId : {}", depId);
-		Map<String,Object> params = new HashMap<>();
-		params.put("depId", depId);
-		params.put("userNo", userNo);
-				
-		MemberResponse member = service.memberDetail(params);
+		MemberResponse member = service.memberDetail(userNo);
 		
-//		log.debug("member : {}",member);
-
 		if(member != null) {
 			return ResponseEntity.ok(member);
 		}else {
@@ -128,6 +119,7 @@ public class MemberController {
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/members")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberInsert(
 			@RequestBody MemberPost member
 			){
@@ -143,6 +135,7 @@ public class MemberController {
 	// 사원 정보 수정
 	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberUpdate(
 			@PathVariable int userNo,
 			@RequestBody MemberPatch member
@@ -162,6 +155,7 @@ public class MemberController {
 	// 사원 정보 삭제
 	@CrossOrigin(origins="http://localhost:5173")
 	@DeleteMapping("members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberDelete(
 			@PathVariable int userNo
 			) {

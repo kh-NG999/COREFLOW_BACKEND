@@ -40,7 +40,7 @@ public class VacationDaoImpl implements VacationDao{
 	}
 	
 	@Override
-	public LoginUser loginUserProfile(int userNo) {
+	public LoginUser loginUserProfile(long userNo) {
 		return session.selectOne("vacation.loginUserProfile",userNo);
 	}
 	

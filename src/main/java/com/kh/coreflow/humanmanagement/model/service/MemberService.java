@@ -19,7 +19,7 @@ public interface MemberService {
 	
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	MemberResponse memberDetail(Map<String, Object> params);
+	MemberResponse memberDetail(int userNo);
 
 	int memberInsert(MemberPost member);
 	

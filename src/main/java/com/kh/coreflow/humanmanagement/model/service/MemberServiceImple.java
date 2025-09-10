@@ -40,8 +40,8 @@ public class MemberServiceImple implements MemberService{
 	}
 
 	@Override
-	public MemberResponse memberDetail(Map<String, Object> params) {
-		return dao.memberDetail(params);
+	public MemberResponse memberDetail(int userNo) {
+		return dao.memberDetail(userNo);
 	}
 
 	@Override

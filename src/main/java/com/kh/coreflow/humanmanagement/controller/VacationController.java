@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +21,7 @@ import com.kh.coreflow.humanmanagement.model.dto.VacationDto.PutVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 import com.kh.coreflow.humanmanagement.model.service.VacationService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,9 +115,9 @@ public class VacationController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/user/profile")
 	public ResponseEntity<LoginUser> loginUserProfile(
-			// @PathVariable int userNo
+			Authentication auth
 			){
-		int userNo = 61;
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
 		LoginUser loginUser = service.loginUserProfile(userNo);
 		
 		if(loginUser != null) {
@@ -131,11 +131,10 @@ public class VacationController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/vacation/personal")
 	public ResponseEntity<List<MemberVacation>> personalVacation(
-			// @PathVariable int userNo,
+			Authentication auth,
 			@RequestParam int year
 			){
-		// 임시 로그인 유저
-		int userNo = 61;
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);
@@ -170,13 +169,9 @@ public class VacationController {
 	public ResponseEntity<Void> putPerVac(
 			Authentication auth,
 			@RequestBody PutVacation putVacation
-//			@AuthenticationPrincipal int userNo
 			){
-		//auth.getPrincipal() -> userno
-		//auth.getAuthorities() -> authority list (ROLE_USER 등등)
-		
-//		log.info("get info : {}",putVacation );
-		int userNo = (int)auth.getPrincipal();
+
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
 				
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);

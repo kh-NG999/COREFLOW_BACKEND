@@ -39,7 +39,7 @@ public class VacationServiceImpl implements VacationService{
 	}
 
 	@Override
-	public LoginUser loginUserProfile(int userNo) {
+	public LoginUser loginUserProfile(long userNo) {
 		return dao.loginUserProfile(userNo);
 	}
 

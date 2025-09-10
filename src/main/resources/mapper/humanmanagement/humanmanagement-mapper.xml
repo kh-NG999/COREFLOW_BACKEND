@@ -64,30 +64,22 @@
 	<!-- 사원 상세 조회 -->
 	<select id="memberDetail" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
 		SELECT
-		M.USER_NO,
-		M.USER_NAME,
-		M.EMAIL,
-		M.HIRE_DATE,
-		M.PHONE,
-		M.EXTENSION,
-		M.ADDRESS,
-		M.ADDRESS_DETAIL,
-		M.UPDATE_DATE,
-		M.STATUS,
-		M.DEP_ID,  M.POS_ID,  D.DEP_NAME,
-		P.POS_NAME
-	FROM MEMBER M
-	LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
-	LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
-	WHERE M.USER_NO = #{userNo} 
-	AND (
-		M.DEP_ID = #{depId} OR
-		EXISTS (
-			SELECT 1
-			FROM DEPARTMENT d2
-			WHERE d2.DEP_ID = #{depId} AND (d2.DEP_ID = 1 OR d2.PARENT_ID = 1)
-		)
-	)
+			M.USER_NO,
+			M.USER_NAME,
+			M.EMAIL,
+			M.HIRE_DATE,
+			M.PHONE,
+			M.EXTENSION,
+			M.ADDRESS,
+			M.ADDRESS_DETAIL,
+			M.UPDATE_DATE,
+			M.STATUS,
+			M.DEP_ID,  M.POS_ID,  D.DEP_NAME,
+			P.POS_NAME
+		FROM MEMBER M
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
+		WHERE M.USER_NO = #{userNo} 
 	</select>
 	
 	<!-- 사원 등록 -->

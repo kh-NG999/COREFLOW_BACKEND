@@ -40,8 +40,8 @@ public class MemberDaoImpl implements MemberDao{
 	}
 
 	@Override
-	public MemberResponse memberDetail(Map<String, Object> params) {
-		return session.selectOne("member.memberDetail",params);
+	public MemberResponse memberDetail(int userNo) {
+		return session.selectOne("member.memberDetail",userNo);
 	}
 
 	@Override
