@@ -117,7 +117,7 @@ public class ApprovalController {
         }
     }
 
-    // Principal 객체에서 사용자 번호를 가져오는 유틸리티 메서드 (구현 필요)
+    // Principal 객체에서 사용자 번호를 가져오는 유틸리티 메서드
     private int getUserNoFromPrincipal(Principal principal) {
     	Authentication authentication = (Authentication) principal;
     	
