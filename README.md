@@ -11,6 +11,6 @@
 
 - controller가 파라미터에서 Authentication auth를 통해 auth.getPrincipal()로 userNo만 가져올 수 있었습니다.
 
-- 이제는 ((UserDeptcode)auth.getPrincipal()).getUserId()와 ((UserDeptcode)auth.getPrincipal()).getDepId() 이 두가지를 통해 로그인 사용자의 userId와 depId를 가져오실 수 있습니다.
+- 이제는 ((UserDeptcode)auth.getPrincipal()).getUserNo()와 ((UserDeptcode)auth.getPrincipal()).getDepId() 이 두가지를 통해 로그인 사용자의 userNo와 depId를 가져오실 수 있습니다.
 
 - userDeptCode의 경우, userDto에 구성되어 있으니 확인 바랍니다. 기존에 auth.getPrincipal()만으로 구성해두신 분들은 백엔드 실행에서 오류가 나실 수 있으니 이 부분 수정 부탁드립니다.

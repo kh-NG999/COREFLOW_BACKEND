@@ -2,6 +2,9 @@ package com.kh.coreflow.model.dto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.http.ResponseEntity.HeadersBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +39,7 @@ public class UserDto {
 		private Long userNo;
 		private String userPwd;
 		private String email;
-		private String userName; // 전부 바꿔주기
+		private String userName;
 		private Long depId;
 		private Long posId;
 		private String profile;
@@ -44,7 +47,7 @@ public class UserDto {
 		private Date hireDate;
 		private String phone;
 		private String address;
-		private String status = "INCOMPLETE";
+		private String status;
 	}
 	
 	@Data
@@ -56,7 +59,7 @@ public class UserDto {
 		private String userPwd;
 		private String email;
 		private String userName;
-		private Long deptId;
+		private Long depId;
 		private Long posId;
 		private String profile;
 		
@@ -117,5 +120,7 @@ public class UserDto {
 		private Long userNo;
 		private Long depId;
 	}
+	
+	
 	 
 }

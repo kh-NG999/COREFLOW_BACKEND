@@ -122,7 +122,7 @@ public class AuthServiceImpl implements AuthService{
 				.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
 		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 		if (userAuth == null) {
-		    throw new IllegalArgumentException("권한 정보 없음");
+			throw new IllegalArgumentException("권한 정보 없음");
 		}
 		Long depId = user.getDepId();
 
@@ -142,21 +142,27 @@ public class AuthServiceImpl implements AuthService{
 		
 		return AuthResult.builder()
 				.accessToken(accessToken)
-				.refreshToken(refreshToken)
+				.refreshToken(refreshCookie)
 				.user(userNoPassword)
 				.build();
 	}
 
 	@Override
 	public Optional<User> findUserByUserNo(Long userNo) {
-		return authDao.findUserByUserNo(userNo);
+		Optional<User> userOpt = authDao.findUserByUserNo(userNo);
+		if(userOpt.isPresent()) {
+		    User user = userOpt.get();
+		    UserAuthority roles = authDao.findUserAuthorityByUserNo(userNo);
+		    user.setRoles(roles.getRoles());
+		}
+		return userOpt;
 	}
 
 	@Override
-	public boolean findUserPwd(String name, String email) {
-		User user = authDao.findUserPwd(name, email);
+	public boolean findUserPwd(String userName, String email) {
+		User user = authDao.findUserPwd(userName, email);
 		if(user == null) {
-			throw new IllegalArgumentException("해당 정보와 일치하는 계정이 없습니다");
+			return false;
 		}
 		
 		String tempPwd = createTempPwd();

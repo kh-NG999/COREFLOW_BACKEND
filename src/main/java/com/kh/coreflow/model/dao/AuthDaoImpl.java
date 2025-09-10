@@ -43,9 +43,9 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public User findUserPwd(String name, String email) {
+	public User findUserPwd(String userName, String email) {
 		Map<String, String> param = new HashMap<>();
-		param.put("name", name);
+		param.put("userName", userName);
 		param.put("email", email);
 		return session.selectOne("auth.findUserPwd", param);
 	}

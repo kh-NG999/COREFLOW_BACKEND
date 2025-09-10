@@ -30,6 +30,7 @@ import com.kh.coreflow.security.model.provider.JWTProvider;
 import com.kh.coreflow.security.model.service.AuthService;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,9 +83,19 @@ public class AuthController {
 	
 	@PostMapping("/refresh")
 	public ResponseEntity<AuthResult> refresh(
+			HttpServletRequest request,
 			@CookieValue(name = REFRESH_COOKIE, required = false)
 			String refreshCookie
 			){
+		// 전체 쿠키 확인
+	    if (request.getCookies() != null) {
+	        for (var c : request.getCookies()) {
+	            System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
+	        }
+	    } else {
+	        System.out.println("No cookies received");
+	    }
+		
 		if(refreshCookie == null || refreshCookie.isBlank()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -107,7 +118,7 @@ public class AuthController {
 		// 1. 클라이언트 헤더에서 id값 추출
 		String accessToken = resolveAccessToken(request);
 		Long userId = jwt.getUserNo(accessToken);
-				
+		
 		// 리프레쉬토큰 제거
 		ResponseCookie refreshCookie = 
 				ResponseCookie
@@ -122,7 +133,7 @@ public class AuthController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<Optional<User>> getUserInfo(HttpServletRequest req){
+	public ResponseEntity<AuthResult> getUserInfo(HttpServletRequest req){
 		
 		// 1. 요청 헤더에서 jwt토큰 추출
 		String jwtToken = resolveAccessToken(req);
@@ -139,7 +150,19 @@ public class AuthController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		return ResponseEntity.ok(user);
+		String refreshToken = resolveRefreshTokenFromCookie(req); // 쿠키에서 읽는 함수
+		
+		// 옵셔널 설정 해제
+		User actualUser = user.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
+		actualUser.setUserPwd(null); // 마이페이지에서 password안보이게 처리
+
+	    AuthResult result = AuthResult.builder()
+	                                  .accessToken(jwtToken)   // 기존 accessToken 그대로
+	                                  .refreshToken(refreshToken) // 있으면 전달
+	                                  .user(actualUser)
+	                                  .build();
+		
+		return ResponseEntity.ok(result);
 	}
 	
 	@PutMapping("/{userNo}/phone")
@@ -186,6 +209,20 @@ public class AuthController {
             return bearerToken.substring(7);
         }
         return null;
+	}
+	
+	private String resolveRefreshTokenFromCookie(HttpServletRequest request) {
+	    if (request.getCookies() == null) {
+	        return null;
+	    }
+
+	    for (Cookie cookie : request.getCookies()) {
+	        if ("refreshToken".equals(cookie.getName())) { // 쿠키 이름은 서버에서 설정한 이름과 동일해야 함
+	            return cookie.getValue();
+	        }
+	    }
+
+	    return null; // 쿠키에 refreshToken이 없는 경우
 	}
 }
 
