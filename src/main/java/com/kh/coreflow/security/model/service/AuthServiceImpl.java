@@ -126,11 +126,24 @@ public class AuthServiceImpl implements AuthService{
 		}
 		Long depId = user.getDepId();
 
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
+		// 2. 토큰 발급
+		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
+		log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
+		
+		User userNoPassword = User.builder()
+								.userNo(user.getUserNo())
+								.email(user.getEmail())
+								.userName(user.getUserName())
+								.profile(user.getProfile())
+								.roles(userAuth.getRoles())
+								.depId(user.getDepId())
+								.build();
 		
 		return AuthResult.builder()
 				.accessToken(accessToken)
-				.user(user)
+				.refreshToken(refreshToken)
+				.user(userNoPassword)
 				.build();
 	}
 
