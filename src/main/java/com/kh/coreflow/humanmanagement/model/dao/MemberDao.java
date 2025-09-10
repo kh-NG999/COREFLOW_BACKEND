@@ -1,5 +1,6 @@
 package com.kh.coreflow.humanmanagement.model.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
@@ -57,5 +60,19 @@ public class MemberDao implements MemberDaoImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return session.delete("member.memberDelete",userNo);
+	}
+
+	@Override
+	public List<MemberLite> searchMembers(String query, Integer limit, Long depId) {
+		Map<String,Object> p = new HashMap<>();
+		p.put("query", query);
+		p.put("limit", limit);
+		p.put("depId", depId);
+		
+		return session.selectList("member.searchMembers", p);
+	}
+	@Override
+	public List<DepartmentLite> findAll() {
+		return session.selectList("department.findAll");
 	}
 }

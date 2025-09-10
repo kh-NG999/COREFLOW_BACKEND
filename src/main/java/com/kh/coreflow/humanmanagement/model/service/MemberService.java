@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.humanmanagement.model.dao.MemberDaoImpl;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
@@ -57,5 +59,16 @@ public class MemberService implements MemberServiceImpl{
 	@Override
 	public int memberDelete(int userNo) {
 		return dao.memberDelete(userNo);
+	}
+
+	// 남건후
+	@Override
+	public List<MemberLite> search(String query, Integer limit, Long depId) {
+		return dao.searchMembers(query, limit, depId);
+	}
+
+	@Override
+	public List<DepartmentLite> findAll() {
+		return dao.findAll();
 	}
 }

@@ -135,4 +135,42 @@
 		DELETE FROM MEMBER
 		WHERE USER_NO = #{userNo}
 	</delete>
+	
+  <!-- 남건후 -->
+  <select id="searchMembers" parameterType="map"
+          resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberLite">
+    SELECT
+      USER_NO    AS userNo,
+      DEP_ID     AS depId,
+      POS_ID     AS posId,
+      USER_NAME  AS userName,
+      EMAIL      AS email
+    FROM MEMBER
+    WHERE NVL(STATUS,'T') = 'T'
+      <if test="depId != null">
+        AND DEP_ID = #{depId}
+      </if>
+      <if test="query != null and query != ''">
+        AND (
+          UPPER(USER_NAME) LIKE '%' || UPPER(#{query}) || '%'
+          OR UPPER(EMAIL)  LIKE '%' || UPPER(#{query}) || '%'
+        )
+      </if>
+    ORDER BY USER_NAME ASC
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
+  </select>
+  
+    <select id="findAll"
+          resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$DepartmentLite">
+    SELECT
+      DEP_ID     AS depId,
+      DEP_NAME   AS depName,
+      PARENT_ID  AS parentId
+    FROM DEPARTMENT
+    ORDER BY DEP_NAME ASC
+  </select>
+
+
 </mapper>
