@@ -14,23 +14,23 @@ public interface AuthDao {
 
 	void insertUserRole(UserAuthority auth);
 
-	Optional<User> findUserByUserNo(int userNo);
+	Optional<User> findUserByUserNo(Long userNo);
 
 	User findUserPwd(String name, String email);
 
 	void updatePwd(String email, String encodedPwd);
 
-	void updatePhone(int userNo, String string);
+	void updatePhone(Long userNo, String string);
 
-	void updateAddress(int userNo, String string);
+	void updateAddress(Long userNo, String string);
 
 	void updateProfileImage(Map<String, Object> imageUpdate);
 
-	int checkProfileImage(int userNo);
+	int checkProfileImage(Long userNo);
 	
 	void insertProfileImage(Map<String, Object> imageUpdate);
 
-	UserAuthority findUserAuthorityByUserNo(int userNo);
+	UserAuthority findUserAuthorityByUserNo(Long userNo);
 
 
 	

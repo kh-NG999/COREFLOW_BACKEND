@@ -44,13 +44,13 @@ public class AuthServiceImpl implements AuthService{
 					throw new BadCredentialsException("비밀번호 오류");
 				}
 				
-				int userNo = user.getUserNo();
+				Long userNo = user.getUserNo();
 				UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 				if (userAuth == null) {
 				    throw new IllegalArgumentException("권한 정보 없음");
 				}
 				log.info("권한 조회: userNo={} roles={} depId={}", userNo, userAuth.getRoles(), user.getDepId());
-				int depId = user.getDepId();
+				Long depId = user.getDepId();
 
 				// 2. 토큰 발급
 				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
@@ -93,12 +93,12 @@ public class AuthServiceImpl implements AuthService{
 											.build();
 		authDao.insertUserRole(auth);
 		
-		int userNo = user.getUserNo();
+		Long userNo = user.getUserNo();
 		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-		int depId = user.getDepId();
+		Long depId = user.getDepId();
 		
 		//토큰 발급
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService{
 
 	@Override
 	public AuthResult refreshByCookie(String refreshCookie) {
-		int userNo = jwt.parseRefresh(refreshCookie);
+		Long userNo = jwt.parseRefresh(refreshCookie);
 		
 		User user = authDao.findUserByUserNo(userNo)
 				.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService{
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-		int depId = user.getDepId();
+		Long depId = user.getDepId();
 
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
 		
@@ -135,7 +135,7 @@ public class AuthServiceImpl implements AuthService{
 	}
 
 	@Override
-	public Optional<User> findUserByUserNo(int userNo) {
+	public Optional<User> findUserByUserNo(Long userNo) {
 		return authDao.findUserByUserNo(userNo);
 	}
 

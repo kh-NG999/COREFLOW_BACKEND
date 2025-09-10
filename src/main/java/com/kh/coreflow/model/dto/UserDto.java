@@ -34,12 +34,12 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class User {
-		private int userNo;
+		private Long userNo;
 		private String userPwd;
 		private String email;
 		private String userName; // 전부 바꿔주기
-		private int depId;
-		private int posId;
+		private Long depId;
+		private Long posId;
 		private String profile;
 		private List<String> roles;
 		private Date hireDate;
@@ -53,12 +53,12 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserCreate{
-		private int userNo;
+		private Long userNo;
 		private String userPwd;
 		private String email;
 		private String userName;
-		private int deptId;
-		private int posId;
+		private Long deptId;
+		private Long posId;
 		private String profile;
 		
 		@Builder.Default
@@ -85,7 +85,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserUpdate{
-		private int userNo;
+		private Long userNo;
 		private String userPwd;
 		private String phone;
 		private String address;
@@ -97,7 +97,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserCredential {
-		private int userNo;
+		private Long userNo;
 		private String userPwd;
 	}
 	
@@ -106,7 +106,7 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserAuthority {
-		private int userNo;
+		private Long userNo;
 		private List<String> roles;
 	}
 	
@@ -115,8 +115,8 @@ public class UserDto {
 	@AllArgsConstructor
 	@Builder
 	public static class UserDeptcode {
-		private int userNo;
-		private int depId;
+		private Long userNo;
+		private Long depId;
 	}
 	 
 }

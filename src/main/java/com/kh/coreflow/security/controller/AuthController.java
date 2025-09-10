@@ -106,7 +106,7 @@ public class AuthController {
 		
 		// 1. 클라이언트 헤더에서 id값 추출
 		String accessToken = resolveAccessToken(request);
-		int userId = jwt.getUserNo(accessToken);
+		Long userId = jwt.getUserNo(accessToken);
 				
 		// 리프레쉬토큰 제거
 		ResponseCookie refreshCookie = 
@@ -131,7 +131,7 @@ public class AuthController {
 		}
 		
 		// 2. JWT토큰에서 ID값 추출하기
-		int userNo = jwt.getUserNo(jwtToken);
+		Long userNo = jwt.getUserNo(jwtToken);
 		
 		// 사용자 정보 조회
 		Optional<User> user = service.findUserByUserNo(userNo);
@@ -144,7 +144,7 @@ public class AuthController {
 	
 	@PutMapping("/{userNo}/phone")
     public ResponseEntity<Void> updatePhone(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
 		userService.updatePhone(userNo, body.get("phone"));
         return ResponseEntity.ok().build();
@@ -152,7 +152,7 @@ public class AuthController {
 	
 	@PutMapping("/{userNo}/address")
     public ResponseEntity<Void> updateAddress(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
         userService.updateAddress(userNo, body.get("address"));
         return ResponseEntity.ok().build();
@@ -161,7 +161,7 @@ public class AuthController {
     // 비밀번호 수정
     @PutMapping("/{userNo}/password")
     public ResponseEntity<Void> updatePassword(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
         userService.updatePassword(userNo, body.get("currentPassword"), body.get("newPassword"));
         return ResponseEntity.ok().build();
@@ -170,7 +170,7 @@ public class AuthController {
     // 프로필 이미지 수정
     @PutMapping("/{userNo}/profile")
     public ResponseEntity<?> updateProfile(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestPart("profile") MultipartFile profile) {
     	
     	if(profile != null && !profile.isEmpty()) {
