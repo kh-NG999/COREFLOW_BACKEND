@@ -17,15 +17,15 @@ public class AttendanceDto {
 		private String posName;
 		private String checkInTime;
 		private String checkOutTime;
-		private int status;
+		private String vacName;
 	}
 	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class putCheckInTime{
+	public static class PutCheckIn{
+		private int attId;
 		private String attDate;
-		private int userNo;
 		private String checkInTime;
 		private int status;
 	}
@@ -33,16 +33,16 @@ public class AttendanceDto {
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class selelctAttId{
+	public static class PutCheckOut{
 		private int attId;
+		private String checkOutTime;
 	}
 	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class putCheckOutTime{
-		private int attId;
-		private int userNo;
-		private String checkOutTime;
+	public static class VacType{
+		private int vacCode;
+		private String vacName;
 	}
 }

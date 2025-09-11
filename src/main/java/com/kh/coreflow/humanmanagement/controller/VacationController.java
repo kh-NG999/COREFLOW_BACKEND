@@ -49,7 +49,7 @@ public class VacationController {
 	
 	// 모든 사원 휴가 내역 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/vacation")
+	@GetMapping("/vacation/member")
 	public ResponseEntity<List<MemberVacation>> allVacation(
 			@RequestParam int year,
 			@RequestParam int month
@@ -71,7 +71,7 @@ public class VacationController {
 	
 	// 검색 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/vacation/member")
+	@GetMapping("/vacation/member/search")
 	public ResponseEntity<List<MemberChoice>> memberChoice(
 			@RequestParam(value="userName", required=false) String userName
 			){
@@ -200,5 +200,4 @@ public class VacationController {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
 }

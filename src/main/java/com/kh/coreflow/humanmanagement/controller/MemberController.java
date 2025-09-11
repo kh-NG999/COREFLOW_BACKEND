@@ -37,8 +37,6 @@ public class MemberController {
 	@GetMapping("/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
-//		log.debug("deptList : {}",deptList);
-//		System.out.println("부모 부서 : "+deptList);
 		
 		if(deptList != null && !deptList.isEmpty()) {
 			return ResponseEntity.ok(deptList);
@@ -54,8 +52,6 @@ public class MemberController {
 			@PathVariable int parentId
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
-//		log.debug("deptDetailList : {}",deptDetailList);
-//		System.out.println("자식 부서 : "+deptDetailList);
 		
 		if(deptDetailList != null && !deptDetailList.isEmpty()) {
 			return ResponseEntity.ok(deptDetailList);
@@ -69,8 +65,6 @@ public class MemberController {
 	@GetMapping("/positions")
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
-//		log.debug("posiList : {}",posiList);
-//		System.out.println("직위 : "+posiList);
 		
 		if(posiList != null) {
 			return ResponseEntity.ok(posiList);
@@ -86,8 +80,6 @@ public class MemberController {
 			@RequestParam Map<String,String> searchParams
 			){		
 		List<MemberResponse> memberList = service.memberList(searchParams);
-//		log.debug("memberList : {}",memberList);
-//		System.out.println(memberList);
 		
 		if(!memberList.isEmpty()) {
 			return ResponseEntity.ok(memberList);

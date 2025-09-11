@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 
 public interface AttendanceDao {
 	
@@ -11,4 +13,9 @@ public interface AttendanceDao {
 
 	List<AttendanceInfo> perAttendance(Map<String, Object> params);
 
+	int checkIn(Map<String, Object> params);
+
+	int checkOut(PutCheckOut checkOut);
+
+	List<VacType> vacTypeList(VacType vacType);
 }

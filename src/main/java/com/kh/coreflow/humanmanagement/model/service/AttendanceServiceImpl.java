@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.humanmanagement.model.dao.AttendanceDao;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,4 +27,18 @@ public class AttendanceServiceImpl implements AttendanceService{
 		return dao.perAttendance(params);
 	}
 
+	@Override
+	public int checkIn(Map<String, Object> params) {
+		return dao.checkIn(params);
+	}
+
+	@Override
+	public int checkOut(PutCheckOut checkOut) {
+		return dao.checkOut(checkOut);
+	}
+
+	@Override
+	public List<VacType> vacTypeList(VacType vacType) {
+		return dao.vacTypeList(vacType);
+	}
 }

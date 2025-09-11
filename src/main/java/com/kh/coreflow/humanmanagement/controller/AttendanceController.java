@@ -10,10 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckIn;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.service.AttendanceService;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
@@ -57,9 +63,7 @@ public class AttendanceController {
 			@RequestParam int month
 			){
 		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
-		
-		log.info("userNo : {} / year : {} / month : {}",userNo,year,month);
-		
+				
 		Map<String,Object> params = new HashMap<>();
 		params.put("userNo", userNo);
 		params.put("year", year);
@@ -74,19 +78,55 @@ public class AttendanceController {
 		}
 	}
 	
-	// 버튼 클릭시 
+	// 출근버튼 클릭시 
+	@CrossOrigin(origins="http://localhost:5173")
+	@PostMapping("/attendance/checkIn")
+	public ResponseEntity<Void> checkIn(
+			Authentication auth,
+			@RequestBody PutCheckIn checkIn
+			){
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("checkIn", checkIn);
+		
+		int result = service.checkIn(params);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	
+	// 퇴근버튼 클릭시
+	@CrossOrigin(origins="http://localhost:5173")
+	@PatchMapping("/attendance/checkOut")
+	public ResponseEntity<Void> checkOut(
+			@RequestBody PutCheckOut checkOut
+			){
+		int result = service.checkOut(checkOut);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	// 비고 종류 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/attendance/vacType")
+	public ResponseEntity<List<VacType>> vacationType(
+			@RequestBody VacType vacType
+			){
+		List<VacType> vacTypeList = service.vacTypeList(vacType);
+		
+		if(vacTypeList != null && !vacTypeList.isEmpty()) {
+			return ResponseEntity.ok(vacTypeList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}	
+	}
 }

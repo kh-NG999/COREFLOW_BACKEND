@@ -7,6 +7,8 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
+import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,5 +25,20 @@ public class AttendanceDaoImpl implements AttendanceDao{
 	@Override
 	public List<AttendanceInfo> perAttendance(Map<String, Object> params) {
 		return session.selectList("attendance.perAttendance",params);
+	}
+
+	@Override
+	public int checkIn(Map<String, Object> params) {
+		return session.insert("attendance.checkIn",params);
+	}
+
+	@Override
+	public int checkOut(PutCheckOut checkOut) {
+		return session.update("attendance.checkOut",checkOut);
+	}
+
+	@Override
+	public List<VacType> vacTypeList(VacType vacType) {
+		return session.selectList("attendance.vacTypeList",vacType);
 	}
 }
