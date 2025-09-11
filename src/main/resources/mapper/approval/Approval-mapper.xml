@@ -37,10 +37,13 @@
 
     <!-- 문서 상태 변경 -->
     <update id="updateApprovalStatus" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
-        UPDATE approval
-        SET approval_status = #{approvalStatus},
-            end_date = CASE WHEN #{approvalStatus} IN (1,2) THEN NOW() ELSE end_date END
-        WHERE approval_id = #{approvalId}
+        UPDATE 
+        	approval
+        SET 
+        	approval_status = #{approvalStatus},
+            end_date = SYSDATE
+        WHERE
+        	approval_id = #{approvalId}
     </update>
 
     <!-- 결재선 등록 -->
@@ -70,12 +73,11 @@
     <!-- 특정 결재자 대기 중인 결재선 조회 -->
     <select id="findWaitingLinesByApprover" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
         SELECT *
-        FROM approval_line
-        WHERE approval_id = #{approvalId}
-          AND approval_no = #{approverNo}
-          AND line_status = #{lineStatus}
-        ORDER BY line_order
-    </select>
+    	FROM approval_line
+    	WHERE approval_id = #{approvalId}
+      	AND approver_user_no = #{userId} AND line_status = #{status}    
+      	ORDER BY line_order
+	</select>
 
     <!-- 결재선 번호 기준 조회 (순차 결재 다음 결재자 활성화용) -->
     <select id="findLineByApprovalIdAndOrder" parameterType="map" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">

@@ -3,7 +3,9 @@ package com.kh.coreflow.approval.model.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -165,6 +167,7 @@ public class ApprovalService {
 	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo) {
 		return dao.selectReceivedApprovalsByApproverNo(userNo);
 	}
+	
 
 }
 

@@ -17,6 +17,8 @@ public class ApprovalDto {
     private Date startDate;
     private Date endDate;
     private Date saveDate;		// 임시저장날짜
+    private String status;	// 문서 상태
+    private String comment; // 승인,반려 사유 작성가능
     
     private List<Integer> approverUserNo;
     private List<Integer> ccUserNo;
