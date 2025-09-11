@@ -119,9 +119,10 @@ public class AttendanceController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/attendance/vacType")
 	public ResponseEntity<List<VacType>> vacationType(
-			@RequestBody VacType vacType
+			VacType vacType
 			){
 		List<VacType> vacTypeList = service.vacTypeList(vacType);
+		log.info("vacTypeList : {}", vacTypeList);
 		
 		if(vacTypeList != null && !vacTypeList.isEmpty()) {
 			return ResponseEntity.ok(vacTypeList);

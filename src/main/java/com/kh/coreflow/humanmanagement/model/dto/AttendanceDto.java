@@ -42,7 +42,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class VacType{
-		private int vacCode;
+		private Integer vacCode;
 		private String vacName;
 	}
 }
