@@ -144,7 +144,7 @@
         	approval_line L ON a.approval_id = l.approval_id
         WHERE 
         	L.approver_user_no = #{userNo}
-          AND L.line_status = 'PENDING'
+          AND L.line_status = 'WAITING'
     </select>
 
     <!-- 검색 (예시: 제목/내용) -->
