@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.coreflow.calendar.model.dao.CalendarDao;
 import com.kh.coreflow.calendar.model.dao.EventDao;
 import com.kh.coreflow.calendar.model.dto.EventDto;
+import com.kh.coreflow.calendar.model.dto.EventDto.EventTypeDto;
 import com.kh.coreflow.common.exception.ConflictException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -118,6 +119,39 @@ public class EventServiceImpl implements EventService {
             throw new IllegalStateException("삭제 대상이 없습니다.");
         }
     }
+
+	@Override
+	public List<EventDto.EventTypeDto> getEventTypes() {
+		return eventDao.selectAllEventTypes(); }
+
+	private String toCode(String name) {
+	  String base = name == null ? "" : name.trim();
+	  base = java.text.Normalizer.normalize(base, java.text.Normalizer.Form.NFD)
+	           .replaceAll("\\p{M}","")
+	           .replaceAll("[^A-Za-z0-9]+","_")
+	           .replaceAll("^_|_$","")
+	           .toUpperCase();
+	  return base.isEmpty() ? "TYPE" : base;
+	}
+	
+	@Override
+	public EventDto.EventTypeDto createEventType(String typeName) {
+		EventDto.EventTypeDto dto = EventDto.EventTypeDto.builder()
+			      .typeName(typeName)
+			      .typeCode(toCode(typeName))
+			      .build();
+			  eventDao.insertEventType(dto); // dto.typeId 채워짐
+			  return dto;
+	}
+	@Override
+	public void updateEventType(Long typeId, String typeName) {
+		  eventDao.updateEventTypeName(EventDto.EventTypeDto.builder().typeId(typeId).typeName(typeName).build());
+	}
+
+	@Override
+	public void deleteEventType(Long typeId) {
+		 eventDao.deleteEventType(typeId);	
+	}
     
     
 }

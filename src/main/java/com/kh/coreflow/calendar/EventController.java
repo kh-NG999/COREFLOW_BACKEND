@@ -2,6 +2,7 @@ package com.kh.coreflow.calendar;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -121,7 +122,47 @@ public class EventController {
         }
     }
     
-    
+    @GetMapping("/event-types")
+    public ResponseEntity<List<EventDto.EventTypeDto>> listEventTypes(
+            @AuthenticationPrincipal UserDeptcode me
+    ) {
+        if (me == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(eventService.getEventTypes());
+    }
+
+    @PostMapping("/event-types")
+    public ResponseEntity<EventDto.EventTypeDto> createEventType(
+        @AuthenticationPrincipal UserDeptcode me,
+        @RequestBody Map<String,String> body
+    ){
+      if (me == null) return ResponseEntity.status(401).build();
+      String typeName = body.get("typeName");
+      EventDto.EventTypeDto saved = eventService.createEventType(typeName);
+      URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+          .path("/{id}").buildAndExpand(saved.getTypeId()).toUri();
+      return ResponseEntity.created(location).body(saved);
+    }
+
+    @PutMapping("/event-types/{typeId}")
+    public ResponseEntity<Void> updateEventType(
+        @AuthenticationPrincipal UserDeptcode me,
+        @PathVariable Long typeId,
+        @RequestBody Map<String,String> body
+    ){
+      if (me == null) return ResponseEntity.status(401).build();
+      eventService.updateEventType(typeId, body.get("typeName"));
+      return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/event-types/{typeId}")
+    public ResponseEntity<Void> deleteEventType(
+        @AuthenticationPrincipal UserDeptcode me,
+        @PathVariable Long typeId
+    ){
+      if (me == null) return ResponseEntity.status(401).build();
+      eventService.deleteEventType(typeId);
+      return ResponseEntity.noContent().build();
+    }
 }
 
 

@@ -1,6 +1,8 @@
 package com.kh.coreflow.calendar.model.dao;
 
 import com.kh.coreflow.calendar.model.dto.EventDto;
+import com.kh.coreflow.calendar.model.dto.EventDto.EventTypeDto;
+
 import java.util.List;
 
 public interface EventDao {
@@ -32,5 +34,10 @@ public interface EventDao {
 	    }
 	    return sum;
 	}
+
+	List<EventDto.EventTypeDto> selectAllEventTypes();
+	int insertEventType(EventDto.EventTypeDto dto);
+	int updateEventTypeName(EventDto.EventTypeDto dto);
+	int deleteEventType(Long typeId);
 
 }

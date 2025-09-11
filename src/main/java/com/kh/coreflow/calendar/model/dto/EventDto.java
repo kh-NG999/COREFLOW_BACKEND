@@ -26,7 +26,8 @@ public class EventDto {
 		private Long roomId;
 		private String status; // 생성 시 서버에서 'CONFIRMED'로 세팅
 		private Long labelId;
-		private String eventType; // MEETING/PERSONAL/OOO 등
+		private Long typeId; // MEETING/PERSONAL/OOO 등
+		private String typeCode;
 		private String rrule;
 		private String exdates;
 		private List<Long> attendeeUserNos;
@@ -49,7 +50,9 @@ public class EventDto {
 		private Long roomId;
 		private String status;
 		private Long labelId;
-		private String eventType;
+		private Long typeId;
+		private String typeName; 
+		private String typeCode; 
 		private String rrule;
 		private String exdates;
 		private Long createByUserNo;
@@ -70,4 +73,15 @@ public class EventDto {
 	    private String labelName;
 	    private String labelColor;
 	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class EventTypeDto {
+	    private Long typeId;
+	    private String typeCode;
+	    private String typeName;
+	}
+	
 }

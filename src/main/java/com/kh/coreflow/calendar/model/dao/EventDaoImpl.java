@@ -1,6 +1,8 @@
 package com.kh.coreflow.calendar.model.dao;
 
 import com.kh.coreflow.calendar.model.dto.EventDto;
+import com.kh.coreflow.calendar.model.dto.EventDto.EventTypeDto;
+
 import lombok.RequiredArgsConstructor;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -119,5 +121,22 @@ public class EventDaoImpl implements EventDao {
     public int deleteLabel(Long labelId) {
         return sql.delete("event.deleteLabel", labelId);
     }
+
+	@Override
+	public List<EventDto.EventTypeDto> selectAllEventTypes() {
+		return sql.selectList("event.selectAllEventTypes");
+	}
+	@Override
+	public int insertEventType(EventTypeDto dto) {
+		return sql.insert("event.insertEventType", dto);
+	}
+	@Override
+	public int updateEventTypeName(EventTypeDto dto) {
+		return sql.update("event.updateEventTypeName", dto);
+	}
+	@Override
+	public int deleteEventType(Long typeId) {
+		return sql.delete("event.deleteEventType", typeId);
+	}
     
 }

@@ -15,7 +15,9 @@
     <result property="roomId"         column="ROOM_ID"/>
     <result property="status"         column="STATUS"/>
     <result property="labelId"        column="LABEL_ID"/>
-    <result property="eventType"      column="EVENT_TYPE"/>
+    <result property="typeId"      	  column="TYPE_ID"/>
+    <result property="typeName" 	  column="TYPE_NAME"/> 
+    <result property="typeCode" 	  column="TYPE_CODE"/> 
     <result property="rrule"          column="RRULE"/>
     <result property="exdates"        column="EXDATES"/>
     <result property="createByUserNo" column="CREATE_BY_USER_NO"/>
@@ -28,16 +30,34 @@
   <select id="selectEventsByCalendarAndPeriod"
           resultMap="EventResMap"
           parameterType="map">
-    SELECT
-      EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
-      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, EVENT_TYPE,
-      RRULE, EXDATES, CREATE_BY_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
-    FROM EVENT
-    WHERE CAL_ID = #{calendarId}
-      AND START_AT &lt; #{to}
-      AND END_AT   &gt; #{from}
-      AND STATUS   &lt;&gt; 'DELETED'
-    ORDER BY START_AT ASC, END_AT ASC, EVENT_ID ASC
+     SELECT
+	    e.EVENT_ID        AS EVENT_ID,
+	    e.CAL_ID          AS CAL_ID,
+	    e.TITLE           AS TITLE,
+	    e.START_AT        AS START_AT,
+	    e.END_AT          AS END_AT,
+	    e.ALL_DAY_YN      AS ALL_DAY_YN,
+	    e.LOCATION_TEXT   AS LOCATION_TEXT,
+	    e.NOTE            AS NOTE,
+	    e.ROOM_ID         AS ROOM_ID,
+	    e.STATUS          AS STATUS,
+	    e.LABEL_ID        AS LABEL_ID,
+	    e.TYPE_ID         AS TYPE_ID,     <!-- ★ 여기! e.TYPE_ID로 명확히 -->
+	    t.TYPE_NAME       AS TYPE_NAME,
+	    t.TYPE_CODE       AS TYPE_CODE,
+	    e.RRULE           AS RRULE,
+	    e.EXDATES         AS EXDATES,
+	    e.CREATE_BY_USER_NO AS CREATE_BY_USER_NO,
+	    e.CREATE_DATE     AS CREATE_DATE,
+	    e.UPDATE_USER_NO  AS UPDATE_USER_NO,
+	    e.UPDATE_DATE     AS UPDATE_DATE
+    FROM EVENT e
+     LEFT JOIN EVENT_TYPE t ON t.TYPE_ID = e.TYPE_ID
+    WHERE e.CAL_ID = #{calendarId}
+      AND e.START_AT &lt; #{to}
+      AND e.END_AT   &gt; #{from}
+      AND e.STATUS   &lt;&gt; 'DELETED'
+    ORDER BY e.START_AT ASC, e.END_AT ASC, e.EVENT_ID ASC
   </select>
 
   <!-- 회의실 겹침검사 (생성 시) -->
@@ -68,7 +88,7 @@
     </selectKey>
     INSERT INTO EVENT (
       EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
-      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, EVENT_TYPE,
+      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, TYPE_ID,
       RRULE, EXDATES, CREATE_BY_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
     ) VALUES (
       #{req.eventId}, #{req.calId}, #{req.title}, #{req.startAt}, #{req.endAt},
@@ -77,7 +97,7 @@
         <otherwise> 'N' </otherwise>
       </choose>,
       #{req.locationText}, #{req.note}, #{req.roomId},
-      'CONFIRMED', #{req.labelId}, #{req.eventType},
+      'CONFIRMED', #{req.labelId}, #{req.typeId},
       #{req.rrule}, #{req.exdates},
       #{userNo}, SYSTIMESTAMP, #{userNo}, SYSTIMESTAMP
     )
@@ -96,7 +116,7 @@
            LOCATION_TEXT  = #{req.locationText},
            NOTE           = #{req.note},
            ROOM_ID        = #{req.roomId},
-           EVENT_TYPE     = #{req.eventType},
+           TYPE_ID     = #{req.typeId},
            LABEL_ID       = #{req.labelId},
            RRULE          = #{req.rrule},
            EXDATES        = #{req.exdates},
@@ -144,6 +164,37 @@
               AND KIND     = #{kind}
      )
   </insert>
+
+  <!-- 이벤트 유형 전체 목록 -->
+  <select id="selectAllEventTypes"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+    SELECT
+      TYPE_ID   AS typeId,
+      TYPE_CODE AS typeCode,
+      TYPE_NAME AS typeName
+    FROM EVENT_TYPE
+    ORDER BY TYPE_NAME
+  </select>
+	<!-- 생성 -->
+	<insert id="insertEventType"
+	        parameterType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+	  <selectKey keyProperty="typeId" resultType="long" order="BEFORE">
+	    SELECT EVENT_TYPE_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	  INSERT INTO EVENT_TYPE (TYPE_ID, TYPE_CODE, TYPE_NAME)
+	  VALUES (#{typeId}, #{typeCode}, #{typeName})
+	</insert>
+	<!-- 이름만 수정 -->
+	<update id="updateEventTypeName"
+	        parameterType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+	  UPDATE EVENT_TYPE
+	     SET TYPE_NAME = #{typeName}
+	   WHERE TYPE_ID = #{typeId}
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteEventType" parameterType="long">
+	  DELETE FROM EVENT_TYPE WHERE TYPE_ID = #{typeId}
+	</delete>
 
   <!-- event-mapper.xml 의 <mapper namespace="event"> 안에 아래 추가 -->
 	

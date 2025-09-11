@@ -1,6 +1,8 @@
 package com.kh.coreflow.calendar.model.service;
 
 import com.kh.coreflow.calendar.model.dto.EventDto;
+import com.kh.coreflow.calendar.model.dto.EventDto.EventTypeDto;
+
 import java.util.List;
 
 public interface EventService {
@@ -14,4 +16,9 @@ public interface EventService {
     Long labelCreate(EventDto.LabelReq req);
     void labelUpdate(Long labelId, EventDto.LabelReq req);
     void labelDelete(Long labelId);
+	
+    List<EventDto.EventTypeDto> getEventTypes();
+	EventTypeDto createEventType(String typeName);
+	void updateEventType(Long typeId, String typeName);
+	void deleteEventType(Long typeId);
 }
