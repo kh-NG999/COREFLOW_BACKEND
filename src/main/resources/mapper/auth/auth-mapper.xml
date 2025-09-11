@@ -58,7 +58,8 @@
     
     <update id="updateAddress" parameterType="map">
     	UPDATE MEMBER
-    	SET ADDRESS = #{string}
+    	SET ADDRESS = #{address},
+    		ADDRESS_DETAIL = #{addressDetail}
     	WHERE USER_NO = #{userNo}
     </update>
     
