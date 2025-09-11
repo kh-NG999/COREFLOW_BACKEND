@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 import com.kh.coreflow.personal.model.service.UserService;
 import com.kh.coreflow.security.CustomUserDetails;
 import com.kh.coreflow.security.model.service.AuthService;

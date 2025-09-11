@@ -177,7 +177,7 @@ public class AuthController {
     public ResponseEntity<Void> updateAddress(
     		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
-        userService.updateAddress(userNo, body.get("address"));
+        userService.updateAddress(userNo, body.get("address"), body.get("addressDetail"));
         return ResponseEntity.ok().build();
     }
 

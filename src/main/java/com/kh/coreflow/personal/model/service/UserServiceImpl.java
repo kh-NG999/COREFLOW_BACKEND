@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void updateAddress(Long userNo, String string) {
-		authDao.updateAddress(userNo, string);
+	public void updateAddress(Long userNo, String string, String string2) {
+		authDao.updateAddress(userNo, string, string2);
 	}
 	
 	@Override

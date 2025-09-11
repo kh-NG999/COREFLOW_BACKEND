@@ -3,6 +3,7 @@ package com.kh.coreflow.humanmanagement.model.dto;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +38,27 @@ public class MemberDto {
 		private String depName;
 		private int posId;
 		private String posName;
+		private String phone;
+		private String extension;
+		private String address;
+		private String addressDetail;
+		private Date updateDate;
+		private String status;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class MemberCreate{
+		private int userNo;
+		private String userName;
+		private String email;
+		private String userPwd;
+		private Date hireDate;
+		private int depId;
+		private int posId;
+		private String profile;
 		private String phone;
 		private String extension;
 		private String address;

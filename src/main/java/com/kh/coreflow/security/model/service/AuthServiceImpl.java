@@ -128,7 +128,7 @@ public class AuthServiceImpl implements AuthService{
 
 		// 2. 토큰 발급
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
-		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
+		
 		log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 		
 		User userNoPassword = User.builder()

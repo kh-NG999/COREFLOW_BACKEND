@@ -82,10 +82,11 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void updateAddress(Long userNo, String string) {
+	public void updateAddress(Long userNo, String string, String string2) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
-		param.put("string", string);
+		param.put("address", string);
+		param.put("addressDetail", string2);
 		session.update("auth.updateAddress", param);
 	}
 
