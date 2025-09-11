@@ -75,6 +75,10 @@ public class ApprovalDao {
 	public List<ApprovalDto> selectApprovalsByUserNo(int userNo) {
 		return session.selectList("approvalMapper.selectApprovalsByUserNo", userNo);
 	}
+	// 받은 문서함
+	public List<ApprovalDto> selectReceivedApprovalsByApproverNo(int userNo) {
+		return session.selectList("approvalMapper.selectReceivedApprovalsByApproverNo", userNo);
+	}
 	
 	
 	

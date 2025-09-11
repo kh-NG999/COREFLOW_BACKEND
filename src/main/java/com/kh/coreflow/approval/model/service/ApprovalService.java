@@ -163,7 +163,7 @@ public class ApprovalService {
 	}
 
 	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo) {
-		return dao.selectApprovalsByUserNo(userNo);
+		return dao.selectReceivedApprovalsByApproverNo(userNo);
 	}
 
 }

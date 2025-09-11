@@ -132,23 +132,19 @@
     </select>
 
     <!-- 현재 결재자 승인 대기 문서 조회 -->
-    <select id="selectReceivedApprovalsByUserNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+    <select id="selectReceivedApprovalsByApproverNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
         SELECT
         	A.approval_id,
-        	A.user_no,
         	A.approval_title,
         	A.approval_type,
-        	A.approval_status,
         	A.start_date
         FROM 
         	approval A
         INNER JOIN 
         	approval_line L ON a.approval_id = l.approval_id
         WHERE 
-        	L.approval_user_no = #{userNo}
-          AND L.line_status = 'WAITING'
-        ORDER BY 
-        A.start_date DESC
+        	L.approver_user_no = #{userNo}
+          AND L.line_status = 'PENDING'
     </select>
 
     <!-- 검색 (예시: 제목/내용) -->
