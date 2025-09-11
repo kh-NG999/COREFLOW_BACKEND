@@ -93,7 +93,7 @@
     SELECT * FROM DUAL
 	</insert>
 	
-	<insert id="insertMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages" >
+	<insert id="insertMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages"  useGeneratedKeys="true" keyProperty="messageId,sentAt" keyColumn="MESSAGE_ID,SENT_AT">
 		INSERT INTO CHAT_MESSAGES (
         ROOM_ID,
         USER_NO,
@@ -114,13 +114,21 @@
 		CHAT_MESSAGES A INNER JOIN MEMBER B
 		ON A.USER_NO = B.USER_NO
 		WHERE A.ROOM_ID = #{roomId}
+		ORDER BY SENT_AT
 	</select>
 	
 	<select id="getMyChattingRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-	SELECT A.* FROM CHAT_ROOMS A
-	INNER JOIN CHAT_ROOM_JOIN B
-	ON A.ROOM_ID = B.ROOM_ID
-	WHERE B.USER_NO = #{userNo}
+	SELECT CR.*,
+        (
+            SELECT COUNT(*)
+            FROM CHAT_MESSAGES CM
+            WHERE CM.ROOM_ID = CRJ.ROOM_ID
+            AND CM.SENT_AT > CRJ.LAST_READ_AT
+        ) AS UNREAD_COUNT
+    FROM CHAT_ROOMS CR
+    JOIN CHAT_ROOM_JOIN CRJ
+    ON CR.ROOM_ID = CRJ.ROOM_ID
+    WHERE CRJ.USER_NO = #{userNo}
 	</select>	
 	
 	<select id="selectLastMessagesForRooms" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
@@ -160,8 +168,34 @@
 	</select>
 	
 	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT * FROM CHAT_ROOMS
+		SELECT DISTINCT *
+	    FROM CHAT_ROOMS
 		WHERE ROOM_ID = #{roomId}
 	</select>
-
+	
+	
+	<select id="getCountMessageSubscribe" parameterType="map" resultType="Integer">
+		SELECT COUNT(*)
+		FROM CHAT_MESSAGES CM INNER JOIN CHAT_ROOM_JOIN CRJ
+		ON CM.ROOM_ID = CRJ.ROOM_ID
+		WHERE CRJ.USER_NO = #{userNo}
+		AND (
+		CM.SENT_AT > CRJ.LAST_READ_AT
+		OR CRJ.LAST_READ_AT IS NULL )
+	</select>
+	
+	<select id="getParticipantUserNos" resultType="Long">
+		SELECT A.USER_NO USER_NO FROM CHAT_PROFILE A
+			INNER JOIN CHAT_ROOM_JOIN B
+			ON A.USER_NO = B.USER_NO
+		WHERE ROOM_ID = #{roomId}
+	</select>
+	
+	<update id="updateLastReadAt" parameterType="map">
+		UPDATE CHAT_ROOM_JOIN
+	    SET LAST_READ_AT = SYSTIMESTAMP
+	    WHERE ROOM_ID = #{roomId}
+	    AND USER_NO = #{userNo}
+	</update>
+	
 </mapper>

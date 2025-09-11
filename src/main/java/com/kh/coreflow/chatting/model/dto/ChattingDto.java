@@ -63,6 +63,8 @@ public class ChattingDto {
 		private String status;
 		private Date createdAt;
 		private chatMessages lastMessage;
+		
+		private int unreadCount;
 	}
 	
 	@Data

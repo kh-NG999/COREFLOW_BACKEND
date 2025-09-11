@@ -99,7 +99,6 @@ public class ChattingDaoImpl implements ChattingDao {
 		Map<String, Object> params = new HashMap<>();
 	    params.put("roomId", roomId);
 	    params.put("userNos", chatRoomJoin);
-	    log.info("list : {}",chatRoomJoin);
 	    return session.insert("chat.insertChatRoomJoins", params);
 	}
 
@@ -111,6 +110,28 @@ public class ChattingDaoImpl implements ChattingDao {
 	@Override
 	public chatRooms getRoom(Long roomId) {
 		return session.selectOne("chat.getRoom",roomId);
+	}
+
+	@Override
+	public List<Long> getParticipantUserNos(Long roomId) {
+		return session.selectList("chat.getParticipantUserNos",roomId);
+	}
+
+	@Override
+	public chatRooms getUpdatedChatRoomInfo(Long userNo,Long roomId, chatMessages message) {
+	    chatRooms returnRoomInfo = session.selectOne("chat.getRoom",roomId);
+	    int unReadCount = session.selectOne("chat.getCountMessageSubscribe",userNo);
+	    returnRoomInfo.setLastMessage(message);
+	    returnRoomInfo.setUnreadCount(unReadCount);
+		return returnRoomInfo;
+	}
+
+	@Override
+	public int updateLastReadAt(long roomId, Long userNo) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("roomId", roomId);
+	    params.put("userNo", userNo);
+		return session.update("chat.updateLastReadAt",params);
 	}
 
 }

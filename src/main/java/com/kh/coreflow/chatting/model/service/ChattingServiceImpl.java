@@ -138,4 +138,19 @@ public class ChattingServiceImpl implements ChattingService {
 		return chattingDao.getRoom(roomId);
 	}
 
+	@Override
+	public List<Long> getParticipantUserNos(Long roomId) {
+		return chattingDao.getParticipantUserNos(roomId);
+	}
+
+	@Override
+	public chatRooms getUpdatedChatRoomInfo(Long userNo, Long roomId, chatMessages message) {
+		return chattingDao.getUpdatedChatRoomInfo(userNo, roomId,message);
+	}
+
+	@Override
+	public int updateLastReadAt(long roomId, Long userNo) {
+		return chattingDao.updateLastReadAt(roomId,userNo);
+	}
+
 }

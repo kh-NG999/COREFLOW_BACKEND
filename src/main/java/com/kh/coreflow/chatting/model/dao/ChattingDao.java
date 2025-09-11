@@ -43,4 +43,10 @@ public interface ChattingDao {
 
 	chatRooms getRoom(Long roomId);
 
+	List<Long> getParticipantUserNos(Long roomId);
+
+	chatRooms getUpdatedChatRoomInfo(Long userNo, Long roomId, chatMessages message);
+
+	int updateLastReadAt(long roomId, Long userNo);
+
 }

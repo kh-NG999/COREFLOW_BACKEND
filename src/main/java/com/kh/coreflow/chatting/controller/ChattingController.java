@@ -42,9 +42,9 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		log.info("userDetail : {}",userDetails);
+		//log.info("userDetail : {}",userDetails);
 		chatProfile profile = chattingService.getMyProfile(user.getUserNo());
-		log.info("profile : {}",profile);
+		//log.info("profile : {}",profile);
 		return ResponseEntity.ok(profile);
 	}
 	
@@ -52,9 +52,9 @@ public class ChattingController {
 	public ResponseEntity<List<chatProfile>> chatUser(
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		log.info("userNo : {}",user.getUserNo());
+		//log.info("userNo : {}",user.getUserNo());
 		List<chatProfile> list = chattingService.getChatProfiles(user.getUserNo());
-		log.info("user List : {}",list);
+		//log.info("user List : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -63,7 +63,7 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatProfile> list = chattingService.getFavoriteProfiles(user.getUserNo());
-		log.info("favUser List : {}",list);
+		//log.info("favUser List : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -123,10 +123,10 @@ public class ChattingController {
 			@PathVariable("roomId") Long roomId,
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		log.info("userNo : {}",user.getUserNo());
-		log.info("Room Id : {}",roomId);
+		//log.info("userNo : {}",user.getUserNo());
+		//log.info("Room Id : {}",roomId);
 		List<chatMessages> list = chattingService.getMessages(roomId);
-		log.info("messageList : {}",list);
+		//log.info("messageList : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -136,6 +136,7 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatRooms> list = chattingService.getmyChattingRooms(user.getUserNo());
+		log.info("myChattingRooms : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -146,7 +147,7 @@ public class ChattingController {
 			){
 		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
 		chatRooms returnRoom = chattingService.getRoom(roomId);
-		log.info("returnRoom : {}, roomId : {}",returnRoom, roomId);
+		//log.info("returnRoom : {}, roomId : {}",returnRoom, roomId);
 		return ResponseEntity.ok(returnRoom);
 	}
 	
@@ -156,5 +157,20 @@ public class ChattingController {
 			){
 		chatRooms getRoom = chattingService.getRoom(roomId);
 		return ResponseEntity.ok(getRoom);
+	}
+	
+	@PostMapping("/room/{roomId}/read")
+	public ResponseEntity<?> updateLastReadAt(
+	        @PathVariable("roomId") long roomId,
+	        @AuthenticationPrincipal UserDeptcode user
+	) {
+	    Long userNo = user.getUserNo();
+	    log.info("userNo : {}",userNo);
+	    int answer = chattingService.updateLastReadAt(roomId, userNo);
+	    if(answer>0) {
+		    return ResponseEntity.ok().build();
+	    }else {
+	    	return ResponseEntity.badRequest().build();
+	    }
 	}
 }
