@@ -37,7 +37,7 @@ public class UserDto {
 		private Long userNo;
 		private String userPwd;
 		private String email;
-		private String userName; // 전부 바꿔주기
+		private String userName;
 		private Long depId;
 		private Long posId;
 		private String profile;
@@ -45,7 +45,8 @@ public class UserDto {
 		private Date hireDate;
 		private String phone;
 		private String address;
-		private String status = "INCOMPLETE";
+		private String addressDetail;
+		private String status;
 	}
 	
 	@Data
@@ -57,7 +58,7 @@ public class UserDto {
 		private String userPwd;
 		private String email;
 		private String userName;
-		private Long deptId;
+		private Long depId;
 		private Long posId;
 		private String profile;
 		
@@ -69,6 +70,7 @@ public class UserDto {
 		private String status = "INCOMPLETE";
 		private String phone;
 		private String address;
+		private String addressDetail;
 	}
 	
 	@Data
@@ -89,6 +91,7 @@ public class UserDto {
 		private String userPwd;
 		private String phone;
 		private String address;
+		private String addressDetail;
 		private String profile;
 	}
 	
@@ -118,5 +121,7 @@ public class UserDto {
 		private Long userNo;
 		private Long depId;
 	}
+	
+	
 	 
 }

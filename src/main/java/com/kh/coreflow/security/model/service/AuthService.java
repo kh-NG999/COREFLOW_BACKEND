@@ -17,7 +17,7 @@ public interface AuthService {
 
 	Optional<User> findUserByUserNo(Long userNo);
 
-	boolean findUserPwd(String name, String email);
+	boolean findUserPwd(String userName, String email);
 
 	Optional<User> findUserByEmail(String email);
 

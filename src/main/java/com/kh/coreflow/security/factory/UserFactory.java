@@ -3,7 +3,7 @@ package com.kh.coreflow.security.factory;
 import java.security.SecureRandom;
 import java.util.Date;
 
-import com.kh.coreflow.model.dto.UserDto.User;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberCreate;
 
 public class UserFactory {
 
@@ -24,18 +24,19 @@ public class UserFactory {
      * INCOMPLETE 상태의 임시 계정을 생성
      * 수정 필요
      */
-    public static User createIncompleteUser(String email, String userName, Long depId, Long posId) {
-        return User.builder()
+    public static MemberCreate createIncompleteUser(String email, String userName, int depId, int posId) {
+        return MemberCreate.builder()
                 .email(email)
-                .userPwd(generateRandomPassword(10)) // 서버에서 자동 생성
-                .userName(userName)    	// 프론트 입력값
-                .depId(depId) // 프론트 select-option
+                .userPwd(generateRandomPassword(10))
+                .userName(userName)	// 프론트 입력값
+                .depId(depId) 	// 프론트 select-option
                 .posId(posId)   // 프론트 select-option
-                .profile("/images/default-profile.png")	// 기본 프로필
+                .profile("/resources/static/images/p/default.png")	// 기본 프로필
                 .hireDate(new Date())	// 계정 생성일
                 .phone("미입력")
                 .address("미입력")
-                .status("INCOMPLETE")	// 미완성 계정
+                .status("T")	// 재직여부
                 .build();
+                
     }
 }

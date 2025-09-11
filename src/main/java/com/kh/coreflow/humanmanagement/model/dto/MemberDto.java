@@ -50,6 +50,27 @@ public class MemberDto {
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
+	@Builder
+	public static class MemberCreate{
+		private int userNo;
+		private String userName;
+		private String email;
+		private String userPwd;
+		private Date hireDate;
+		private int depId;
+		private int posId;
+		private String profile;
+		private String phone;
+		private String extension;
+		private String address;
+		private String addressDetail;
+		private Date updateDate;
+		private String status;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class MemberPost{
 		private int userNo;
 		private String userName;
