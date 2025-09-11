@@ -127,7 +127,27 @@ public class ApprovalController {
     	UserDeptcode userDetails = (UserDeptcode) authentication.getPrincipal();        
     	return userDetails.getUserNo();
     }
+    
+    @Operation(summary = "받은문서함")
+    @GetMapping("/received-documents")
+    public ResponseEntity<List<ApprovalDto>> getReceivedDocuments(Principal principal){
+    	int userNo = getUserNoFromPrincipal(principal);
+    	List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo);
+    	return ResponseEntity.ok(documents);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
