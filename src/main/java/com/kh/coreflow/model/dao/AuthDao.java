@@ -16,13 +16,13 @@ public interface AuthDao {
 
 	Optional<User> findUserByUserNo(Long userNo);
 
-	User findUserPwd(String name, String email);
+	User findUserPwd(String userName, String email);
 
 	void updatePwd(String email, String encodedPwd);
 
 	void updatePhone(Long userNo, String string);
 
-	void updateAddress(Long userNo, String string);
+	void updateAddress(Long userNo, String string, String string2);
 
 	void updateProfileImage(Map<String, Object> imageUpdate);
 

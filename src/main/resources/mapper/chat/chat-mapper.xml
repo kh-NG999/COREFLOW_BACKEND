@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="chat">
+
+
+	<select id="getMyProfile" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
+		WHERE A.USER_NO = #{userNo}
+	</select>
+
+
+	<select id="getChatProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
+		WHERE A.USER_NO != #{userNo}
+	</select>
+	
+	<insert id="insertMyProfile" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		INSERT INTO CHAT_PROFILE (
+			USER_NO, STATUS
+		) VALUES (
+			#{userNo},
+			'O'
+		)
+	</insert>
+	
+	<select id="getFavoriteProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT D.FAVORITE_USER_NO AS USER_NO, C.USER_NAME, C.STATUS FROM
+		( 
+			SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM
+			CHAT_PROFILE A INNER JOIN "MEMBER" B
+			ON A.USER_NO = B.USER_NO
+		) C INNER JOIN USER_FAVORITE D
+		ON C.USER_NO = D.FAVORITE_USER_NO
+		WHERE D.USER_NO = #{userNo}
+	</select>
+	
+	<insert id="insertFavoriteProfiles" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$userFavorite">
+		INSERT INTO USER_FAVORITE (
+			USER_NO,
+			FAVORITE_USER_NO
+		) VALUES (
+			#{userNo},
+			#{favoriteUserNo}
+		)
+	</insert>
+	
+	<delete id="deleteFavoriteProfiles" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$userFavorite">
+		DELETE FROM USER_FAVORITE
+		WHERE USER_NO = #{userNo} AND
+		FAVORITE_USER_NO = #{favoriteUserNo}
+	</delete>
+	
+	<select id="findRoomByMember" parameterType="map" resultType="long">
+		SELECT A.ROOM_ID ROOM_ID FROM
+		    (SELECT ROOM_ID FROM CHAT_ROOM_JOIN
+		    GROUP BY ROOM_ID HAVING COUNT(USER_NO) = #{userCount}
+		    AND SUM(CASE WHEN USER_NO IN
+	        <foreach collection="userNos" item="userNo" open="(" separator="," close=")">
+	        	#{userNo}
+	        </foreach>
+	        THEN 1 ELSE 0 END) = #{userCount}) A
+        INNER JOIN CHAT_ROOMS B
+		ON A.ROOM_ID = B.ROOM_ID
+		WHERE B.ROOM_TYPE = #{type}
+	</select>
+	
+	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT * FROM CHAT_ROOMS
+		WHERE ROOM_ID=#{roomId}
+	</select>
+	
+	<insert id="makeChatRoom" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
+		INSERT INTO CHAT_ROOMS (
+			USER_NO, ROOM_NAME, ROOM_TYPE
+		) VALUES (
+			#{userNo}, #{roomName}, #{roomType}
+		)
+	</insert>
+	
+	<insert id="insertChatRoomJoins" parameterType="map">
+    INSERT ALL
+        <foreach collection="userNos" item="userNo">
+            INTO CHAT_ROOM_JOIN(USER_NO, ROOM_ID) VALUES (#{userNo}, #{roomId})
+        </foreach>
+    SELECT * FROM DUAL
+	</insert>
+	
+	<insert id="insertMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages"  useGeneratedKeys="true" keyProperty="messageId,sentAt" keyColumn="MESSAGE_ID,SENT_AT">
+		INSERT INTO CHAT_MESSAGES (
+        ROOM_ID,
+        USER_NO,
+        MESSAGE_TEXT,
+        IS_FILE,
+        TYPE
+    ) VALUES (
+        #{roomId},
+        #{userNo},
+        #{messageText},
+        'F',
+        #{type}
+    )
+	</insert>
+	
+	<select id="getMessages" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+		SELECT A.*, B.USER_NAME FROM 
+		CHAT_MESSAGES A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+		WHERE A.ROOM_ID = #{roomId}
+		ORDER BY SENT_AT
+	</select>
+	
+	<select id="getMyChattingRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+	SELECT CR.*,
+        (
+            SELECT COUNT(*)
+            FROM CHAT_MESSAGES CM
+            WHERE CM.ROOM_ID = CRJ.ROOM_ID
+            AND CM.SENT_AT > CRJ.LAST_READ_AT
+        ) AS UNREAD_COUNT
+    FROM CHAT_ROOMS CR
+    JOIN CHAT_ROOM_JOIN CRJ
+    ON CR.ROOM_ID = CRJ.ROOM_ID
+    WHERE CRJ.USER_NO = #{userNo}
+	</select>	
+	
+	<select id="selectLastMessagesForRooms" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+    SELECT
+        MESSAGE_ID,
+        ROOM_ID,
+        USER_NO,
+        MESSAGE_TEXT,
+        SENT_AT,
+        IS_FILE,
+        TYPE
+    FROM (
+        SELECT
+            M.MESSAGE_ID,
+            M.ROOM_ID,
+            M.USER_NO,
+            M.MESSAGE_TEXT,
+            M.SENT_AT,
+            M.IS_FILE,
+            M.TYPE,
+            ROW_NUMBER() OVER (PARTITION BY M.ROOM_ID ORDER BY M.SENT_AT DESC) AS RN
+        FROM
+            CHAT_MESSAGES M
+        WHERE
+            M.ROOM_ID IN
+            <foreach collection="list" item="room" open="(" separator="," close=")">
+                #{room.roomId}
+            </foreach>
+    )
+    WHERE
+        RN = 1
+	</select>
+	
+	<select id="findUserByUserNo" resultType="com.kh.coreflow.model.dto.UserDto$User">
+		SELECT * FROM
+		MEMBER WHERE USER_NO = #{userNo}
+	</select>
+	
+	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT DISTINCT *
+	    FROM CHAT_ROOMS
+		WHERE ROOM_ID = #{roomId}
+	</select>
+	
+	
+	<select id="getCountMessageSubscribe" parameterType="map" resultType="Integer">
+		SELECT COUNT(*)
+		FROM CHAT_MESSAGES CM INNER JOIN CHAT_ROOM_JOIN CRJ
+		ON CM.ROOM_ID = CRJ.ROOM_ID
+		WHERE CRJ.USER_NO = #{userNo}
+		AND (
+		CM.SENT_AT > CRJ.LAST_READ_AT
+		OR CRJ.LAST_READ_AT IS NULL )
+	</select>
+	
+	<select id="getParticipantUserNos" resultType="Long">
+		SELECT A.USER_NO USER_NO FROM CHAT_PROFILE A
+			INNER JOIN CHAT_ROOM_JOIN B
+			ON A.USER_NO = B.USER_NO
+		WHERE ROOM_ID = #{roomId}
+	</select>
+	
+	<update id="updateLastReadAt" parameterType="map">
+		UPDATE CHAT_ROOM_JOIN
+	    SET LAST_READ_AT = SYSTIMESTAMP
+	    WHERE ROOM_ID = #{roomId}
+	    AND USER_NO = #{userNo}
+	</update>
+	
+</mapper>

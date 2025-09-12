@@ -64,8 +64,8 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void updateAddress(Long userNo, String string) {
-		authDao.updateAddress(userNo, string);
+	public void updateAddress(Long userNo, String string, String string2) {
+		authDao.updateAddress(userNo, string, string2);
 	}
 	
 	@Override
@@ -98,11 +98,9 @@ public class UserServiceImpl implements UserService{
         
         int count = authDao.checkProfileImage(userNo);
         
-        if(count > 0) {
-        	authDao.updateProfileImage(imageUpdate);
-        }else {
-        	authDao.insertProfileImage(imageUpdate);
-        }
+        if(count > 0) authDao.updateProfileImage(imageUpdate);
+        else authDao.insertProfileImage(imageUpdate);
+        
         System.out.println("DB 반영 결과: " + count);
         
         File savedFile = new File(dir.getAbsolutePath() + "\\" + changeName);

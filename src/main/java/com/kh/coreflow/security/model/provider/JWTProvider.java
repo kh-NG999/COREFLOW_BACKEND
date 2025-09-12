@@ -1,18 +1,27 @@
 package com.kh.coreflow.security.model.provider;
 
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JWTProvider {
 
@@ -99,6 +108,41 @@ public class JWTProvider {
                 .parseClaimsJws(token)
                 .getBody();
 		return claims.get("depId", Long.class);
+	}
+	
+	public boolean validateToken(String token) {
+		try {
+			getClaims(token);
+			return true;
+		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+			log.info("잘못된 JWT 서명입니다.");
+		} catch (ExpiredJwtException e) {
+			log.info("만료된 JWT 토큰입니다.");
+		} catch (UnsupportedJwtException e) {
+			log.info("지원되지 않는 JWT 토큰입니다.");
+		} catch (IllegalArgumentException e) {
+			log.info("JWT 토큰이 잘못되었습니다.");
+		}
+		return false;
+	}
+	
+	public Authentication getAuthentication(String accessToken) {
+		// 토큰 복호화
+		Claims claims = getClaims(accessToken);
+		// 클레임에서 userNo 추출
+		long userNo = Long.parseLong(claims.getSubject());
+		// 권한 정보 생성 (여기서는 "ROLE_USER"로 고정, 필요시 DB에서 조회)
+		List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+		// UsernamePasswordAuthenticationToken을 만들어 반환
+		return new UsernamePasswordAuthenticationToken(userNo, null, authorities);
+	}
+	
+	private Claims getClaims(String token) {
+		return Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
 	}
 	
 }
