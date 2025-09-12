@@ -42,9 +42,7 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		//log.info("userDetail : {}",userDetails);
 		chatProfile profile = chattingService.getMyProfile(user.getUserNo());
-		//log.info("profile : {}",profile);
 		return ResponseEntity.ok(profile);
 	}
 	
@@ -52,9 +50,16 @@ public class ChattingController {
 	public ResponseEntity<List<chatProfile>> chatUser(
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		//log.info("userNo : {}",user.getUserNo());
 		List<chatProfile> list = chattingService.getChatProfiles(user.getUserNo());
-		//log.info("user List : {}",list);
+		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping("/searchUser")
+	public ResponseEntity<List<chatProfile>> searchUser(
+			@AuthenticationPrincipal UserDeptcode user,
+			@RequestParam(name = "query") String query
+			){
+		List<chatProfile> list = chattingService.findChatProfiles(user.getUserNo(),query);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -63,7 +68,6 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatProfile> list = chattingService.getFavoriteProfiles(user.getUserNo());
-		//log.info("favUser List : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -75,8 +79,10 @@ public class ChattingController {
 			){
 		favUser.setUserNo(user.getUserNo());
 		int result = chattingService.insertFavoriteProfiles(favUser);
-		
-		return null;
+		if(result>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
 	}
 
 	@DeleteMapping("/favorites/{favUserNo}")
@@ -89,8 +95,10 @@ public class ChattingController {
 		favUser.setUserNo(user.getUserNo());
 		favUser.setFavoriteUserNo(favUserNo);
 		int result = chattingService.deleteFavoriteProfiles(favUser);
-		
-		return null;
+		if(result>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
 	}
 	
 	@GetMapping("/private/{userNo}")
@@ -123,10 +131,7 @@ public class ChattingController {
 			@PathVariable("roomId") Long roomId,
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		//log.info("userNo : {}",user.getUserNo());
-		//log.info("Room Id : {}",roomId);
 		List<chatMessages> list = chattingService.getMessages(roomId);
-		//log.info("messageList : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -147,7 +152,6 @@ public class ChattingController {
 			){
 		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
 		chatRooms returnRoom = chattingService.getRoom(roomId);
-		//log.info("returnRoom : {}, roomId : {}",returnRoom, roomId);
 		return ResponseEntity.ok(returnRoom);
 	}
 	
@@ -161,7 +165,7 @@ public class ChattingController {
 	
 	@PostMapping("/room/{roomId}/read")
 	public ResponseEntity<?> updateLastReadAt(
-	        @PathVariable("roomId") long roomId,
+	        @PathVariable("roomId") Long roomId,
 	        @AuthenticationPrincipal UserDeptcode user
 	) {
 	    Long userNo = user.getUserNo();
@@ -173,4 +177,46 @@ public class ChattingController {
 	    	return ResponseEntity.badRequest().build();
 	    }
 	}
+	
+
+	@PostMapping("/state")
+	public ResponseEntity<chatProfile> updateState(
+			@RequestBody Map<String,Object> statusParam,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		Long userNo = user.getUserNo();
+		String status = (String)statusParam.get("state");
+		int answer = chattingService.updateState(status,userNo);
+		if(answer>0) {
+			chatProfile returnProfile= chattingService.getMyProfile(userNo);
+			return ResponseEntity.ok(returnProfile);
+		}
+		else
+			return ResponseEntity.badRequest().build();
+	}
+	
+	@GetMapping("/room/{roomId}/user")
+	public ResponseEntity<List<chatProfile>> getRoomUsers(
+	        @PathVariable("roomId") Long roomId
+			){
+		List<chatProfile> list = chattingService.getRoomUsers(roomId);
+		log.info("userList : {}",list);
+		if(list!=null) {
+			return ResponseEntity.ok(list);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
+		
+	}
+	
+	@PostMapping("/room/join")
+	public ResponseEntity<Void> joinUser(
+		@RequestBody Map<String,Object> param){
+		int answer = chattingService.setJoinUser(param);
+		if(answer>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
+	}
+	
 }

@@ -1,6 +1,7 @@
 package com.kh.coreflow.chatting.model.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,6 +66,8 @@ public class ChattingDto {
 		private chatMessages lastMessage;
 		
 		private int unreadCount;
+		
+		private List<chatProfile> partner;
 	}
 	
 	@Data

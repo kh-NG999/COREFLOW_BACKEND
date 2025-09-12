@@ -8,6 +8,7 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 public interface ChattingService {
 
@@ -38,5 +39,13 @@ public interface ChattingService {
 	chatRooms getUpdatedChatRoomInfo(Long userNo, Long roomId, chatMessages message);
 
 	int updateLastReadAt(long roomId, Long userNo);
+
+	int updateState(String status, Long userNo);
+
+	List<chatProfile> findChatProfiles(Long userNo, String query);
+
+	List<chatProfile> getRoomUsers(Long roomId);
+
+	int setJoinUser(Map<String, Object> getParam);
 
 }

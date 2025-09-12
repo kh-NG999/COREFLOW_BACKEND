@@ -152,5 +152,25 @@ public class ChattingServiceImpl implements ChattingService {
 	public int updateLastReadAt(long roomId, Long userNo) {
 		return chattingDao.updateLastReadAt(roomId,userNo);
 	}
+	
+	@Override
+	public int updateState(String status, Long userNo) {
+		return chattingDao.updateState(status,userNo);
+	}
+
+	@Override
+	public List<chatProfile> findChatProfiles(Long userNo, String query) {
+		return chattingDao.findChatProfiles(userNo,query);
+	}
+
+	@Override
+	public List<chatProfile> getRoomUsers(Long roomId) {
+		return chattingDao.getRoomUsers(roomId);
+	}
+
+	@Override
+	public int setJoinUser(Map<String, Object> getParam) {
+		return chattingDao.setJoinUser(getParam);
+	}
 
 }

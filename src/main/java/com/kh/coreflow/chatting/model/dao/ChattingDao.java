@@ -2,6 +2,7 @@ package com.kh.coreflow.chatting.model.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
@@ -48,5 +49,13 @@ public interface ChattingDao {
 	chatRooms getUpdatedChatRoomInfo(Long userNo, Long roomId, chatMessages message);
 
 	int updateLastReadAt(long roomId, Long userNo);
+
+	int updateState(String status, Long userNo);
+
+	List<chatProfile> findChatProfiles(Long userNo, String query);
+
+	List<chatProfile> getRoomUsers(Long roomId);
+
+	int setJoinUser(Map<String, Object> getParam);
 
 }

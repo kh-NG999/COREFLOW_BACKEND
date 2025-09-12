@@ -134,4 +134,33 @@ public class ChattingDaoImpl implements ChattingDao {
 		return session.update("chat.updateLastReadAt",params);
 	}
 
+	@Override
+	public int updateState(String status, Long userNo) {
+		String statusCode = session.selectOne("chat.findState",status);
+		Map<String, Object> params = new HashMap<>();
+	    params.put("status", statusCode);
+	    params.put("userNo", userNo);
+	    log.info("status : {}",params);
+	    int answer = session.update("chat.updateState",params);
+	    return answer;
+	}
+
+	@Override
+	public List<chatProfile> findChatProfiles(Long userNo, String query) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("userNo", userNo);
+	    params.put("query", query);
+		return session.selectList("chat.findChatProfiles",params);
+	}
+
+	@Override
+	public List<chatProfile> getRoomUsers(Long roomId) {
+		return session.selectList("chat.getRoomUsers",roomId);
+	}
+
+	@Override
+	public int setJoinUser(Map<String, Object> getParam) {
+		return session.insert("chat.setJoinUser",getParam);
+	}
+
 }
