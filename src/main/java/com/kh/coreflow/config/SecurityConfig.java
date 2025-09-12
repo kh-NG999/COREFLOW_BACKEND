@@ -51,7 +51,6 @@ public class SecurityConfig {
 					.authorizeHttpRequests(auth
 						-> auth
 						.requestMatchers("/vacation/member/**","/attendance/member/**").hasAnyRole("ADMIN","HR")
-						.requestMatchers("/vacation/**").hasRole("ADMIN")
 						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
 						.requestMatchers("/ws/**").permitAll()
