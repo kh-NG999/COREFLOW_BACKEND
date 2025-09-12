@@ -198,7 +198,15 @@ public class AuthController {
     	
     	if(profile != null && !profile.isEmpty()) {
             String url = userService.updateProfileImage(userNo, profile);
-            return ResponseEntity.ok(url);
+            Optional<User> userOpt = service.findUserByUserNo(userNo);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body("User not found");
+            }
+            User user = userOpt.get();
+            user.setProfile(url);
+            
+            return ResponseEntity.ok(user);
         }
         return ResponseEntity.badRequest().body("No file uploaded");
     }
@@ -225,16 +233,3 @@ public class AuthController {
 	    return null; // 쿠키에 refreshToken이 없는 경우
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

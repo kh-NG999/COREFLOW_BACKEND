@@ -79,7 +79,6 @@
 	<update id="updateProfileImage" parameterType="map">
 		UPDATE IMAGE
 		<set>
-			IMG_ID = IMAGE_SEQ.NEXTVAL,
 			ORIGIN_NAME = #{originName},
 			CHANGE_NAME = #{changeName},
         	CREATE_DATE = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
@@ -91,6 +90,12 @@
 	    SELECT AUTHORITY
 	    FROM AUTHORITY
 	    WHERE USER_NO = #{userNo}
+	</select>
+	
+	<select id="findUserProfileByUserNo" resultType="com.kh.coreflow.model.dto.ImageDto$Profile">
+		SELECT IMAGE_CODE, CHANGE_NAME
+		FROM IMAGE
+		WHERE REF_ID = #{userNo}
 	</select>
 	
 </mapper>

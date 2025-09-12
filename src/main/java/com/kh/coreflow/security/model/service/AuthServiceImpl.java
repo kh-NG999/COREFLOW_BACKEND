@@ -154,6 +154,8 @@ public class AuthServiceImpl implements AuthService{
 		    User user = userOpt.get();
 		    UserAuthority roles = authDao.findUserAuthorityByUserNo(userNo);
 		    user.setRoles(roles.getRoles());
+		    String profile = authDao.findUserProfileByUserNo(userNo);
+		    user.setProfile(profile);
 		}
 		return userOpt;
 	}

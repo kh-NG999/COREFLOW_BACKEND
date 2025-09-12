@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+
+import com.kh.coreflow.model.dto.ImageDto;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
 
@@ -99,6 +101,15 @@ public class AuthDaoImpl implements AuthDao{
 	            .userNo(userNo)
 	            .roles(roles)
 	            .build();
+	}
+
+	@Override
+	public String findUserProfileByUserNo(Long userNo) {
+		ImageDto.Profile profile = session.selectOne("auth.findUserProfileByUserNo", userNo);
+		if(profile != null) {
+			return "images/" + profile.getImageCode() + "/" + profile.getChangeName();
+		}
+		return null;
 	}
 	
 	

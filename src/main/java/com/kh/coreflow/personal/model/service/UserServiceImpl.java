@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	@Transactional
 	public String updateProfileImage(Long userNo, MultipartFile profile) {
-		String webPath = "/resources/static/images/p/";
+		String webPath = "/images/p/";
         String serverFolderPath = "src/main/resources/static/images/p/";
         File dir = new File(serverFolderPath);
 		System.out.println(dir.getAbsolutePath());

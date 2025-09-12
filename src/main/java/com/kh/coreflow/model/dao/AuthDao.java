@@ -32,6 +32,8 @@ public interface AuthDao {
 
 	UserAuthority findUserAuthorityByUserNo(Long userNo);
 
+	String findUserProfileByUserNo(Long userNo);
+
 
 	
 }
