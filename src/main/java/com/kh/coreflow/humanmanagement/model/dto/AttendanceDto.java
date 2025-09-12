@@ -45,4 +45,12 @@ public class AttendanceDto {
 		private Integer vacCode;
 		private String vacName;
 	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class VacTypeUpdate{
+		private Integer attId;
+		private int vacCode;
+	}
 }

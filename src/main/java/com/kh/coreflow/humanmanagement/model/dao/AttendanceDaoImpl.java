@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
-import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,5 +41,10 @@ public class AttendanceDaoImpl implements AttendanceDao{
 	@Override
 	public List<VacType> vacTypeList(VacType vacType) {
 		return session.selectList("attendance.vacTypeList",vacType);
+	}
+
+	@Override
+	public int vacTypeUpdate(VacTypeUpdate vacTypeUpdate) {
+		return session.update("attendance.vacTypeUpdate",vacTypeUpdate);
 	}
 }

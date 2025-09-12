@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import com.kh.coreflow.humanmanagement.model.dao.AttendanceDao;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
-import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,5 +41,10 @@ public class AttendanceServiceImpl implements AttendanceService{
 	@Override
 	public List<VacType> vacTypeList(VacType vacType) {
 		return dao.vacTypeList(vacType);
+	}
+
+	@Override
+	public int vacUpdate(VacTypeUpdate vacTypeUpdate) {
+		return dao.vacTypeUpdate(vacTypeUpdate);
 	}
 }

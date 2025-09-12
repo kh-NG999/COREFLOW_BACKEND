@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckIn;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
-import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
 import com.kh.coreflow.humanmanagement.model.service.AttendanceService;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
@@ -129,5 +130,22 @@ public class AttendanceController {
 		}else {
 			return ResponseEntity.noContent().build();
 		}	
+	}
+	
+	// 비고 수정
+	@CrossOrigin(origins="http://localhost:5173")
+	@PatchMapping("/attendance/vacType")
+	public ResponseEntity<Void> vacationTypeUpdate(
+			@RequestBody VacTypeUpdate vacTypeUpdate
+			){
+		log.info("vacTypeUpdate : {}",vacTypeUpdate);
+		
+		int result = service.vacUpdate(vacTypeUpdate);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 }

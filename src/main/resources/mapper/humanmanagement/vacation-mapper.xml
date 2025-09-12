@@ -5,9 +5,10 @@
 	<select id="vacInfo" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$VacationInfo">
 		SELECT *
 		FROM VACATION_BASIC
+		ORDER BY WORK_LV ASC
 	</select>
 	
-	<!-- 모든 사원 검색 -->
+	<!-- 모든 사원 휴가 내역 검색 -->
 	<select id="allVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 	SELECT
 		V.USER_NO,
@@ -24,6 +25,7 @@
 	WHERE
 		EXTRACT(YEAR FROM V.VAC_START) = #{year} AND
 		EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
+	ORDER BY VAC_ID DESC
 	</select>
 	
 	<!-- 사원 검색 -->
@@ -38,6 +40,7 @@
 		LEFT JOIN DEPARTMENT USING(DEP_ID)
 		LEFT JOIN POSITIONS USING(POS_ID)
 		WHERE USER_NAME Like '%' || #{userName} || '%'
+		ORDER BY USER_NO ASC
 	</select>
 	
 	<!-- 검색 사원 휴가 내역 조회 -->
@@ -58,6 +61,7 @@
 			V.USER_NO = #{userNo} AND
 			EXTRACT(YEAR FROM V.VAC_START) = #{year} AND
 			EXTRACT(MONTH FROM V.VAC_START) = TO_NUMBER(#{month})
+		ORDER BY VAC_ID DESC
 	</select>
 	
 	<!-- 휴가 승인 상태 업데이트 -->
@@ -87,6 +91,7 @@
 			VAC_NAME
 		FROM VACATION_TYPE
 		WHERE VAC_CODE >= 4
+		ORDER BY VAC_CODE ASC
 	</select>
 	
 	<!-- 로그인 사원 휴가 내역 조회 -->
@@ -106,6 +111,7 @@
 		WHERE
 			V.USER_NO = #{userNo} AND
 			EXTRACT(YEAR FROM V.VAC_START) = #{year}
+		ORDER BY VAC_ID DESC
 	</select>
 	
 	<insert id="putPerVac" parameterType="map">

@@ -5,7 +5,8 @@ import java.util.Map;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
-import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
 
 public interface AttendanceService {
 
@@ -18,4 +19,6 @@ public interface AttendanceService {
 	int checkOut(PutCheckOut checkOut);
 
 	List<VacType> vacTypeList(VacType vacType);
+
+	int vacUpdate(VacTypeUpdate vacTypeUpdate);
 }
