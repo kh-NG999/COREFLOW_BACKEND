@@ -20,10 +20,11 @@
 	<select id="posiList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Position">
 		SELECT *
 		FROM POSITIONS
+		ORDER BY POS_ID ASC
 	</select>
 	
 	<!-- 사원 조회 -->
-	<select id="memberList" parameterType="map" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
+	<select id="memberList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
 		SELECT
 			USER_NO,
 			USER_NAME,
@@ -59,27 +60,28 @@
 				AND POS_NAME = #{posName}
 			</if>
 		</where>
+		ORDER BY USER_NO DESC
 	</select>
 	
 	<!-- 사원 상세 조회 -->
 	<select id="memberDetail" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
 		SELECT
-			USER_NO,
-			USER_NAME,
-			EMAIL,
-			HIRE_DATE,
-			PHONE,
-			EXTENSION,
-			ADDRESS,
-			ADDRESS_DETAIL,
-			UPDATE_DATE,
-			DEP_NAME,
-			POS_NAME,
-			STATUS
+			M.USER_NO,
+			M.USER_NAME,
+			M.EMAIL,
+			M.HIRE_DATE,
+			M.PHONE,
+			M.EXTENSION,
+			M.ADDRESS,
+			M.ADDRESS_DETAIL,
+			M.UPDATE_DATE,
+			M.STATUS,
+			M.DEP_ID,  M.POS_ID,  D.DEP_NAME,
+			P.POS_NAME
 		FROM MEMBER M
-		LEFT JOIN DEPARTMENT USING(DEP_ID)
-		LEFT JOIN POSITIONS USING(POS_ID)
-		WHERE USER_NO = #{userNo}
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
+		WHERE M.USER_NO = #{userNo} 
 	</select>
 	
 	<!-- 사원 등록 -->
@@ -127,7 +129,8 @@
 			</if>
 			UPDATE_DATE = SYSDATE
 		</set>
-		WHERE USER_NO = #{userNo}
+		WHERE USER_NO = #{userNo} AND
+			  DEP_ID = #{depId}
 	</update>
 	
 	<!-- 회원 정보 삭제 -->

@@ -1,11 +1,11 @@
-package com.kh.coreflow.humanmanagement.model.dao;
+package com.kh.coreflow.humanmanagement.model.service;
 
 import java.util.List;
 import java.util.Map;
 
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
+import com.kh.coreflow.humanmanagement.model.dao.MemberDao;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
@@ -14,48 +14,48 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
 import lombok.RequiredArgsConstructor;
 
-@Repository
+@Service
 @RequiredArgsConstructor
-public class MemberDaoImpl implements MemberDao{
-	private final SqlSessionTemplate session;
-
+public class MemberServiceImple implements MemberService{
+	private final MemberDao dao;
+	
 	@Override
 	public List<Department> deptList() {
-		return session.selectList("member.deptList");
+		return dao.deptList();
 	}
 
 	@Override
 	public List<Department> deptDetailList(int parentId) {
-		return session.selectList("member.deptDetailList",parentId);
+		return dao.deptDetailList(parentId);
 	}
-	
+
 	@Override
 	public List<Position> posiList() {
-		return session.selectList("member.posiList");
+		return dao.posiList();
 	}
 	
 	@Override
 	public List<MemberResponse> memberList(Map<String, String> searchParams) {
-		return session.selectList("member.memberList",searchParams);
+		return dao.memberList(searchParams);
 	}
 
 	@Override
 	public MemberResponse memberDetail(int userNo) {
-		return session.selectOne("member.memberDetail",userNo);
+		return dao.memberDetail(userNo);
 	}
 
 	@Override
 	public int memberInsert(MemberPost member) {
-		return session.insert("member.memberInsert",member);
+		return dao.memberInsert(member);
 	}
 	
 	@Override
 	public int memberUpdate(MemberPatch member) {
-		return session.update("member.memberUpdate",member);
+		return dao.memberUpdate(member);
 	}
 
 	@Override
 	public int memberDelete(int userNo) {
-		return session.delete("member.memberDelete",userNo);
+		return dao.memberDelete(userNo);
 	}
 }

@@ -7,13 +7,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.AttendanceInfo;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckIn;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
+import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
 import com.kh.coreflow.humanmanagement.model.service.AttendanceService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 public class AttendanceController {
 	private final AttendanceService service;
 	
-	// 사원 데이터 조회
+	// 전체 사원 근태 정보 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/attendance")
-	public ResponseEntity<List<AttendanceInfo>> attInfo(
+	@GetMapping("/attendance/member")
+	public ResponseEntity<List<AttendanceInfo>> allAttendance(
 			@RequestParam(value="attDate", required=true) String attDateStr,
 			@RequestParam(value="userNo", required=false) Integer userNo
 			) {
@@ -36,16 +45,107 @@ public class AttendanceController {
 		params.put("attDate", attDate);
 		params.put("userNo", userNo);
 		
-		List<AttendanceInfo> attInfoList = service.attInfo(params);
-		
-//		log.debug("attInfoList : {}",attInfoList);
-//		System.out.println(attInfoList);
-		
-		if(attInfoList != null && !attInfoList.isEmpty()) {
+		List<AttendanceInfo> memAttendance = service.memAttendance(params);
+				
+		if(memAttendance != null && !memAttendance.isEmpty()) {
 			
-			return ResponseEntity.ok(attInfoList); 
+			return ResponseEntity.ok(memAttendance); 
 		}else {
 			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 로그인 사용자 근태 정보 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/attendance/personal")
+	public ResponseEntity<List<AttendanceInfo>> personalAttendance(
+			Authentication auth,
+			@RequestParam int year,
+			@RequestParam int month
+			){
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+				
+		Map<String,Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("year", year);
+		params.put("month", month);
+		
+		List<AttendanceInfo> perAttendance = service.perAttendance(params);
+		
+		if(perAttendance != null && !perAttendance.isEmpty()) {
+			return ResponseEntity.ok(perAttendance);
+		}else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	// 출근버튼 클릭시 
+	@CrossOrigin(origins="http://localhost:5173")
+	@PostMapping("/attendance/checkIn")
+	public ResponseEntity<Void> checkIn(
+			Authentication auth,
+			@RequestBody PutCheckIn checkIn
+			){
+		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("checkIn", checkIn);
+		
+		int result = service.checkIn(params);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	// 퇴근버튼 클릭시
+	@CrossOrigin(origins="http://localhost:5173")
+	@PatchMapping("/attendance/checkOut")
+	public ResponseEntity<Void> checkOut(
+			@RequestBody PutCheckOut checkOut
+			){
+		int result = service.checkOut(checkOut);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	// 비고 종류 조회
+	@CrossOrigin(origins="http://localhost:5173")
+	@GetMapping("/attendance/vacType")
+	public ResponseEntity<List<VacType>> vacationType(
+			VacType vacType
+			){
+		List<VacType> vacTypeList = service.vacTypeList(vacType);
+		log.info("vacTypeList : {}", vacTypeList);
+		
+		if(vacTypeList != null && !vacTypeList.isEmpty()) {
+			return ResponseEntity.ok(vacTypeList);
+		}else {
+			return ResponseEntity.noContent().build();
+		}	
+	}
+	
+	// 비고 수정
+	@CrossOrigin(origins="http://localhost:5173")
+	@PatchMapping("/attendance/vacType")
+	public ResponseEntity<Void> vacationTypeUpdate(
+			@RequestBody VacTypeUpdate vacTypeUpdate
+			){
+		log.info("vacTypeUpdate : {}",vacTypeUpdate);
+		
+		int result = service.vacUpdate(vacTypeUpdate);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
 		}
 	}
 }

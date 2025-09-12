@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
-import com.kh.coreflow.humanmanagement.model.service.MemberServiceImpl;
+import com.kh.coreflow.humanmanagement.model.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 public class MemberController {
-	private final MemberServiceImpl service;
+	private final MemberService service;
 	
 	// 부모 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
-//		log.debug("deptList : {}",deptList);
-//		System.out.println("부모 부서 : "+deptList);
 		
 		if(deptList != null && !deptList.isEmpty()) {
 			return ResponseEntity.ok(deptList);
@@ -53,8 +52,6 @@ public class MemberController {
 			@PathVariable int parentId
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
-//		log.debug("deptDetailList : {}",deptDetailList);
-//		System.out.println("자식 부서 : "+deptDetailList);
 		
 		if(deptDetailList != null && !deptDetailList.isEmpty()) {
 			return ResponseEntity.ok(deptDetailList);
@@ -68,8 +65,6 @@ public class MemberController {
 	@GetMapping("/positions")
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
-//		log.debug("posiList : {}",posiList);
-//		System.out.println("직위 : "+posiList);
 		
 		if(posiList != null) {
 			return ResponseEntity.ok(posiList);
@@ -85,8 +80,6 @@ public class MemberController {
 			@RequestParam Map<String,String> searchParams
 			){		
 		List<MemberResponse> memberList = service.memberList(searchParams);
-//		log.debug("memberList : {}",memberList);
-//		System.out.println(memberList);
 		
 		if(!memberList.isEmpty()) {
 			return ResponseEntity.ok(memberList);
@@ -98,24 +91,25 @@ public class MemberController {
 	// 사원 상세 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<MemberResponse> memberDetail(
 			@PathVariable int userNo
 			){
 		MemberResponse member = service.memberDetail(userNo);
-//		log.debug("member : {}",member);
-
+		
 		if(member != null) {
 			return ResponseEntity.ok(member);
 		}else {
 			return ResponseEntity.notFound().build();
-		}		
+		}
 	}
 	
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/members")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberInsert(
-			@RequestBody MemberPost member 
+			@RequestBody MemberPost member
 			){
 		int result = service.memberInsert(member);
 		
@@ -129,11 +123,14 @@ public class MemberController {
 	// 사원 정보 수정
 	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberUpdate(
 			@PathVariable int userNo,
 			@RequestBody MemberPatch member
-			){		
+			){
 		member.setUserNo(userNo);
+		log.info("userNo : {}",userNo);
+		log.info("member : {}",member);
 		int result = service.memberUpdate(member);
 		
 		if(result > 0) {
@@ -146,6 +143,7 @@ public class MemberController {
 	// 사원 정보 삭제
 	@CrossOrigin(origins="http://localhost:5173")
 	@DeleteMapping("members/{userNo}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberDelete(
 			@PathVariable int userNo
 			) {
