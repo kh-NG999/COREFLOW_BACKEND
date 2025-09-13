@@ -2,4 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="organization">
 	
+	<!-- 부모 부서 조회 -->
+	<select id="parentDeptList" resultType="com.kh.coreflow.humanmanagement.model.dto.OrganizationDto$ParentDep">
+		SELECT
+			DEP_ID,
+			DEP_NAME,
+			PARENT_ID
+		FROM DEPARTMENT
+		WHERE PARENT_ID IS NULL
+		ORDER BY DEP_ID ASC
+	</select>
+	
+	<!-- 자식 부서 조회 -->
+	<select id="childDeptList" resultType="com.kh.coreflow.humanmanagement.model.dto.OrganizationDto$ChildDep">
+		SELECT
+			DEP_ID,
+			DEP_NAME,
+			PARENT_ID
+		FROM DEPARTMENT
+		WHERE PARENT_ID = #{parentId}
+		ORDER BY DEP_ID ASC
+	</select>
+	
+	<!-- 부서별 사원 조회 -->
+	<select id="memberList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$MemberResponse">
+		SELECT
+			USER_NO,
+			USER_NAME,
+			POS_NAME
+		FROM MEMBER
+		LEFT JOIN POSITIONS USING(POS_ID)
+		WHERE DEP_ID = #{depId}
+		ORDER BY USER_NO ASC
+	</select>
 </mapper>
