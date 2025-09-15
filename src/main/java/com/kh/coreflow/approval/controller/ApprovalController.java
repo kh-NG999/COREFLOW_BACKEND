@@ -1,10 +1,13 @@
 package com.kh.coreflow.approval.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
 import com.kh.coreflow.approval.model.service.ApprovalService;
+import com.kh.coreflow.model.dto.UserDto;
+import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -102,15 +107,26 @@ public class ApprovalController {
         List<ApprovalDto> documents = service.getDocumentsByUser(userNo);
         return ResponseEntity.ok(documents);
     }
-
+    //결재
     @Operation(summary = "결재문서 상세 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<ApprovalDto> getApprovalDetails(@PathVariable("id") int approvalId) {
+    public ResponseEntity<Map<String, Object>> getApprovalDetails(
+    		@PathVariable("id") int approvalId,
+    		@AuthenticationPrincipal User user) {
+    	
         ApprovalDto approval = service.getApprovalDetails(approvalId);
         if (approval == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(approval);
+        int currentUserNo = user.getUserNo();
+        boolean isCurrentUserApprover = approval.getLines().stream()
+        		.anyMatch(line -> "WAITING".equals(line.getLineStatus()) && line.getApproverUserNo() == currentUserNo);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("approval", approval);
+        response.put("currentUserIsApprover", isCurrentUserApprover);
+        
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "받은문서함")
@@ -121,3 +137,6 @@ public class ApprovalController {
         return ResponseEntity.ok(documents);
     }
 }
+
+
+
