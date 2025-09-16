@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
+import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.chatting.model.service.ChattingService;
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 import com.kh.coreflow.security.CustomUserDetails;
 
@@ -37,25 +42,74 @@ public class ChattingController {
 	@Autowired
 	ChattingService chattingService;
 	
+	@Autowired
+	FileService fileService;
+	
 	@GetMapping("myProfile")
 	public ResponseEntity<chatProfile> myProfile(
 			@AuthenticationPrincipal UserDeptcode user,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		//log.info("userDetail : {}",userDetails);
-		chatProfile profile = chattingService.getMyProfile(user.getUserNo());
-		//log.info("profile : {}",profile);
-		return ResponseEntity.ok(profile);
+		chatProfile prof = chattingService.getMyProfile(user.getUserNo());
+		
+		if(prof!=null) {
+			customFile profile = fileService.getFile("CP",prof.getUserNo());
+			if(profile==null) {
+				customFile tempProfile = new customFile();
+				tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+				tempProfile.setImageCode("CP");
+				tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+				profile=tempProfile;
+			}
+			prof.setProfile(profile);
+			return ResponseEntity.ok(prof);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@GetMapping("/user")
 	public ResponseEntity<List<chatProfile>> chatUser(
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		//log.info("userNo : {}",user.getUserNo());
 		List<chatProfile> list = chattingService.getChatProfiles(user.getUserNo());
-		//log.info("user List : {}",list);
+		for(chatProfile el : list) {
+			customFile profile = fileService.getFile("CP",el.getUserNo());
+			if(profile==null) {
+				customFile tempProfile = new customFile();
+				tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+				tempProfile.setImageCode("CP");
+				tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+				profile=tempProfile;
+			}
+			el.setProfile(profile);
+		}
+		
 		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping("/searchUser")
+	public ResponseEntity<List<chatProfile>> searchUser(
+			@AuthenticationPrincipal UserDeptcode user,
+			@RequestParam(name = "query") String query
+			){
+		List<chatProfile> list = chattingService.findChatProfiles(user.getUserNo(),query);
+		if(list!=null) {
+			for(chatProfile el : list) {
+				customFile profile = fileService.getFile("CP",el.getUserNo());
+				if(profile==null) {
+					customFile tempProfile = new customFile();
+					tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+					tempProfile.setImageCode("CP");
+					tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+					profile=tempProfile;
+				}
+				el.setProfile(profile);
+			}
+			return ResponseEntity.ok(list);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	@GetMapping("/favorites")
@@ -63,7 +117,19 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatProfile> list = chattingService.getFavoriteProfiles(user.getUserNo());
-		//log.info("favUser List : {}",list);
+		
+		for(chatProfile el : list) {
+			customFile profile = fileService.getFile("CP",el.getUserNo());
+			if(profile==null) {
+				customFile tempProfile = new customFile();
+				tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+				tempProfile.setImageCode("CP");
+				tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+				profile=tempProfile;
+			}
+			el.setProfile(profile);
+		}
+		
 		return ResponseEntity.ok(list);
 	}
 	
@@ -75,8 +141,10 @@ public class ChattingController {
 			){
 		favUser.setUserNo(user.getUserNo());
 		int result = chattingService.insertFavoriteProfiles(favUser);
-		
-		return null;
+		if(result>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
 	}
 
 	@DeleteMapping("/favorites/{favUserNo}")
@@ -85,12 +153,13 @@ public class ChattingController {
 			@PathVariable("favUserNo") Long favUserNo
 			){
 		userFavorite favUser = new userFavorite();
-		log.info("info:{}",favUserNo);
 		favUser.setUserNo(user.getUserNo());
 		favUser.setFavoriteUserNo(favUserNo);
 		int result = chattingService.deleteFavoriteProfiles(favUser);
-		
-		return null;
+		if(result>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
 	}
 	
 	@GetMapping("/private/{userNo}")
@@ -123,11 +192,18 @@ public class ChattingController {
 			@PathVariable("roomId") Long roomId,
 			@AuthenticationPrincipal UserDeptcode user
 			){
-		//log.info("userNo : {}",user.getUserNo());
-		//log.info("Room Id : {}",roomId);
 		List<chatMessages> list = chattingService.getMessages(roomId);
-		//log.info("messageList : {}",list);
-		return ResponseEntity.ok(list);
+		if(list!=null) {
+			for(chatMessages el : list) {
+				if(el.getType()==chatMessages.MessageType.FILE) {
+					customFile file = fileService.getFile("CM",el.getMessageId());
+					el.setFile(file);
+				}
+			}
+			return ResponseEntity.ok(list);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	
@@ -136,7 +212,6 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatRooms> list = chattingService.getmyChattingRooms(user.getUserNo());
-		log.info("myChattingRooms : {}",list);
 		return ResponseEntity.ok(list);
 	}
 	
@@ -147,7 +222,6 @@ public class ChattingController {
 			){
 		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
 		chatRooms returnRoom = chattingService.getRoom(roomId);
-		//log.info("returnRoom : {}, roomId : {}",returnRoom, roomId);
 		return ResponseEntity.ok(returnRoom);
 	}
 	
@@ -161,16 +235,140 @@ public class ChattingController {
 	
 	@PostMapping("/room/{roomId}/read")
 	public ResponseEntity<?> updateLastReadAt(
-	        @PathVariable("roomId") long roomId,
+	        @PathVariable("roomId") Long roomId,
 	        @AuthenticationPrincipal UserDeptcode user
 	) {
 	    Long userNo = user.getUserNo();
-	    log.info("userNo : {}",userNo);
 	    int answer = chattingService.updateLastReadAt(roomId, userNo);
 	    if(answer>0) {
 		    return ResponseEntity.ok().build();
 	    }else {
 	    	return ResponseEntity.badRequest().build();
 	    }
+	}
+	
+
+	@PostMapping("/state")
+	public ResponseEntity<chatProfile> updateState(
+			@RequestBody Map<String,Object> statusParam,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		Long userNo = user.getUserNo();
+		String status = (String)statusParam.get("state");
+		int answer = chattingService.updateState(status,userNo);
+		if(answer>0) {
+			chatProfile returnProfile= chattingService.getMyProfile(userNo);
+			
+			if(returnProfile!=null) {
+				customFile profile = fileService.getFile("CP",returnProfile.getUserNo());
+				if(profile==null) {
+					customFile tempProfile = new customFile();
+					tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+					tempProfile.setImageCode("CP");
+					tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+					profile=tempProfile;
+				}
+				returnProfile.setProfile(profile);
+				return ResponseEntity.ok(returnProfile);
+			}else {
+				return ResponseEntity.badRequest().build();
+			}
+		}
+		else
+			return ResponseEntity.badRequest().build();
+	}
+	
+	@GetMapping("/room/{roomId}/user")
+	public ResponseEntity<List<chatProfile>> getRoomUsers(
+	        @PathVariable("roomId") Long roomId
+			){
+		List<chatProfile> list = chattingService.getRoomUsers(roomId);
+		if(list!=null) {
+			
+			for(chatProfile el : list) {
+				customFile profile = fileService.getFile("CP",el.getUserNo());
+				if(profile==null) {
+					customFile tempProfile = new customFile();
+					tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+					tempProfile.setImageCode("CP");
+					tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+					profile=tempProfile;
+				}
+				el.setProfile(profile);
+			}
+			return ResponseEntity.ok(list);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
+		
+	}
+	
+	@PostMapping("/room/join")
+	public ResponseEntity<Void> joinUser(
+		@RequestBody Map<String,Object> param){
+		int answer = chattingService.setJoinUser(param);
+		if(answer>0)
+			return ResponseEntity.ok().build();
+		else
+			return ResponseEntity.badRequest().build();
+	}
+	
+	@GetMapping("/profile/{userNo}")
+	public ResponseEntity<chatProfileDetail> getProfileDetail(
+			@PathVariable("userNo") Long userNo
+			){
+		chatProfileDetail prof = chattingService.getProfileDetail(userNo);
+
+		if(prof!=null) {
+			customFile profile = fileService.getFile("CP",prof.getUserNo());
+			if(profile==null) {
+				customFile tempProfile = new customFile();
+				tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+				tempProfile.setImageCode("CP");
+				tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+				profile=tempProfile;
+			}
+			prof.setProfile(profile);
+			return ResponseEntity.ok(prof);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	@PostMapping("/profile/image")
+	public ResponseEntity<chatProfileDetail> changeProfileImage(
+			@RequestParam("file") MultipartFile file,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		customFile profileImage = fileService.setOrChangeOneImage(file,user.getUserNo(),"CP");
+		if(profileImage!= null) {
+			chatProfileDetail myProfile = chattingService.getProfileDetail(user.getUserNo());
+			myProfile.setProfile(profileImage);
+			return ResponseEntity.ok(myProfile);
+		}
+		else
+			return ResponseEntity.badRequest().build();
+	}
+	
+	@PostMapping("/room/{roomId}/file")
+	public ResponseEntity<chatMessages> uploadFileOnRoom(
+			@RequestParam("file") MultipartFile file,
+			@PathVariable("roomId") Long roomId,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		chatMessages message = new chatMessages();
+    	message.setUserNo(user.getUserNo());
+    	message.setIsFile("T");
+    	message.setType(chatMessages.MessageType.FILE);
+    	message.setRoomId(roomId);
+    	int result = chattingService.insertMessage(message);
+    	customFile image = fileService.setOrChangeOneImage(file,message.getMessageId(),"CM");
+    	message.setMessageText(image.getChangeName());
+    	
+    	if(result >0)
+    		return ResponseEntity.ok(message);
+    	else {
+    		return ResponseEntity.badRequest().build();
+    	}
 	}
 }

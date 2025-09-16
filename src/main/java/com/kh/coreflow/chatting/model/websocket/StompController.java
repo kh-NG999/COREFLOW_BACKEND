@@ -1,6 +1,5 @@
 package com.kh.coreflow.chatting.model.websocket;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -8,12 +7,13 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.service.ChattingService;
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 
@@ -28,6 +28,7 @@ public class StompController {
 	private final ChattingService service;
 	private final JWTProvider jwtProvider;
     private final SimpMessagingTemplate messagingTemplate;
+    private final FileService fileService; 
 
     //들어오는 메시지를 처리
     @MessageMapping("/chat/enter/{roomNo}")
@@ -67,8 +68,47 @@ public class StompController {
     ) {
     	Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
     	message.setUserNo(userNo);
-    	log.info("message : {}",message);
     	int result = service.insertMessage(message);
+
+        // 3. 기존처럼 해당 채팅방을 구독 중인 모두에게 메시지를 보내기
+    	messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
+    	
+    	List<Long> participantUserNos = service.getParticipantUserNos(roomId);
+    	
+    	for (Long participantUserNo : participantUserNos) {
+            // service.getUpdatedChatRoomInfo()는 마지막 메시지가 포함된 최신 ChatRooms 객체를 반환하는 메소드 (구현 필요)
+            chatRooms updatedRoomInfo = service.getUpdatedChatRoomInfo(participantUserNo, roomId, message);
+            
+            // "/queue/user/{userNo}" 형태의 개인 채널로 메시지를 보냅니다.
+            messagingTemplate.convertAndSendToUser(
+                String.valueOf(participantUserNo), // Spring Security Principal 이름 (보통 String)
+                "/queue/updates", // 개인 알림을 받을 구독 주소
+                updatedRoomInfo   // 최신화된 채팅방 정보 객체
+            );
+        }
+    	
+    	if(result >0)
+    		return message;
+    	else {
+    		return null;
+    	}
+    }
+    
+
+    @MessageMapping("/chat/file/{roomId}")
+    public chatMessages handleFile(
+            @DestinationVariable Long roomId,
+            Authentication auth,
+            chatMessages message
+    ) {
+    	Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+    	message.setUserNo(userNo);
+    	customFile file = fileService.findFile("CM",message.getMessageText());
+    	message.setMessageText(file.getOriginName());
+    	message.setIsFile("T");
+    	message.setType(chatMessages.MessageType.FILE);
+    	int result = service.changeMessage(message);
+    	message.setFile(file);
 
         // 3. 기존처럼 해당 채팅방을 구독 중인 모두에게 메시지를 보내기
     	messagingTemplate.convertAndSend("/topic/room/" + roomId, message);

@@ -55,7 +55,6 @@ public class AuthServiceImpl implements AuthService{
 				// 2. 토큰 발급
 				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
 				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
-				log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 				
 				User userNoPassword = User.builder()
 										.userNo(user.getUserNo())
@@ -76,7 +75,6 @@ public class AuthServiceImpl implements AuthService{
 	@Override
 	@Transactional
 	public AuthResult signUp(String email, String userPwd) {
-		log.info("pwd : {}",userPwd);
 		// 1) Users테이블에 데이터 추가
 		User user = User.builder()
 						.email(email)
@@ -127,9 +125,7 @@ public class AuthServiceImpl implements AuthService{
 		Long depId = user.getDepId();
 
 		// 2. 토큰 발급
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
-		
-		log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
+		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분			
 		
 		User userNoPassword = User.builder()
 								.userNo(user.getUserNo())
@@ -139,7 +135,7 @@ public class AuthServiceImpl implements AuthService{
 								.roles(userAuth.getRoles())
 								.depId(user.getDepId())
 								.build();
-		
+
 		return AuthResult.builder()
 				.accessToken(accessToken)
 				.refreshToken(refreshCookie)
