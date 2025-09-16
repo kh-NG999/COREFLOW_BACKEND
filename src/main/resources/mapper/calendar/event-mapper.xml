@@ -153,6 +153,34 @@
     </if>
   </insert>
 
+  <select id="selectAttendeesByEventId"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$Member">
+    SELECT p.USER_NO   AS userNo,
+           u.USER_NAME AS userName,
+           u.EMAIL     AS email,
+           u.DEP_ID    AS depId
+      FROM EVENT_PARTICIPANT p
+      JOIN MEMBER u ON u.USER_NO = p.USER_NO
+     WHERE p.EVENT_ID = #{eventId}
+       AND p.KIND = 'ATTENDEE'
+     ORDER BY u.USER_NAME
+  </select>
+
+  <select id="selectSharersByEventId"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$Member">
+    SELECT p.USER_NO   AS userNo,
+           u.USER_NAME AS userName,
+           u.EMAIL     AS email,
+           u.DEP_ID    AS depId
+      FROM EVENT_PARTICIPANT p
+      JOIN MEMBER u ON u.USER_NO = p.USER_NO
+     WHERE p.EVENT_ID = #{eventId}
+       AND p.KIND = 'SHARER'
+     ORDER BY u.USER_NAME
+  </select>
+
   <insert id="insertParticipantIfAbsent" parameterType="map">
     INSERT INTO EVENT_PARTICIPANT (EP_ID, EVENT_ID, USER_NO, KIND)
     SELECT EVENT_PARTICIPANT_SEQ.NEXTVAL, #{eventId}, #{userNo}, #{kind}
@@ -230,5 +258,96 @@
 	  DELETE FROM LABEL WHERE LABEL_ID = #{labelId}
 	</delete>
 
+  <!-- 회의실 요약 맵 -->
+  <resultMap id="RoomSummaryMap" type="com.kh.coreflow.calendar.model.dto.EventDto$RoomSummary">
+    <id     property="roomId"        column="ROOM_ID"/>
+    <result property="roomName"      column="ROOM_NAME"/>
+    <result property="buildingName"  column="BUILDING_NAME"/>
+    <result property="floor"         column="FLOOR"/>
+    <result property="roomNo"        column="ROOM_NO"/>
+    <result property="capacity"      column="CAPACITY"/>
+    <result property="detailLocation" column="DETAIL_LOCATION"/>
+  </resultMap>
 
+  <!-- 상세 조회 맵 -->
+  <resultMap id="EventDetailMap" type="com.kh.coreflow.calendar.model.dto.EventDto$DetailRes">
+  <id     property="eventId"        column="EVENT_ID"/>
+  <result property="calId"          column="CAL_ID"/>
+  <result property="title"          column="TITLE"/>
+  <result property="startAt"        column="START_AT"/>
+  <result property="endAt"          column="END_AT"/>
+  <result property="allDayYn"       column="ALL_DAY_YN"/>
+  <result property="locationText"   column="LOCATION_TEXT"/>
+  <result property="note"           column="NOTE"/>
+  <result property="roomId"         column="E_ROOM_ID"/> <!-- 👈 변경 -->
+  <result property="status"         column="STATUS"/>
+  <result property="labelId"        column="LABEL_ID"/>
+  <result property="typeId"         column="TYPE_ID"/>
+  <result property="createByUserNo" column="CREATE_BY_USER_NO"/>
+  <association property="room" resultMap="RoomSummaryMap"/>
+</resultMap>
+
+  <!-- 단건 상세: EVENT + CONFERENCE_ROOM 조인 -->
+<select id="selectEventDetailById"
+        parameterType="java.lang.Long"
+        resultMap="EventDetailMap">
+  SELECT
+    e.EVENT_ID, e.CAL_ID, e.TITLE, e.START_AT, e.END_AT, e.ALL_DAY_YN,
+    e.LOCATION_TEXT, e.NOTE,
+    e.ROOM_ID AS E_ROOM_ID,          -- 👈 이벤트의 ROOM_ID는 E_ROOM_ID로 별도 별칭
+    e.STATUS, e.LABEL_ID, e.TYPE_ID,
+    e.CREATE_BY_USER_NO,
+
+    r.ROOM_ID         AS ROOM_ID,    -- 👈 회의실 요약 맵에서 쓰는 ROOM_ID는 r.* 컬럼
+    r.ROOM_NAME       AS ROOM_NAME,
+    r.BUILDING_NAME   AS BUILDING_NAME,
+    r.FLOOR           AS FLOOR,
+    r.ROOM_NO         AS ROOM_NO,
+    r.CAPACITY        AS CAPACITY,
+    r.DETAIL_LOCATION AS DETAIL_LOCATION
+
+  FROM EVENT e
+  /* 👇 최신/유효한 예약 1건만 골라 이벤트별로 룸을 매칭 (테이블명/컬럼명은 프로젝트 실제 명칭에 맞춰주세요) */
+  LEFT JOIN (
+      SELECT EVENT_ID,
+             MAX(ROOM_ID) KEEP (DENSE_RANK LAST ORDER BY RESV_ID) AS ROOM_ID
+      FROM ROOM_RESERVATION
+      WHERE STATUS = 'CONFIRMED'
+      GROUP BY EVENT_ID
+  ) rr ON rr.EVENT_ID = e.EVENT_ID
+
+  /* EVENT.ROOM_ID가 있으면 그걸 우선, 없으면 예약의 ROOM_ID 사용 */
+  LEFT JOIN CONFERENCE_ROOM r ON r.ROOM_ID = NVL(e.ROOM_ID, rr.ROOM_ID)
+
+  WHERE e.EVENT_ID = #{value}
+</select>
+
+  <!-- 권한 체크: HR/ADMIN 보유 여부 -->
+  <select id="countHrOrAdmin" parameterType="long" resultType="int">
+    SELECT COUNT(1)
+      FROM COREFLOW.AUTHORITIES
+     WHERE USER_NO = #{value}
+       AND AUTHORITY IN ('ROLE_HR','ROLE_ADMIN')
+  </select>
+
+  <update id="updateEventRoomLink" parameterType="map">
+    UPDATE EVENT
+	SET ROOM_ID = #{roomId},
+	  UPDATE_USER_NO = #{userNo},
+	  UPDATE_DATE = SYSDATE
+	WHERE EVENT_ID = #{eventId}
+  </update>
 </mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

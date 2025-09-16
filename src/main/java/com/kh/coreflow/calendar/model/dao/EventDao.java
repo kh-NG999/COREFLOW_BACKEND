@@ -39,5 +39,11 @@ public interface EventDao {
 	int insertEventType(EventDto.EventTypeDto dto);
 	int updateEventTypeName(EventDto.EventTypeDto dto);
 	int deleteEventType(Long typeId);
+	
+	EventDto.DetailRes selectEventDetailById(Long eventId);
+	int countHrOrAdmin(Long userNo);
+	int updateEventRoomLink(Long eventId, Long roomId, Long userNo);
 
+	List<EventDto.Member> selectAttendeesByEventId(Long eventId);
+	List<EventDto.Member> selectSharersByEventId(Long eventId);
 }

@@ -68,4 +68,5 @@ public class CalendarDaoImpl implements CalendarDao {
         Integer cnt = sql.selectOne("calendar.existsCalendarAccess", p);
         return cnt != null && cnt > 0;
     }
+    
 }

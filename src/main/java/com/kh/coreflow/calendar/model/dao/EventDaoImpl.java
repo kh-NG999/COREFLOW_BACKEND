@@ -139,4 +139,32 @@ public class EventDaoImpl implements EventDao {
 		return sql.delete("event.deleteEventType", typeId);
 	}
     
+	@Override
+    public EventDto.DetailRes selectEventDetailById(Long eventId) {
+        return sql.selectOne("event.selectEventDetailById", eventId);
+    }
+
+    @Override
+    public int countHrOrAdmin(Long userNo) {
+        return sql.selectOne("event.countHrOrAdmin", userNo);
+    }
+    
+    @Override
+    public int updateEventRoomLink(Long eventId, Long roomId, Long userNo) {
+        Map<String,Object> p = new HashMap<>();
+        p.put("eventId", eventId);
+        p.put("roomId", roomId);
+        p.put("userNo", userNo);
+        return sql.update("event.updateEventRoomLink", p);
+    }
+    
+    @Override
+    public List<EventDto.Member> selectAttendeesByEventId(Long eventId) {
+      return sql.selectList("event.selectAttendeesByEventId", eventId);
+    }
+
+    @Override
+    public List<EventDto.Member> selectSharersByEventId(Long eventId) {
+      return sql.selectList("event.selectSharersByEventId", eventId);
+    }
 }

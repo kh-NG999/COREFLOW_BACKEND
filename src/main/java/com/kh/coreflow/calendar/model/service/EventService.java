@@ -21,4 +21,11 @@ public interface EventService {
 	EventTypeDto createEventType(String typeName);
 	void updateEventType(Long typeId, String typeName);
 	void deleteEventType(Long typeId);
+	
+	void updateEventWithAuth(Long me, Long eventId, Object updateReq);
+    void deleteEventWithAuth(Long me, Long eventId);
+    EventDto.DetailRes getEventDetail(Long userNo, Long eventId);
+    void updateEventRoomLink(Long userNo, Long eventId, Long roomId);
+    
+
 }

@@ -163,6 +163,20 @@ public class EventController {
       eventService.deleteEventType(typeId);
       return ResponseEntity.noContent().build();
     }
+    
+    // 단건 상세
+    @GetMapping("/{eventId}/detail")
+    public ResponseEntity<EventDto.DetailRes> eventDetail(
+            @AuthenticationPrincipal com.kh.coreflow.model.dto.UserDto.UserDeptcode me,
+            @PathVariable Long eventId
+    ) {
+        if (me == null) return ResponseEntity.status(401).build();
+
+        EventDto.DetailRes res = eventService.getEventDetail(me.getUserNo(), eventId);
+        if (res == null) return ResponseEntity.notFound().build(); // 없으면 404
+
+        return ResponseEntity.ok(res);
+    }
 }
 
 
