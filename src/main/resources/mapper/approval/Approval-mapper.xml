@@ -40,8 +40,8 @@
         UPDATE 
         	approval
         SET 
-        	approval_status = #{approvalStatus},
-            end_date = SYSDATE
+        	approval_status = #{approvalStatus}
+         
         WHERE
         	approval_id = #{approvalId}
     </update>
@@ -64,9 +64,9 @@
     </select>
 
     <!-- 결재선 상태 변경 -->
-    <update id="updateApprovalLineStatus" parameterType="map">
+    <update id="updateApprovalLineStatus" parameterType="java.util.HashMap">
         UPDATE approval_line
-        SET line_status = #{lineStatus}
+        SET line_status = #{status}
         WHERE line_id = #{lineId}
     </update>
 
@@ -164,5 +164,61 @@
     FROM approval
     ORDER BY start_date DESC
 	</select>
+	
+	<!-- 결재완료 문서함 -->
+	<select id="selectProcessedApprovalsByApproverNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+    SELECT
+        A.APPROVAL_ID,
+        A.APPROVAL_TITLE,
+        A.APPROVAL_TYPE,
+        A.START_DATE,
+        L.LINE_STATUS AS processedStatus
+    FROM
+        APPROVAL A
+    INNER JOIN
+        APPROVAL_LINE L ON A.APPROVAL_ID = L.APPROVAL_ID WHERE
+        L.APPROVER_USER_NO = #{userNo}
+      AND L.LINE_STATUS IN ('APPROVED', 'REJECTED')
+    ORDER BY A.START_DATE DESC
+	</select>	
+
+	<!-- 문서 임시저장 -->
+	<select id="selectTempApprovalsByUserNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+		SELECT
+			A.APPROVAL_ID,
+			A.APPROVAL_TITLE,
+			A.APPROVAL_TYPE,
+			A.SAVE_DATE,
+			A.APPROVAL_STATUS
+		FROM
+			APPROVAL A
+		WHERE
+			A.USER_NO = #{userNo}
+		AND A.APPROVAL_STATUS = 0
+		ORDER BY A.SAVE_DATE DESC
+	</select>
+	
+	<!--임시저장 상태-->
+	<update id="updateApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+		UPDATE APPROVAL
+		SET
+			APPROVAL_TITLE = #{approvalTitle},
+	        APPROVAL_DETAIL = #{approvalDetail},
+	        APPROVAL_TYPE = #{approvalType},
+	        APPROVAL_STATUS = #{approvalStatus},
+	        START_DATE = #{startDate},
+	        SAVE_DATE = #{saveDate}
+    	WHERE
+        	APPROVAL_ID = #{approvalId}
+	</update>
+	<!--결재선 삭제-->
+	<delete id="deleteApprovalLines" parameterType="int">
+    	DELETE FROM APPROVAL_LINE WHERE APPROVAL_ID = #{approvalId}
+	</delete>
 
 </mapper>
+
+
+
+
+

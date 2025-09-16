@@ -79,7 +79,22 @@ public class ApprovalDao {
 	public List<ApprovalDto> selectReceivedApprovalsByApproverNo(int userNo) {
 		return session.selectList("approvalMapper.selectReceivedApprovalsByApproverNo", userNo);
 	}
-	
+	// 결재완료 문서함
+	public List<ApprovalDto> selectProcessedApprovalsByApproverNo(int userNo) {
+		return session.selectList("approvalMapper.selectProcessedApprovalsByApproverNo", userNo);
+	}
+	// 임시저장함
+	public List<ApprovalDto> selectTempApprovalsByUserNo(int userNo){
+	    return session.selectList("approvalMapper.selectTempApprovalsByUserNo", userNo);
+	}
+	// 내용 업데이트
+	public int updateApproval(ApprovalDto approval) {
+		return session.update("approvalMapper.updateApproval", approval);
+	}
+	// 문서 결재선 삭제(수정용)
+	public int deleteApprovalLines(int approvalId) {
+		return session.delete("approvalMapper.deleteApprovalLines", approvalId);			
+	}
 	
 	
 }

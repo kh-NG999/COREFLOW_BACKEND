@@ -167,6 +167,65 @@ public class ApprovalService {
 	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo) {
 		return dao.selectReceivedApprovalsByApproverNo(userNo);
 	}
+
+	public void updateApprovalStatus(int approvalId, Integer newStatus) {
+		
+		ApprovalDto approvalToUpdate = new ApprovalDto();
+		
+		approvalToUpdate.setApprovalId(approvalId);
+		approvalToUpdate.setApprovalStatus(newStatus);
+		
+		int result = dao.updateApprovalStatus(approvalToUpdate);
+		
+		if (result == 0) {
+			throw new RuntimeException("문서 상태변경 실패 (ID: \" + approvalId + \")");
+		}
+	}
+	
+	public List<ApprovalDto> getProcessedDocumentsByUser(int userNo){
+		return dao.selectProcessedApprovalsByApproverNo(userNo);
+	}
+	
+	public List<ApprovalDto> getTempDocumentsByUser(int userNo){
+		return dao.selectTempApprovalsByUserNo(userNo);
+	}
+
+	@Transactional
+	public void updateApproval(ApprovalDto approval, MultipartFile file, int userNo) {
+		approval.setUserNo(userNo);
+		dao.updateApproval(approval);
+		
+		dao.deleteApprovalLines(approval.getApprovalId());
+		
+		insertLinesAndFiles(approval, file);
+	}
+
+	private void insertLinesAndFiles(ApprovalDto approval, MultipartFile file) {
+        // 결재선 정보
+        if (approval.getApproverUserNo() != null) {
+            for (Integer approverNo : approval.getApproverUserNo()) {
+                ApprovalLineDto line = new ApprovalLineDto();
+                line.setApprovalId(approval.getApprovalId());
+                line.setApproverUserNo(approverNo);
+                line.setLineOrder(1);
+                line.setLineStatus("WAITING");
+                dao.insertApprovalLine(line);
+            }
+        }
+        // 참조자 저장
+        if (approval.getCcUserNo() != null) {
+            for (Integer ccNo : approval.getCcUserNo()) {
+                ApprovalLineDto line = new ApprovalLineDto();
+                line.setApprovalId(approval.getApprovalId());
+                line.setApproverUserNo(ccNo);
+                line.setLineOrder(2);
+                line.setLineStatus("PENDING");
+                dao.insertApprovalLine(line);
+            }
+        }
+        if (file != null && !file.isEmpty()) {
+        }
+    }
 	
 
 }

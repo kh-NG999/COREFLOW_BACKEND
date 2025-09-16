@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -112,22 +114,46 @@ public class ApprovalController {
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getApprovalDetails(
     		@PathVariable("id") int approvalId,
-    		@AuthenticationPrincipal User user) {
+    		Principal principal) {
     	
-        ApprovalDto approval = service.getApprovalDetails(approvalId);
+    	ApprovalDto approval = service.getApprovalDetails(approvalId);
+    	
         if (approval == null) {
             return ResponseEntity.notFound().build();
         }
-        int currentUserNo = user.getUserNo();
+        
+        int currentUserNo = getUserNoFromPrincipal(principal);
+        
         boolean isCurrentUserApprover = approval.getLines().stream()
         		.anyMatch(line -> "WAITING".equals(line.getLineStatus()) && line.getApproverUserNo() == currentUserNo);
         
         Map<String, Object> response = new HashMap<>();
+        
         response.put("approval", approval);
         response.put("currentUserIsApprover", isCurrentUserApprover);
         
         return ResponseEntity.ok(response);
     }
+    
+    @Operation(summary = "결재문서 상태 수정 (관리자용)")
+    @PutMapping("/{id}/status")
+    public ResponseEntity<String> updateStatus(
+    		@PathVariable("id") int approvalId,
+    		@RequestBody Map<String, Integer> payload){
+  
+    	try {
+            Integer newStatus = payload.get("status");
+            if (newStatus == null) {
+                return ResponseEntity.badRequest().body("변경할 상태 정보가 없습니다.");
+            }
+            service.updateApprovalStatus(approvalId, newStatus);
+            return ResponseEntity.ok("문서 상태가 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            log.error("상태 변경 처리 중 오류 발생", e);
+            return ResponseEntity.status(500).body("서버 오류로 인해 상태 변경에 실패했습니다.");
+        	}
+    	}
+    
 
     @Operation(summary = "받은문서함")
     @GetMapping("/received-documents")
@@ -135,6 +161,32 @@ public class ApprovalController {
         int userNo = getUserNoFromPrincipal(principal);
         List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo);
         return ResponseEntity.ok(documents);
+    }
+    
+    @Operation(summary = "결재완료함")
+    @GetMapping("/processed-documents")
+    public ResponseEntity<List<ApprovalDto>> getProcessedDocuments(Principal principal){
+    	int userNo = getUserNoFromPrincipal(principal);
+    	List<ApprovalDto> documents = service.getProcessedDocumentsByUser(userNo);
+    	return ResponseEntity.ok(documents);
+    }
+    
+    @Operation(summary = "임시저장함")
+    @GetMapping("/temp-documents")
+    public ResponseEntity<?> updateApproval(
+            @PathVariable("approvalId") int approvalId,
+            @RequestPart("approvalData") ApprovalDto approval,
+            @RequestPart(value = "files", required = false) MultipartFile file,
+            Principal principal) {
+
+        // URL의 approvalId를 DTO 객체에 설정해줍니다.
+        approval.setApprovalId(approvalId);
+        
+        int userNo = getUserNoFromPrincipal(principal);
+        // 서비스 계층에 수정 로직을 호출합니다.
+        service.updateApproval(approval, file, userNo);
+        
+        return ResponseEntity.ok("문서가 성공적으로 수정되었습니다.");
     }
 }
 
