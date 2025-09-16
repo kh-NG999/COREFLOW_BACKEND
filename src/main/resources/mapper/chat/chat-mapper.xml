@@ -34,9 +34,11 @@
 	<select id="getFavoriteProfiles" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
 		SELECT D.FAVORITE_USER_NO AS USER_NO, C.USER_NAME, C.STATUS FROM
 		( 
-			SELECT A.USER_NO, B.USER_NAME, A.STATUS FROM
+			SELECT A.USER_NO, B.USER_NAME, F.STATUS_NAME AS STATUS FROM
 			CHAT_PROFILE A INNER JOIN "MEMBER" B
 			ON A.USER_NO = B.USER_NO
+			INNER JOIN PROFILE_STATUS F
+			ON A.STATUS = F.STATUS_CODE
 		) C INNER JOIN USER_FAVORITE D
 		ON C.USER_NO = D.FAVORITE_USER_NO
 		WHERE D.USER_NO = #{userNo}
@@ -196,6 +198,68 @@
 	    SET LAST_READ_AT = SYSTIMESTAMP
 	    WHERE ROOM_ID = #{roomId}
 	    AND USER_NO = #{userNo}
+	</update>
+	
+	<select id="findState" resultType="String">
+	SELECT STATUS_CODE
+	FROM PROFILE_STATUS
+	WHERE STATUS_NAME = #{status} 
+	</select>
+	
+	<update id="updateState" parameterType="map">
+		UPDATE CHAT_PROFILE SET
+        STATUS = #{status}
+        WHERE USER_NO = #{userNo}
+	</update>
+	
+	<select id="findChatProfiles" parameterType="map" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
+		WHERE A.USER_NO != #{userNo}
+		AND B.USER_NAME LIKE '%' || #{query} || '%'
+	</select>
+	
+	<select id="getRoomUsers" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
+		SELECT A.USER_NO, C.STATUS_NAME AS STATUS, D.USER_NAME FROM CHAT_PROFILE A 
+		LEFT JOIN CHAT_ROOM_JOIN B
+			ON A.USER_NO = B.USER_NO
+		LEFT JOIN PROFILE_STATUS C
+			ON A.STATUS = C.STATUS_CODE
+		LEFT JOIN MEMBER D
+			ON A.USER_NO = D.USER_NO
+		WHERE B.ROOM_ID=#{roomId}
+	</select>
+	
+	<insert id="setJoinUser" parameterType="map">
+		INSERT ALL
+        <foreach collection="usersToInvite" item="userNo">
+            INTO CHAT_ROOM_JOIN(USER_NO, ROOM_ID) VALUES (#{userNo}, #{roomId})
+        </foreach>
+    SELECT * FROM DUAL
+	</insert>
+	
+	<select id="getProfileDetail" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfileDetail">
+		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS, B.EMAIL, B.PHONE,
+		D.DEP_NAME, E.POS_NAME
+		FROM 
+		CHAT_PROFILE A INNER JOIN MEMBER B
+		ON A.USER_NO = B.USER_NO
+        INNER JOIN PROFILE_STATUS C
+        ON A.STATUS = C.STATUS_CODE
+        INNER JOIN DEPARTMENT D
+        ON B.DEP_ID = D.DEP_ID
+        INNER JOIN POSITIONS E
+        ON B.POS_ID = E.POS_ID
+		WHERE A.USER_NO = #{userNo}
+	</select>
+	
+	<update id="changeMessage" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+	UPDATE CHAT_MESSAGES
+	    SET MESSAGE_TEXT = #{messageText}
+	    WHERE MESSAGE_ID = #{messageId}
 	</update>
 	
 </mapper>

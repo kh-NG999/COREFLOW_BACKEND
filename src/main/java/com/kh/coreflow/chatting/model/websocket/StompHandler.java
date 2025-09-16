@@ -68,7 +68,6 @@ public class StompHandler implements ChannelInterceptor {
         		    	= new UsernamePasswordAuthenticationToken(principal, null, authorities);
         			SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    log.info("STOMP Auth: {}", authToken);
                     //5. STOMP 세션에 사용자 정보 저장
                     accessor.setUser(authToken);
                 } else {

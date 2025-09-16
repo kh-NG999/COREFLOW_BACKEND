@@ -67,7 +67,6 @@ public class StompController {
     ) {
     	Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
     	message.setUserNo(userNo);
-    	log.info("message : {}",message);
     	int result = service.insertMessage(message);
 
         // 3. 기존처럼 해당 채팅방을 구독 중인 모두에게 메시지를 보내기
