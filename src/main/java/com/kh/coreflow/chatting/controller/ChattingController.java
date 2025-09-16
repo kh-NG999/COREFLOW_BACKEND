@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -192,7 +193,17 @@ public class ChattingController {
 			@AuthenticationPrincipal UserDeptcode user
 			){
 		List<chatMessages> list = chattingService.getMessages(roomId);
-		return ResponseEntity.ok(list);
+		if(list!=null) {
+			for(chatMessages el : list) {
+				if(el.getType()==chatMessages.MessageType.FILE) {
+					customFile file = fileService.getFile("CM",el.getMessageId());
+					el.setFile(file);
+				}
+			}
+			return ResponseEntity.ok(list);
+		}else {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 	
 	
@@ -340,7 +351,7 @@ public class ChattingController {
 	}
 	
 	@PostMapping("/room/{roomId}/file")
-	public ResponseEntity<Void> uploadFileOnRoom(
+	public ResponseEntity<chatMessages> uploadFileOnRoom(
 			@RequestParam("file") MultipartFile file,
 			@PathVariable("roomId") Long roomId,
 	        @AuthenticationPrincipal UserDeptcode user
@@ -351,14 +362,11 @@ public class ChattingController {
     	message.setType(chatMessages.MessageType.FILE);
     	message.setRoomId(roomId);
     	int result = chattingService.insertMessage(message);
-    	customFile profileImage = fileService.setOrChangeOneImage(file,message.getMessageId(),"CM");
+    	customFile image = fileService.setOrChangeOneImage(file,message.getMessageId(),"CM");
+    	message.setMessageText(image.getChangeName());
     	
-    	message.setMessageText("/images/"+profileImage.getImageCode()+"/"+profileImage.getChangeName());
-    	
-    	result += chattingService.changeMessage(message);
-//    	
     	if(result >0)
-    		return ResponseEntity.ok().build();
+    		return ResponseEntity.ok(message);
     	else {
     		return ResponseEntity.badRequest().build();
     	}

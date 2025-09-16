@@ -53,7 +53,7 @@ public class SecurityConfig {
 						.requestMatchers("/vacation/member/**","/attendance/member/**").hasAnyRole("ADMIN","HR")
 						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
-						.requestMatchers("/images/**").permitAll()
+						.requestMatchers("/images/**","/download/**").permitAll()
 						.requestMatchers("/ws/**").permitAll()
 						.requestMatchers("/**").authenticated()
 					);

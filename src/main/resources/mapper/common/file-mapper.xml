@@ -15,6 +15,7 @@
 		CREATE_DATE = SYSDATE
 		WHERE IMAGE_CODE = #{imageCode} AND
 		REF_ID = #{refId}
+		MIME_TYPE= #{mimeType}
 	</update>
 	
 	<insert id="insertOneImage" parameterType="com.kh.coreflow.common.model.vo.FileDto$customFile">
@@ -24,14 +25,22 @@
 			ORIGIN_NAME,
 			CHANGE_NAME,
 			IMG_ORDER,
-			REF_ID
+			REF_ID,
+			MIME_TYPE
 		) VALUES (
 			IMAGE_SEQ.NEXTVAL,
 			#{imageCode},
 			#{originName},
 			#{changeName},
 			#{imgOrder},
-			#{refId}
+			#{refId},
+			#{mimeType}
 		)
 	</insert>
+	
+	<select id="findFile" parameterType="map" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		SELECT * FROM IMAGE
+		WHERE IMAGE_CODE = #{fileCode} AND
+		CHANGE_NAME = #{changeName}
+	</select>
 </mapper>

@@ -36,4 +36,12 @@ public class FileDaoImpl implements FileDao{
 		return session.insert("image.insertOneImage",profileImage);
 	}
 
+	@Override
+	public customFile findFile(String fileCode, String changeName) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("fileCode", fileCode);
+		param.put("changeName", changeName);
+		return session.selectOne("image.findFile",param);
+	}
+
 }
