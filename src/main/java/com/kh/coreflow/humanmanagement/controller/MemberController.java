@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
@@ -155,4 +156,18 @@ public class MemberController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+	// 남건후
+    @GetMapping("/CalendarMembers")
+    public ResponseEntity<List<MemberDto.MemberLite>> search(
+            @RequestParam(required = false, defaultValue = "") String query,
+            @RequestParam(required = false, defaultValue = "30") Integer limit,
+            @RequestParam(required = false) Long depId
+    ) {
+        return ResponseEntity.ok(service.search(query, limit, depId));
+    }
+    @GetMapping("/CalendarDepartments")
+    public ResponseEntity<List<MemberDto.DepartmentLite>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
 }

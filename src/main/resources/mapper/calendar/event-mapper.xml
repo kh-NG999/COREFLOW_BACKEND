@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="event">
+
+  <!-- Event 결과 매핑 -->
+  <resultMap id="EventResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$Res">
+    <id     property="eventId"        column="EVENT_ID"/>
+    <result property="calId"          column="CAL_ID"/>
+    <result property="title"          column="TITLE"/>
+    <result property="startAt"        column="START_AT"/>
+    <result property="endAt"          column="END_AT"/>
+    <result property="allDayYn"       column="ALL_DAY_YN"/>
+    <result property="locationText"   column="LOCATION_TEXT"/>
+    <result property="note"           column="NOTE"/>
+    <result property="roomId"         column="ROOM_ID"/>
+    <result property="status"         column="STATUS"/>
+    <result property="labelId"        column="LABEL_ID"/>
+    <result property="typeId"      	  column="TYPE_ID"/>
+    <result property="typeName" 	  column="TYPE_NAME"/> 
+    <result property="typeCode" 	  column="TYPE_CODE"/> 
+    <result property="rrule"          column="RRULE"/>
+    <result property="exdates"        column="EXDATES"/>
+    <result property="createByUserNo" column="CREATE_BY_USER_NO"/>
+    <result property="createDate"     column="CREATE_DATE"/>
+    <result property="updateUserNo"   column="UPDATE_USER_NO"/>
+    <result property="updateDate"     column="UPDATE_DATE"/>
+  </resultMap>
+
+  <!-- 기간 내 이벤트 조회 -->
+  <select id="selectEventsByCalendarAndPeriod"
+          resultMap="EventResMap"
+          parameterType="map">
+     SELECT
+	    e.EVENT_ID        AS EVENT_ID,
+	    e.CAL_ID          AS CAL_ID,
+	    e.TITLE           AS TITLE,
+	    e.START_AT        AS START_AT,
+	    e.END_AT          AS END_AT,
+	    e.ALL_DAY_YN      AS ALL_DAY_YN,
+	    e.LOCATION_TEXT   AS LOCATION_TEXT,
+	    e.NOTE            AS NOTE,
+	    e.ROOM_ID         AS ROOM_ID,
+	    e.STATUS          AS STATUS,
+	    e.LABEL_ID        AS LABEL_ID,
+	    e.TYPE_ID         AS TYPE_ID,     <!-- ★ 여기! e.TYPE_ID로 명확히 -->
+	    t.TYPE_NAME       AS TYPE_NAME,
+	    t.TYPE_CODE       AS TYPE_CODE,
+	    e.RRULE           AS RRULE,
+	    e.EXDATES         AS EXDATES,
+	    e.CREATE_BY_USER_NO AS CREATE_BY_USER_NO,
+	    e.CREATE_DATE     AS CREATE_DATE,
+	    e.UPDATE_USER_NO  AS UPDATE_USER_NO,
+	    e.UPDATE_DATE     AS UPDATE_DATE
+    FROM EVENT e
+     LEFT JOIN EVENT_TYPE t ON t.TYPE_ID = e.TYPE_ID
+    WHERE e.CAL_ID = #{calendarId}
+      AND e.START_AT &lt; #{to}
+      AND e.END_AT   &gt; #{from}
+      AND e.STATUS   &lt;&gt; 'DELETED'
+    ORDER BY e.START_AT ASC, e.END_AT ASC, e.EVENT_ID ASC
+  </select>
+
+  <!-- 회의실 겹침검사 (생성 시) -->
+  <select id="countRoomConflicts" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+    FROM EVENT
+    WHERE ROOM_ID = #{roomId}
+      AND STATUS IN ('CONFIRMED','TENTATIVE')
+      AND START_AT &lt; #{endAt}
+      AND END_AT   &gt; #{startAt}
+  </select>
+
+  <!-- 회의실 겹침검사 (수정 시: 자기 자신 제외) -->
+  <select id="countRoomConflictsExcludingSelf" parameterType="map" resultType="int">
+    SELECT COUNT(1)
+    FROM EVENT
+    WHERE ROOM_ID = #{roomId}
+      AND STATUS IN ('CONFIRMED','TENTATIVE')
+      AND START_AT &lt; #{endAt}
+      AND END_AT   &gt; #{startAt}
+      AND EVENT_ID &lt;&gt; #{eventId}
+  </select>
+
+  <!-- INSERT -->
+  <insert id="insertEvent" parameterType="map">
+    <selectKey keyProperty="req.eventId" resultType="long" order="BEFORE">
+      SELECT EVENT_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO EVENT (
+      EVENT_ID, CAL_ID, TITLE, START_AT, END_AT, ALL_DAY_YN,
+      LOCATION_TEXT, NOTE, ROOM_ID, STATUS, LABEL_ID, TYPE_ID,
+      RRULE, EXDATES, CREATE_BY_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
+    ) VALUES (
+      #{req.eventId}, #{req.calId}, #{req.title}, #{req.startAt}, #{req.endAt},
+      <choose>
+        <when test="req.allDay == true"> 'Y' </when>
+        <otherwise> 'N' </otherwise>
+      </choose>,
+      #{req.locationText}, #{req.note}, #{req.roomId},
+      'CONFIRMED', #{req.labelId}, #{req.typeId},
+      #{req.rrule}, #{req.exdates},
+      #{userNo}, SYSTIMESTAMP, #{userNo}, SYSTIMESTAMP
+    )
+  </insert>
+
+  <!-- UPDATE -->
+  <update id="updateEvent" parameterType="map">
+    UPDATE EVENT
+       SET TITLE          = #{req.title},
+           START_AT       = #{req.startAt},
+           END_AT         = #{req.endAt},
+           ALL_DAY_YN     = <choose>
+                              <when test="req.allDay == true">'Y'</when>
+                              <otherwise>'N'</otherwise>
+                            </choose>,
+           LOCATION_TEXT  = #{req.locationText},
+           NOTE           = #{req.note},
+           ROOM_ID        = #{req.roomId},
+           TYPE_ID     = #{req.typeId},
+           LABEL_ID       = #{req.labelId},
+           RRULE          = #{req.rrule},
+           EXDATES        = #{req.exdates},
+           UPDATE_USER_NO = #{userNo},
+           UPDATE_DATE    = SYSTIMESTAMP
+     WHERE EVENT_ID       = #{eventId}
+       AND STATUS        &lt;&gt; 'DELETED'
+  </update>
+
+  <!-- 논리삭제 -->
+  <update id="logicalDeleteEvent" parameterType="map">
+    UPDATE EVENT
+       SET STATUS        = 'DELETED',
+           UPDATE_USER_NO= #{userNo},
+           UPDATE_DATE   = SYSTIMESTAMP
+     WHERE EVENT_ID      = #{eventId}
+  </update>
+  
+  <!-- 참석자 전체 삭제 -->
+  <delete id="deleteParticipantsByEventId" parameterType="long">
+    DELETE FROM EVENT_PARTICIPANT
+    WHERE EVENT_ID = #{value}
+  </delete>
+
+  <!-- 참석자/공유자 대량 삽입(Oracle 전용 INSERT ALL) -->
+  <insert id="batchInsertParticipants" parameterType="map">
+    <if test="userNos != null and userNos.size() &gt; 0">
+      INSERT ALL
+      <foreach collection="userNos" item="u">
+        INTO EVENT_PARTICIPANT (EP_ID, EVENT_ID, USER_NO, KIND)
+        VALUES (EVENT_PARTICIPANT_SEQ.NEXTVAL, #{eventId}, #{u}, #{kind})
+      </foreach>
+      SELECT 1 FROM DUAL
+    </if>
+  </insert>
+
+  <select id="selectAttendeesByEventId"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$Member">
+    SELECT p.USER_NO   AS userNo,
+           u.USER_NAME AS userName,
+           u.EMAIL     AS email,
+           u.DEP_ID    AS depId
+      FROM EVENT_PARTICIPANT p
+      JOIN MEMBER u ON u.USER_NO = p.USER_NO
+     WHERE p.EVENT_ID = #{eventId}
+       AND p.KIND = 'ATTENDEE'
+     ORDER BY u.USER_NAME
+  </select>
+
+  <select id="selectSharersByEventId"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$Member">
+    SELECT p.USER_NO   AS userNo,
+           u.USER_NAME AS userName,
+           u.EMAIL     AS email,
+           u.DEP_ID    AS depId
+      FROM EVENT_PARTICIPANT p
+      JOIN MEMBER u ON u.USER_NO = p.USER_NO
+     WHERE p.EVENT_ID = #{eventId}
+       AND p.KIND = 'SHARER'
+     ORDER BY u.USER_NAME
+  </select>
+
+  <insert id="insertParticipantIfAbsent" parameterType="map">
+    INSERT INTO EVENT_PARTICIPANT (EP_ID, EVENT_ID, USER_NO, KIND)
+    SELECT EVENT_PARTICIPANT_SEQ.NEXTVAL, #{eventId}, #{userNo}, #{kind}
+      FROM DUAL
+     WHERE NOT EXISTS (
+           SELECT 1 FROM EVENT_PARTICIPANT
+            WHERE EVENT_ID = #{eventId}
+              AND USER_NO  = #{userNo}
+              AND KIND     = #{kind}
+     )
+  </insert>
+
+  <!-- 이벤트 유형 전체 목록 -->
+  <select id="selectAllEventTypes"
+          resultType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+    SELECT
+      TYPE_ID   AS typeId,
+      TYPE_CODE AS typeCode,
+      TYPE_NAME AS typeName
+    FROM EVENT_TYPE
+    ORDER BY TYPE_NAME
+  </select>
+	<!-- 생성 -->
+	<insert id="insertEventType"
+	        parameterType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+	  <selectKey keyProperty="typeId" resultType="long" order="BEFORE">
+	    SELECT EVENT_TYPE_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	  INSERT INTO EVENT_TYPE (TYPE_ID, TYPE_CODE, TYPE_NAME)
+	  VALUES (#{typeId}, #{typeCode}, #{typeName})
+	</insert>
+	<!-- 이름만 수정 -->
+	<update id="updateEventTypeName"
+	        parameterType="com.kh.coreflow.calendar.model.dto.EventDto$EventTypeDto">
+	  UPDATE EVENT_TYPE
+	     SET TYPE_NAME = #{typeName}
+	   WHERE TYPE_ID = #{typeId}
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteEventType" parameterType="long">
+	  DELETE FROM EVENT_TYPE WHERE TYPE_ID = #{typeId}
+	</delete>
+
+  <!-- event-mapper.xml 의 <mapper namespace="event"> 안에 아래 추가 -->
+	
+	<!-- Label 매핑 -->
+	<resultMap id="LabelResMap" type="com.kh.coreflow.calendar.model.dto.EventDto$LabelRes">
+	  <id property="labelId" column="LABEL_ID"/>
+	  <result property="labelName" column="LABEL_NAME"/>
+	  <result property="labelColor" column="LABEL_COLOR"/>
+	</resultMap>
+	
+	<select id="selectAllLabels" resultMap="LabelResMap">
+	  SELECT LABEL_ID, LABEL_NAME, LABEL_COLOR
+	    FROM LABEL
+	   ORDER BY LABEL_ID DESC
+	</select>
+	
+	<insert id="insertLabel" parameterType="map">
+	  <selectKey keyProperty="labelId" resultType="long" order="BEFORE">
+	    SELECT LABEL_SEQ.NEXTVAL FROM DUAL
+	  </selectKey>
+	  INSERT INTO LABEL (LABEL_ID, LABEL_NAME, LABEL_COLOR)
+	  VALUES (#{labelId}, #{req.labelName}, #{req.labelColor})
+	</insert>
+	
+	<update id="updateLabel" parameterType="map">
+	  UPDATE LABEL
+	     SET LABEL_NAME = #{req.labelName},
+	         LABEL_COLOR = #{req.labelColor}
+	   WHERE LABEL_ID = #{labelId}
+	</update>
+	
+	<delete id="deleteLabel" parameterType="long">
+	  DELETE FROM LABEL WHERE LABEL_ID = #{labelId}
+	</delete>
+
+  <!-- 회의실 요약 맵 -->
+  <resultMap id="RoomSummaryMap" type="com.kh.coreflow.calendar.model.dto.EventDto$RoomSummary">
+    <id     property="roomId"        column="ROOM_ID"/>
+    <result property="roomName"      column="ROOM_NAME"/>
+    <result property="buildingName"  column="BUILDING_NAME"/>
+    <result property="floor"         column="FLOOR"/>
+    <result property="roomNo"        column="ROOM_NO"/>
+    <result property="capacity"      column="CAPACITY"/>
+    <result property="detailLocation" column="DETAIL_LOCATION"/>
+  </resultMap>
+
+  <!-- 상세 조회 맵 -->
+  <resultMap id="EventDetailMap" type="com.kh.coreflow.calendar.model.dto.EventDto$DetailRes">
+  <id     property="eventId"        column="EVENT_ID"/>
+  <result property="calId"          column="CAL_ID"/>
+  <result property="title"          column="TITLE"/>
+  <result property="startAt"        column="START_AT"/>
+  <result property="endAt"          column="END_AT"/>
+  <result property="allDayYn"       column="ALL_DAY_YN"/>
+  <result property="locationText"   column="LOCATION_TEXT"/>
+  <result property="note"           column="NOTE"/>
+  <result property="roomId"         column="E_ROOM_ID"/> <!-- 👈 변경 -->
+  <result property="status"         column="STATUS"/>
+  <result property="labelId"        column="LABEL_ID"/>
+  <result property="typeId"         column="TYPE_ID"/>
+  <result property="createByUserNo" column="CREATE_BY_USER_NO"/>
+  <association property="room" resultMap="RoomSummaryMap"/>
+</resultMap>
+
+  <!-- 단건 상세: EVENT + CONFERENCE_ROOM 조인 -->
+<select id="selectEventDetailById"
+        parameterType="java.lang.Long"
+        resultMap="EventDetailMap">
+  SELECT
+    e.EVENT_ID, e.CAL_ID, e.TITLE, e.START_AT, e.END_AT, e.ALL_DAY_YN,
+    e.LOCATION_TEXT, e.NOTE,
+    e.ROOM_ID AS E_ROOM_ID,          -- 👈 이벤트의 ROOM_ID는 E_ROOM_ID로 별도 별칭
+    e.STATUS, e.LABEL_ID, e.TYPE_ID,
+    e.CREATE_BY_USER_NO,
+
+    r.ROOM_ID         AS ROOM_ID,    -- 👈 회의실 요약 맵에서 쓰는 ROOM_ID는 r.* 컬럼
+    r.ROOM_NAME       AS ROOM_NAME,
+    r.BUILDING_NAME   AS BUILDING_NAME,
+    r.FLOOR           AS FLOOR,
+    r.ROOM_NO         AS ROOM_NO,
+    r.CAPACITY        AS CAPACITY,
+    r.DETAIL_LOCATION AS DETAIL_LOCATION
+
+  FROM EVENT e
+  /* 👇 최신/유효한 예약 1건만 골라 이벤트별로 룸을 매칭 (테이블명/컬럼명은 프로젝트 실제 명칭에 맞춰주세요) */
+  LEFT JOIN (
+      SELECT EVENT_ID,
+             MAX(ROOM_ID) KEEP (DENSE_RANK LAST ORDER BY RESV_ID) AS ROOM_ID
+      FROM ROOM_RESERVATION
+      WHERE STATUS = 'CONFIRMED'
+      GROUP BY EVENT_ID
+  ) rr ON rr.EVENT_ID = e.EVENT_ID
+
+  /* EVENT.ROOM_ID가 있으면 그걸 우선, 없으면 예약의 ROOM_ID 사용 */
+  LEFT JOIN CONFERENCE_ROOM r ON r.ROOM_ID = NVL(e.ROOM_ID, rr.ROOM_ID)
+
+  WHERE e.EVENT_ID = #{value}
+</select>
+
+  <!-- 권한 체크: HR/ADMIN 보유 여부 -->
+  <select id="countHrOrAdmin" parameterType="long" resultType="int">
+    SELECT COUNT(1)
+      FROM COREFLOW.AUTHORITIES
+     WHERE USER_NO = #{value}
+       AND AUTHORITY IN ('ROLE_HR','ROLE_ADMIN')
+  </select>
+
+  <update id="updateEventRoomLink" parameterType="map">
+    UPDATE EVENT
+	SET ROOM_ID = #{roomId},
+	  UPDATE_USER_NO = #{userNo},
+	  UPDATE_DATE = SYSDATE
+	WHERE EVENT_ID = #{eventId}
+  </update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
