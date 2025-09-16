@@ -7,12 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class ImageDto {
+public class FileDto {
+	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
-	public static class image{
+	public static class customFile{
 		private Long imgId;
 		private String imageCode;
 		private String originName;
@@ -20,6 +21,6 @@ public class ImageDto {
 		private Long imgOrder;
 		private Date createDate;
 		private Long refId;
-		private String imageCodeName;
 	}
+
 }

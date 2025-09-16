@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.coreflow.chatting.model.dao.ChattingDao;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
+import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.model.dao.AuthDao;
@@ -77,7 +78,6 @@ public class ChattingServiceImpl implements ChattingService {
 		if(type.equals("PRIVATE")) {
 			Long partnerNo = (Long)newChatParam.get("partner");
 			User partner = chattingDao.findUserByUserNo(partnerNo);
-			log.info("partner : {}",partner);
 			newChatRoom.setRoomName(partner.getUserName() + "님과의 채팅");
 			newChatParam.remove("partner");
 		}else {
@@ -171,6 +171,16 @@ public class ChattingServiceImpl implements ChattingService {
 	@Override
 	public int setJoinUser(Map<String, Object> getParam) {
 		return chattingDao.setJoinUser(getParam);
+	}
+
+	@Override
+	public chatProfileDetail getProfileDetail(Long userNo) {
+		return chattingDao.getProfileDetail(userNo);
+	}
+
+	@Override
+	public int changeMessage(chatMessages message) {
+		return chattingDao.changeMessage(message);
 	}
 
 }

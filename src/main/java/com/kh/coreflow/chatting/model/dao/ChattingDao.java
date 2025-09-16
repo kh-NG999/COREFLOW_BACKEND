@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
+import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.model.dto.UserDto.User;
@@ -57,5 +58,9 @@ public interface ChattingDao {
 	List<chatProfile> getRoomUsers(Long roomId);
 
 	int setJoinUser(Map<String, Object> getParam);
+
+	chatProfileDetail getProfileDetail(Long userNo);
+
+	int changeMessage(chatMessages message);
 
 }

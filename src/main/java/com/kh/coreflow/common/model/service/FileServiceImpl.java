@@ -2,25 +2,40 @@ package com.kh.coreflow.common.model.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.nio.file.Paths;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.dao.FileDao;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class FileServiceImpl implements FileService {
 	@Value("${file.upload-dir}")
     private String uploadDir;
+	
+	@Autowired
+	private FileDao fileDao;
 
 	@Override
-	public String saveFile(MultipartFile upfile, String boardCode) {
-	    String serverFolderPath = uploadDir + boardCode + "/";
+	public String saveFile(MultipartFile upfile, String imageCode) {
+		
+		String projectRootPath = new File("").getAbsolutePath();
+		
+		String serverFolderPath = Paths.get(projectRootPath, uploadDir, imageCode).toString();
+		
+	    //String serverFolderPath = uploadDir + imageCode + "/";
 	    File dir = new File(serverFolderPath);
 	    if(!dir.exists()) {
 	        dir.mkdirs();
@@ -38,7 +53,7 @@ public class FileServiceImpl implements FileService {
 	    String changeName = currentTime + random + ext;
 	    
 	    try {
-	        upfile.transferTo(new File(serverFolderPath + changeName));
+	    	upfile.transferTo(new File(Paths.get(serverFolderPath, changeName).toString()));
 	    } catch (IOException e) {
 	        log.error("파일 저장 실패: {}", e.getMessage());
 	        return null; // 또는 실패 시 null 반환
@@ -48,13 +63,18 @@ public class FileServiceImpl implements FileService {
 	}
 	
 	@Override
-	public boolean deleteFile(String changeName, String boardCode) {
+	public boolean deleteFile(String changeName, String imageCode) {
+		
 	    // 1. 파일명이 유효한지 확인합니다.
 	    if (changeName == null || changeName.isEmpty()) {
 	        log.warn("삭제할 파일명이 없습니다.");
 	        return false;
 	    }
-	    String fullPath = Paths.get(uploadDir, boardCode, changeName).toString();
+	    
+		String projectRootPath = new File("").getAbsolutePath();
+		
+		String fullPath = Paths.get(projectRootPath, uploadDir, imageCode,changeName).toString();
+		
 	    File fileToDelete = new File(fullPath);
 
 	    // 3. 파일이 실제로 존재하는지 확인하고 삭제를 시도합니다.
@@ -70,5 +90,40 @@ public class FileServiceImpl implements FileService {
 	        log.warn("삭제할 파일이 존재하지 않습니다: {}", fullPath);
 	        return false; // 파일이 존재하지 않음
 	    }
+	}
+
+	@Override
+	public customFile getFile(String imageCode, Long refId) {
+		return fileDao.getFile(imageCode, refId);
+	}
+
+	@Override
+	@Transactional
+	public customFile setOrChangeOneImage(MultipartFile file, Long userNo, String fileCode) {
+		
+		customFile profileImage = new customFile();
+		profileImage.setOriginName(file.getOriginalFilename());
+		profileImage.setImageCode(fileCode);
+		String path = saveFile(file, fileCode);
+		profileImage.setChangeName(path);
+		profileImage.setImgOrder(0L);
+		profileImage.setRefId(userNo);
+		
+		customFile existImage = fileDao.getFile(profileImage.getImageCode(), userNo);
+		if(existImage !=null) {
+			deleteFile(existImage.getChangeName(),existImage.getImageCode());
+			int answer = fileDao.changeOneImage(profileImage);
+			if(answer>0)
+				return profileImage;
+			else
+				return null;
+		}
+		else {
+			int answer = fileDao.insertOneImage(profileImage);
+			if(answer > 0 )
+				return profileImage;
+			else
+				return null;
+		}
 	}
 }

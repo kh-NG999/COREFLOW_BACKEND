@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
+import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.model.dto.UserDto.User;
@@ -140,7 +141,6 @@ public class ChattingDaoImpl implements ChattingDao {
 		Map<String, Object> params = new HashMap<>();
 	    params.put("status", statusCode);
 	    params.put("userNo", userNo);
-	    log.info("status : {}",params);
 	    int answer = session.update("chat.updateState",params);
 	    return answer;
 	}
@@ -161,6 +161,16 @@ public class ChattingDaoImpl implements ChattingDao {
 	@Override
 	public int setJoinUser(Map<String, Object> getParam) {
 		return session.insert("chat.setJoinUser",getParam);
+	}
+
+	@Override
+	public chatProfileDetail getProfileDetail(Long userNo) {
+		return session.selectOne("chat.getProfileDetail",userNo);
+	}
+
+	@Override
+	public int changeMessage(chatMessages message) {
+		return session.update("chat.changeMessage",message);
 	}
 
 }

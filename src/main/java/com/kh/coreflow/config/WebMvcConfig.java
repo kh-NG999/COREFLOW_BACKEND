@@ -1,5 +1,8 @@
 package com.kh.coreflow.config;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -16,8 +19,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(resourcePath)
-                .addResourceLocations("file:" + uploadDir);
+    	String projectRootPath = new File("").getAbsolutePath();
+        String absoluteUploadDir = Paths.get(projectRootPath, uploadDir).toString();
+
+        registry.addResourceHandler(resourcePath).addResourceLocations("file:///" + absoluteUploadDir.replace("\\", "/") + "/");
     }
     
     @Override

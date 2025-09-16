@@ -3,6 +3,8 @@ package com.kh.coreflow.chatting.model.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +26,7 @@ public class ChattingDto {
 
 		// 클라이언트의 메시지 유형을 관리할 속성
 		public enum MessageType{
-			ENTER, EXIT, TALK
+			ENTER, EXIT, TALK, FILE
 		}
 		private MessageType type;
 		
@@ -39,6 +41,25 @@ public class ChattingDto {
 		private Long userNo;
 		private String userName;
 		private String status;
+		
+		private customFile profile;
+	}
+	
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class chatProfileDetail{
+		private Long userNo;
+		private String userName;
+		private String status;
+		private String email;
+		private String phone;
+		private String depName;
+		private String posName;
+
+		private customFile profile;
 	}
 	
 	@Data
