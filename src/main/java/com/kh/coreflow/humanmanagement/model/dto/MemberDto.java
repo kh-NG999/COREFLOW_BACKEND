@@ -16,7 +16,7 @@ public class MemberDto {
 	public static class Department{
 		private int depId;
 		private String depName;
-		private int parentId;
+		private Integer parentId;
 	}
 	
 	@Data

@@ -3,9 +3,7 @@ package com.kh.coreflow.humanmanagement.model.service;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
-import com.kh.coreflow.humanmanagement.model.dao.MemberDaoImpl;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
@@ -14,61 +12,24 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
-import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
-public class MemberService implements MemberServiceImpl{
-	private final MemberDaoImpl dao;
+public interface MemberService {
+
+	List<Department> deptList();
+
+	List<Department> deptDetailList(int parentId);
 	
-	@Override
-	public List<Department> deptList() {
-		return dao.deptList();
-	}
-
-	@Override
-	public List<Department> deptDetailList(int parentId) {
-		return dao.deptDetailList(parentId);
-	}
-
-	@Override
-	public List<Position> posiList() {
-		return dao.posiList();
-	}
+	List<Position> posiList();
 	
-	@Override
-	public List<MemberResponse> memberList(Map<String, String> searchParams) {
-		return dao.memberList(searchParams);
-	}
+	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	@Override
-	public MemberResponse memberDetail(int userNo) {
-		return dao.memberDetail(userNo);
-	}
+	MemberResponse memberDetail(int userNo);
 
-	@Override
-	public int memberInsert(MemberPost member) {
-		return dao.memberInsert(member);
-	}
+	int memberInsert(MemberPost member);
 	
-	@Override
-	public int memberUpdate(MemberPatch member) {
-		return dao.memberUpdate(member);
-	}
-
-	@Override
-	public int memberDelete(int userNo) {
-		return dao.memberDelete(userNo);
-	}
-
-	// 남건후
-	@Override
-	public List<MemberLite> search(String query, Integer limit, Long depId) {
-		return dao.searchMembers(query, limit, depId);
-	}
-
-	@Override
-	public List<DepartmentLite> findAll() {
-		return dao.findAll();
-	}
+	int memberUpdate(MemberPatch member);
+	
+	List<MemberDto.MemberLite> search(String query, Integer limit, Long depId);
+	List<MemberDto.DepartmentLite> findAll();
+	int memberDelete(int userNo);
 }

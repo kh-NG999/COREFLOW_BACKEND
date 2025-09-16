@@ -1,7 +1,11 @@
 package com.kh.coreflow.humanmanagement.model.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
@@ -11,25 +15,64 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
 
-public interface MemberDaoImpl {
+import lombok.RequiredArgsConstructor;
 
-	List<Department> deptList();
+@Repository
+@RequiredArgsConstructor
+public class MemberDaoImpl implements MemberDao{
+	private final SqlSessionTemplate session;
 
-	List<Department> deptDetailList(int parentId);
+	@Override
+	public List<Department> deptList() {
+		return session.selectList("member.deptList");
+	}
+
+	@Override
+	public List<Department> deptDetailList(int parentId) {
+		return session.selectList("member.deptDetailList",parentId);
+	}
 	
-	List<Position> posiList();
-
-	List<MemberResponse> memberList(Map<String, String> searchParams);
-
-	MemberResponse memberDetail(int userNo);
-
-	int memberInsert(MemberPost member);
+	@Override
+	public List<Position> posiList() {
+		return session.selectList("member.posiList");
+	}
 	
-	int memberUpdate(MemberPatch member);
+	@Override
+	public List<MemberResponse> memberList(Map<String, String> searchParams) {
+		return session.selectList("member.memberList",searchParams);
+	}
 
-	int memberDelete(int userNo);
-
-	List<MemberLite> searchMembers(String query, Integer limit, Long depId);
-
-	List<DepartmentLite> findAll();
+@Override
+public MemberResponse memberDetail(int userNo) {
+	return session.selectOne("member.memberDetail",userNo);
 }
+
+@Override
+public int memberInsert(MemberPost member) {
+	return session.insert("member.memberInsert",member);
+}
+
+@Override
+public int memberUpdate(MemberPatch member) {
+	return session.update("member.memberUpdate",member);
+}
+
+@Override
+public int memberDelete(int userNo) {
+	return session.delete("member.memberDelete",userNo);
+}
+
+@Override
+public List<MemberLite> searchMembers(String query, Integer limit, Long depId) {
+	Map<String,Object> p = new HashMap<>();
+	p.put("query", query);
+	p.put("limit", limit);
+	p.put("depId", depId);
+	
+	return session.selectList("member.searchMembers", p);
+}
+@Override
+public List<DepartmentLite> findAll() {
+	return session.selectList("member.findAll");
+}
+	}

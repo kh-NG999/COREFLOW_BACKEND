@@ -120,6 +120,11 @@ public class UserDto {
 	public static class UserDeptcode {
 		private Long userNo;
 		private Long depId;
+		
+		@Override
+	    public String toString() {
+	        return String.valueOf(userNo);
+	    }
 	}
 	
 	

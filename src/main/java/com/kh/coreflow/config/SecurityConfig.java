@@ -48,11 +48,13 @@ public class SecurityConfig {
 					.sessionManagement(
 							management -> 
 							management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-					.authorizeHttpRequests(auth 
+					.authorizeHttpRequests(auth
 						-> auth
-						.requestMatchers("/vacation/**").hasRole("ADMIN")
+						.requestMatchers("/vacation/member/**","/attendance/member/**").hasAnyRole("ADMIN","HR")
 						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
+						.requestMatchers("/images/**","/download/**").permitAll()
+						.requestMatchers("/ws/**").permitAll()
 						.requestMatchers("/**").authenticated()
 					);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
