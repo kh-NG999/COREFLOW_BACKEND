@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService{
 				    throw new IllegalArgumentException("권한 정보 없음");
 				}
 				log.info("권한 조회: userNo={} roles={} depId={}", userNo, userAuth.getRoles(), user.getDepId());
-				Long depId = user.getDepId();
+				int depId = user.getDepId();
 
 				// 2. 토큰 발급
 				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService{
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-		Long depId = user.getDepId();
+		int depId = user.getDepId();
 		
 		//토큰 발급
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService{
 		if (userAuth == null) {
 			throw new IllegalArgumentException("권한 정보 없음");
 		}
-		Long depId = user.getDepId();
+		int depId = user.getDepId();
 
 		// 2. 토큰 발급
 		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
@@ -175,7 +175,8 @@ public class AuthServiceImpl implements AuthService{
 		return true;
 	}
 
-	private String createTempPwd() {
+	@Override
+	public String createTempPwd() {
 		return UUID.randomUUID().toString().replace("-", "").substring(0,10);
 	}
 

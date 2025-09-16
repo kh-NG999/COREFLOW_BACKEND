@@ -93,7 +93,7 @@ public class MemberController {
 	@GetMapping("/members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<MemberResponse> memberDetail(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			){
 		MemberResponse member = service.memberDetail(userNo);
 		
@@ -107,7 +107,7 @@ public class MemberController {
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/members")
-	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	//@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberInsert(
 			@RequestBody MemberPost member
 			){
@@ -125,7 +125,7 @@ public class MemberController {
 	@PatchMapping("/members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberUpdate(
-			@PathVariable int userNo,
+			@PathVariable Long userNo,
 			@RequestBody MemberPatch member
 			){
 		member.setUserNo(userNo);
@@ -145,7 +145,7 @@ public class MemberController {
 	@DeleteMapping("members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	public ResponseEntity<Void> memberDelete(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			) {
 		int result = service.memberDelete(userNo);
 		

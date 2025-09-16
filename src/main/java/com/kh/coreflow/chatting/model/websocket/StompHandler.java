@@ -57,7 +57,7 @@ public class StompHandler implements ChannelInterceptor {
         				    .map(SimpleGrantedAuthority::new)
         				    .collect(Collectors.toList());
         			// 4) 권한에서 부서코드 추출
-        			Long depId = jwtProvider.getDeptcode(jwtToken);
+        			int depId = jwtProvider.getDeptcode(jwtToken);
         			
         			UserDeptcode principal =  UserDeptcode.builder()
         			        .userNo(userNo)

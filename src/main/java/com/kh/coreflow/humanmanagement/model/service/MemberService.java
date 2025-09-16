@@ -19,11 +19,11 @@ public interface MemberService {
 	
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	MemberResponse memberDetail(int userNo);
+	MemberResponse memberDetail(Long userNo);
 
 	int memberInsert(MemberPost member);
 	
 	int memberUpdate(MemberPatch member);
 
-	int memberDelete(int userNo);
+	int memberDelete(Long userNo);
 }

@@ -34,6 +34,6 @@ public interface AuthDao {
 
 	String findUserProfileByUserNo(Long userNo);
 
-
+	long findUserNoByEmail(String email);
 	
 }

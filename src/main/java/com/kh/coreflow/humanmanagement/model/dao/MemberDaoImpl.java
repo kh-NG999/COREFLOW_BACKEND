@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+import com.kh.coreflow.model.dto.UserDto.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,13 +40,13 @@ public class MemberDaoImpl implements MemberDao{
 	}
 
 	@Override
-	public MemberResponse memberDetail(int userNo) {
+	public MemberResponse memberDetail(Long userNo) {
 		return session.selectOne("member.memberDetail",userNo);
 	}
 
 	@Override
-	public int memberInsert(MemberPost member) {
-		return session.insert("member.memberInsert",member);
+	public int memberInsert(User user) {
+		return session.insert("member.memberInsert",user);
 	}
 	
 	@Override
@@ -55,7 +55,17 @@ public class MemberDaoImpl implements MemberDao{
 	}
 
 	@Override
-	public int memberDelete(int userNo) {
+	public int memberDelete(Long userNo) {
 		return session.delete("member.memberDelete",userNo);
+	}
+
+	@Override
+	public int findDepId(String depName) {
+		return session.selectOne("member.findDepId", depName);
+	}
+
+	@Override
+	public int findPodId(String posName) {
+		return session.selectOne("member.findPodId" ,posName);
 	}
 }

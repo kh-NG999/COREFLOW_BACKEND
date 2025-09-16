@@ -39,7 +39,7 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(Long userNo, Long depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, int depId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
@@ -101,13 +101,28 @@ public class JWTProvider {
 	    return List.of();
 	}
 	
-	public Long getDeptcode(String token) {
+	public int getDeptcode(String token) {
 		Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-		return claims.get("depId", Long.class);
+		
+		return getIntValue(claims.get("depId"));
+	}
+	
+	private int getIntValue(Object obj) {
+	    if (obj == null) return 0; // 기본값
+	    if (obj instanceof Integer i) return i;
+	    if (obj instanceof Long l) return l.intValue();
+	    return Integer.parseInt(obj.toString());
+	}
+
+	private long getLongValue(Object obj) {
+	    if (obj == null) return 0L;
+	    if (obj instanceof Long l) return l;
+	    if (obj instanceof Integer i) return i.longValue();
+	    return Long.parseLong(obj.toString());
 	}
 	
 	public boolean validateToken(String token) {
@@ -131,8 +146,11 @@ public class JWTProvider {
 		Claims claims = getClaims(accessToken);
 		// 클레임에서 userNo 추출
 		long userNo = Long.parseLong(claims.getSubject());
-		// 권한 정보 생성 (여기서는 "ROLE_USER"로 고정, 필요시 DB에서 조회)
-		List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+		// 권한 정보 생성
+		List<String> roles = getRoles(accessToken);
+		List<SimpleGrantedAuthority> authorities = roles.stream()
+														.map(SimpleGrantedAuthority::new)
+														.toList();
 		// UsernamePasswordAuthenticationToken을 만들어 반환
 		return new UsernamePasswordAuthenticationToken(userNo, null, authorities);
 	}

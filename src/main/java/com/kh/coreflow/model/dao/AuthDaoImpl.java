@@ -111,6 +111,11 @@ public class AuthDaoImpl implements AuthDao{
 		}
 		return null;
 	}
+
+	@Override
+	public long findUserNoByEmail(String email) {
+		return session.selectOne("auth.findUserNoByEmail", email);
+	}
 	
 	
 }

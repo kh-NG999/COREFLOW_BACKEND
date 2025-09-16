@@ -34,42 +34,20 @@ public class UserDto {
 	@Builder
 	public static class User {
 		private Long userNo;
-		private String userPwd;
-		private String email;
 		private String userName;
-		private Long depId;
-		private Long posId;
-		private String profile;
+		private String email;
+		private String userPwd;
 		private List<String> roles;
+		private int depId;
+		private int posId;
 		private Date hireDate;
-		private String phone;
-		private String address;
-		private String addressDetail;
-		private String status;
-	}
-	
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class UserCreate{
-		private Long userNo;
-		private String userPwd;
-		private String email;
-		private String userName;
-		private Long depId;
-		private Long posId;
 		private String profile;
-		
-		@Builder.Default
-		private List<String> roles = List.of("ROLE_USER");
-		private Date hireDate;
-		
-		@Builder.Default
-		private String status = "INCOMPLETE";
+		private String extension;
 		private String phone;
 		private String address;
 		private String addressDetail;
+		private Date updateDate;
+		private String status;
 	}
 	
 	@Data
@@ -118,7 +96,7 @@ public class UserDto {
 	@Builder
 	public static class UserDeptcode {
 		private Long userNo;
-		private Long depId;
+		private int depId;
 		
 		@Override
 	    public String toString() {

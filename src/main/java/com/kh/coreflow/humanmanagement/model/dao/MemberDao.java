@@ -8,6 +8,7 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+import com.kh.coreflow.model.dto.UserDto.User;
 
 public interface MemberDao {
 
@@ -19,11 +20,15 @@ public interface MemberDao {
 
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	MemberResponse memberDetail(int userNo);
+	MemberResponse memberDetail(Long userNo);
 
-	int memberInsert(MemberPost member);
+	int memberInsert(User user);
 	
 	int memberUpdate(MemberPatch member);
 
-	int memberDelete(int userNo);
+	int memberDelete(Long userNo);
+	
+	int findDepId(String depName);
+
+	int findPodId(String posName);
 }

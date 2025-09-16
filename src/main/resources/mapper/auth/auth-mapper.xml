@@ -18,12 +18,8 @@
 	    WHERE UPPER(EMAIL) = UPPER(#{email})
 	</select>
 	
-	<!-- 계정생성 임시 -->
-	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="userNo" keyColumn="USER_NO">
-		INSERT INTO MEMBER(EMAIL, USER_NAME, USER_PWD)
-		VALUES (#{email}, #{userName}, #{userPwd})
-	</insert>
-	<insert id="insertUserRole">
+	<!-- 계정생성(권한 부여) -->
+	<insert id="insertUserRole" parameterType="com.kh.coreflow.model.dto.UserDto$UserAuthority">
     	INSERT ALL
     	<foreach collection="roles" item="role">
 		INTO AUTHORITY(USER_NO, AUTHORITY)
@@ -31,6 +27,13 @@
     	</foreach>
     	SELECT 1 FROM DUAL
 	</insert>
+	
+	<!-- userNo 조회 -->
+	<select id="findUserNoByEmail" resultType="long">
+		SELECT USER_NO
+		FROM MEMBER
+		WHERE EMAIL = #{email}
+	</select>
 	
 	<select id="findUserByUserNo" resultMap="UserResult">
         SELECT M.*
