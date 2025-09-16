@@ -13,4 +13,6 @@ public interface FileService {
 	customFile getFile(String imageCode, Long userNo);
 
 	customFile setOrChangeOneImage(MultipartFile file, Long userNo, String fileCode);
+
+	customFile findFile(String imageCode, String changeName);
 }

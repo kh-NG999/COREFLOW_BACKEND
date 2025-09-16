@@ -108,6 +108,7 @@ public class FileServiceImpl implements FileService {
 		profileImage.setChangeName(path);
 		profileImage.setImgOrder(0L);
 		profileImage.setRefId(userNo);
+		profileImage.setMimeType(file.getContentType());
 		
 		customFile existImage = fileDao.getFile(profileImage.getImageCode(), userNo);
 		if(existImage !=null) {
@@ -125,5 +126,11 @@ public class FileServiceImpl implements FileService {
 			else
 				return null;
 		}
+	}
+
+	@Override
+	public customFile findFile(String fileCode, String changeName) {
+		// TODO Auto-generated method stub
+		return fileDao.findFile(fileCode,changeName);
 	}
 }

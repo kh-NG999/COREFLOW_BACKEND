@@ -10,4 +10,6 @@ public interface FileDao {
 
 	int insertOneImage(customFile profileImage);
 
+	customFile findFile(String fileCode, String changeName);
+
 }
