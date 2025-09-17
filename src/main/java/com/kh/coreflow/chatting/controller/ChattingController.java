@@ -371,4 +371,19 @@ public class ChattingController {
     		return ResponseEntity.badRequest().build();
     	}
 	}
+	
+	@DeleteMapping("/room/{roomId}/leave")
+	public ResponseEntity<Void> leaveRoom(
+			@PathVariable("roomId") Long roomId,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		
+		int result = chattingService.leaveRoom(roomId,user.getUserNo());
+		
+    	if(result >0)
+    		return ResponseEntity.ok().build();
+    	else {
+    		return ResponseEntity.badRequest().build();
+    	}
+	}
 }

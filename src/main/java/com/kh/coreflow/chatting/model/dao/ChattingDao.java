@@ -63,4 +63,6 @@ public interface ChattingDao {
 
 	int changeMessage(chatMessages message);
 
+	int leaveRoom(Long roomId, Long userNo);
+
 }

@@ -183,4 +183,9 @@ public class ChattingServiceImpl implements ChattingService {
 		return chattingDao.changeMessage(message);
 	}
 
+	@Override
+	public int leaveRoom(Long roomId, Long userNo) {
+		return chattingDao.leaveRoom(roomId,userNo);
+	}
+
 }
