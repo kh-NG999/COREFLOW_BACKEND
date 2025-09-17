@@ -182,39 +182,9 @@
     ORDER BY A.START_DATE DESC
 	</select>	
 
-	<!-- 문서 임시저장 -->
-	<select id="selectTempApprovalsByUserNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
-		SELECT
-			A.APPROVAL_ID,
-			A.APPROVAL_TITLE,
-			A.APPROVAL_TYPE,
-			A.SAVE_DATE,
-			A.APPROVAL_STATUS
-		FROM
-			APPROVAL A
-		WHERE
-			A.USER_NO = #{userNo}
-		AND A.APPROVAL_STATUS = 0
-		ORDER BY A.SAVE_DATE DESC
-	</select>
 	
-	<!--임시저장 상태-->
-	<update id="updateApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
-		UPDATE APPROVAL
-		SET
-			APPROVAL_TITLE = #{approvalTitle},
-	        APPROVAL_DETAIL = #{approvalDetail},
-	        APPROVAL_TYPE = #{approvalType},
-	        APPROVAL_STATUS = #{approvalStatus},
-	        START_DATE = #{startDate},
-	        SAVE_DATE = #{saveDate}
-    	WHERE
-        	APPROVAL_ID = #{approvalId}
-	</update>
-	<!--결재선 삭제-->
-	<delete id="deleteApprovalLines" parameterType="int">
-    	DELETE FROM APPROVAL_LINE WHERE APPROVAL_ID = #{approvalId}
-	</delete>
+	
+	
 
 </mapper>
 

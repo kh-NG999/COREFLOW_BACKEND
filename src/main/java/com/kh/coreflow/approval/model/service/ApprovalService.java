@@ -67,21 +67,20 @@ public class ApprovalService {
             	
             	//폴더없으면 폴더생성
             	if (!uploadDir.exists()) {
-            		uploadDir.mkdir(); 
+            		uploadDir.mkdirs(); 
             	}
-            	String uploadPath = "C:/uploads/";
             	
             	String originalFileName = file.getOriginalFilename();
             	String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
             	String uniqueFileName = UUID.randomUUID().toString() + ext;
             	
-            	File saveFile = new File(uploadPath + uniqueFileName);
+            	File saveFile = new File(this.uploadPath + uniqueFileName);
             	file.transferTo(saveFile);
             	
             	ApprovalFileDto fileDto = new ApprovalFileDto();
             	fileDto.setApprovalId(approval.getApprovalId());
             	fileDto.setOriginalFileName(originalFileName);
-            	fileDto.setFilePath(uploadPath+ uniqueFileName);
+            	fileDto.setFilePath(saveFile.getAbsolutePath());
             	fileDto.setFileSize(file.getSize());
             	
             	dao.insertApprovalFile(fileDto);
@@ -186,19 +185,7 @@ public class ApprovalService {
 		return dao.selectProcessedApprovalsByApproverNo(userNo);
 	}
 	
-	public List<ApprovalDto> getTempDocumentsByUser(int userNo){
-		return dao.selectTempApprovalsByUserNo(userNo);
-	}
-
-	@Transactional
-	public void updateApproval(ApprovalDto approval, MultipartFile file, int userNo) {
-		approval.setUserNo(userNo);
-		dao.updateApproval(approval);
-		
-		dao.deleteApprovalLines(approval.getApprovalId());
-		
-		insertLinesAndFiles(approval, file);
-	}
+	
 
 	private void insertLinesAndFiles(ApprovalDto approval, MultipartFile file) {
         // 결재선 정보

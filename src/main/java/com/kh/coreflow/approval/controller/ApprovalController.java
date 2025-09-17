@@ -63,7 +63,7 @@ public class ApprovalController {
             @RequestPart(value = "files", required = false) MultipartFile file,
             Principal principal) {
         
-        if (approval.getApprovalTitle() == null || approval.getApprovalTitle().trim().isEmpty()) {
+    	if (approval.getApprovalStatus() == 1 && (approval.getApprovalTitle() == null || approval.getApprovalTitle().trim().isEmpty())) {
             return ResponseEntity.badRequest().body("제목은 필수입력 항목입니다");
         }
         int userNo = getUserNoFromPrincipal(principal);
@@ -111,7 +111,7 @@ public class ApprovalController {
     }
     //결재
     @Operation(summary = "결재문서 상세 조회")
-    @GetMapping("/{id}")
+    @GetMapping("/{id:[0-9]+}")
     public ResponseEntity<Map<String, Object>> getApprovalDetails(
     		@PathVariable("id") int approvalId,
     		Principal principal) {
@@ -171,23 +171,6 @@ public class ApprovalController {
     	return ResponseEntity.ok(documents);
     }
     
-    @Operation(summary = "임시저장함")
-    @GetMapping("/temp-documents")
-    public ResponseEntity<?> updateApproval(
-            @PathVariable("approvalId") int approvalId,
-            @RequestPart("approvalData") ApprovalDto approval,
-            @RequestPart(value = "files", required = false) MultipartFile file,
-            Principal principal) {
-
-        // URL의 approvalId를 DTO 객체에 설정해줍니다.
-        approval.setApprovalId(approvalId);
-        
-        int userNo = getUserNoFromPrincipal(principal);
-        // 서비스 계층에 수정 로직을 호출합니다.
-        service.updateApproval(approval, file, userNo);
-        
-        return ResponseEntity.ok("문서가 성공적으로 수정되었습니다.");
-    }
 }
 
 
