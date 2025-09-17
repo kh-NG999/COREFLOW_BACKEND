@@ -25,4 +25,9 @@ public class NoticeServiceImpl implements NoticeService{
 		return dao.notiList(params);
 	}
 
+	@Override
+	public int notiInsert(Map<String, Object> params) {
+		return dao.notiInsert(params);
+	}
+
 }

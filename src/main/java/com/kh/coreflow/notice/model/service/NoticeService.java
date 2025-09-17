@@ -10,5 +10,7 @@ public interface NoticeService {
 	List<NoticeResponse> notiList();
 	
 	List<NoticeResponse> notiList(Map<String, String> params);
+
+	int notiInsert(Map<String, Object> params);
 	
 }

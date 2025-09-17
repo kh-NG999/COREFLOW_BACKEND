@@ -25,5 +25,10 @@ public class NoticeDaoImpl implements NoticeDao{
 		return session.selectList("notice.notiList",params);
 	}
 
+	@Override
+	public int notiInsert(Map<String, Object> params) {
+		return session.insert("notice.notiInsert",params);
+	}
+
 
 }

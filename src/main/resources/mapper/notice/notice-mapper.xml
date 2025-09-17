@@ -31,4 +31,25 @@
 			N.ESSENTIAL DESC,
 			N.NOTI_ID DESC
 	</select>
+	
+	<!-- 공지 등록(첨부파일) -->
+	<insert id="notiInsert">
+		<selectKey keyProperty="notiId" resultType="int" order="BEFORE">
+			SELECT SEQ_NOTI_ID.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO NOTICE(NOTI_ID, WRITER, TITLE, CONTENT, ESSENTIAL, END_DATE, END_TIME)
+		VALUES(
+			#{notiId},
+			#{userNo},
+			#{title},
+			#{content},
+			#{essential},
+			<if test="endDate != null and !endDate.isEmpty()">
+				#{endDate},			
+			</if>
+			<if test="endTime != null and !endTime.isEmpty()">
+				#{endTime}
+			</if>
+			)
+	</insert>
 </mapper>

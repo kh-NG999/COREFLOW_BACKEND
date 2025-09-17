@@ -1,6 +1,11 @@
 package com.kh.coreflow.notice.model.dto;
 
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,19 +35,20 @@ public class NoticeDto {
 		private String keyword;
 	}
 	
-	// 공지 상세 조회
-	// 첨부파일은 일단 생략
+	
+	// 공지 등록(첨부파일)
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class NoticeDetail{
-		필독여부,
-		제목,
-		작성자,
-		부서,
-		직위,
-		작성일,
-		내용
-		
-		
+	public static class NoticeInsert{
+		private int notiId;
+		private String title;
+		private String content;
+		private String essential;
+		private String endDate;
+		private String endTime;
+		private List<String> depName;
+		private List<String> posName;
+		private List<MultipartFile> fileList;
 	}
+}
