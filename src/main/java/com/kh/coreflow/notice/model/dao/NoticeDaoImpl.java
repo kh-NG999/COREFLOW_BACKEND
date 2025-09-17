@@ -1,6 +1,7 @@
 package com.kh.coreflow.notice.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,5 +19,11 @@ public class NoticeDaoImpl implements NoticeDao{
 	public List<NoticeResponse> notiList() {
 		return session.selectList("notice.notiList");
 	}
+	
+	@Override
+	public List<NoticeResponse> notiList(Map<String, String> params) {
+		return session.selectList("notice.notiList",params);
+	}
+
 
 }
