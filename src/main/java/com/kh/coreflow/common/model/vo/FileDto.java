@@ -21,6 +21,7 @@ public class FileDto {
 		private Long imgOrder;
 		private Date createDate;
 		private Long refId;
+		private String mimeType;
 	}
 
 }

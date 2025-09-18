@@ -31,6 +31,7 @@ public class ChattingDto {
 		private MessageType type;
 		
 		private String userName;
+		private customFile file;
 	}
 	
 	@Data

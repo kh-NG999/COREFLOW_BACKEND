@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="conferenceRoom">
+	
+  <resultMap id="RoomResMap" type="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$Res">
+    <id     property="roomId"         column="ROOM_ID"/>
+    <result property="updateUserNo"   column="UPDATE_USER_NO"/>
+    <result property="roomName"       column="ROOM_NAME"/>
+    <result property="buildingName"   column="BUILDING_NAME"/>
+    <result property="floor"          column="FLOOR"/>
+    <result property="roomNo"         column="ROOM_NO"/>
+    <result property="capacity"       column="CAPACITY"/>
+    <result property="detailLocation" column="DETAIL_LOCATION"/>
+    <result property="status"         column="STATUS"/>
+    <result property="createDate"     column="CREATE_DATE"/>
+    <result property="updateDate"     column="UPDATE_DATE"/>
+    <result property="createUserNo"   column="CREATE_USER_NO"/>
+  </resultMap>
+
+  <resultMap id="RoomReservationResMap" type="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$ReservationRes">
+    <id     property="resvId"     column="RESV_ID"/>
+    <result property="roomId"     column="ROOM_ID"/>
+    <result property="userNo"     column="USER_NO"/>
+    <result property="startAt"    column="START_AT"/>
+    <result property="endAt"      column="END_AT"/>
+    <result property="status"     column="STATUS"/>
+    <result property="eventId"    column="EVENT_ID"/>
+    <result property="expiresAt"  column="EXPIRES_AT"/>
+    <result property="title"      column="TITLE"/>
+    <result property="createDate" column="CREATE_DATE"/>
+    <result property="updateDate" column="UPDATE_DATE"/>
+  </resultMap>
+
+  <!-- 목록 조회 (필터: 건물/층/상태/최소인원) -->
+  <select id="selectRooms" resultMap="RoomResMap" parameterType="map">
+    SELECT
+      ROOM_ID, UPDATE_USER_NO, ROOM_NAME, BUILDING_NAME, FLOOR, ROOM_NO,
+      CAPACITY, DETAIL_LOCATION, STATUS, CREATE_DATE, UPDATE_DATE, CREATE_USER_NO
+    FROM CONFERENCE_ROOM
+    <where>
+      <if test="buildingName != null and buildingName != ''">
+        AND BUILDING_NAME = #{buildingName}
+      </if>
+      <if test="floor != null and floor != ''">
+        AND FLOOR = #{floor}
+      </if>
+      <if test="status != null and status != ''">
+        AND STATUS = #{status}
+      </if>
+      <if test="minCapacity != null">
+        AND CAPACITY &gt;= #{minCapacity}
+      </if>
+    </where>
+    ORDER BY NVL(BUILDING_NAME,'~'), NVL(FLOOR,'~'), NVL(ROOM_NO,'~')
+  </select>
+
+  <!-- 단건 조회 -->
+  <select id="selectRoomById" resultMap="RoomResMap" parameterType="long">
+    SELECT
+      ROOM_ID, UPDATE_USER_NO, ROOM_NAME, BUILDING_NAME, FLOOR, ROOM_NO,
+      CAPACITY, DETAIL_LOCATION, STATUS, CREATE_DATE, UPDATE_DATE, CREATE_USER_NO
+    FROM CONFERENCE_ROOM
+    WHERE ROOM_ID = #{roomId}
+  </select>
+
+  <!-- 회의실 생성 -->
+  <insert id="insertRoom" parameterType="map">
+    <selectKey keyProperty="roomId" resultType="long" order="BEFORE">
+      SELECT ROOM_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO CONFERENCE_ROOM (
+      ROOM_ID, ROOM_NAME, BUILDING_NAME, FLOOR, ROOM_NO,
+      CAPACITY, DETAIL_LOCATION, STATUS,
+      CREATE_USER_NO, CREATE_DATE
+    ) VALUES (
+      #{roomId}, #{req.roomName}, #{req.buildingName}, #{req.floor}, #{req.roomNo},
+      #{req.capacity}, #{req.detailLocation},
+      NVL(#{req.status}, 'ACTIVE'),
+      #{createUserNo}, SYSTIMESTAMP
+    )
+  </insert>
+
+  <!-- 사용 가능 방인지 -->
+  <select id="existsActiveRoom" parameterType="long" resultType="int">
+    SELECT 1
+      FROM CONFERENCE_ROOM
+     WHERE ROOM_ID = #{roomId}
+       AND STATUS = 'ACTIVE'
+  </select>
+
+  <select id="existsReservationOverlap" parameterType="map" resultType="int">
+    SELECT 1
+      FROM ROOM_RESERVATION r
+     WHERE r.ROOM_ID = #{roomId}
+       AND r.STATUS  = 'CONFIRMED'
+       AND r.START_AT &lt; #{endAt}
+       AND #{startAt} &lt; r.END_AT
+       AND ROWNUM = 1
+  </select>
+
+  <select id="existsReservationOverlapExcludingId" parameterType="map" resultType="int">
+    SELECT 1
+      FROM ROOM_RESERVATION r
+     WHERE r.ROOM_ID = #{roomId}
+       AND r.STATUS = 'CONFIRMED'
+       AND r.START_AT &lt; #{endAt}
+       AND #{startAt} &lt; r.END_AT
+       AND r.RESV_ID != #{excludeResvId}
+       AND ROWNUM = 1
+  </select>
+
+  <!-- 단건 조회 -->
+  <select id="findReservationById"
+          parameterType="long"
+          resultMap="RoomReservationResMap">
+    SELECT
+      RESV_ID, ROOM_ID, USER_NO, START_AT, END_AT, STATUS,
+      EVENT_ID, EXPIRES_AT, TITLE,
+      CREATE_DATE, UPDATE_DATE
+    FROM ROOM_RESERVATION
+    WHERE RESV_ID = #{resvId}
+  </select>
+
+  <!-- 내 예약 목록 -->
+  <select id="selectMyReservations" parameterType="map" resultMap="RoomReservationResMap">
+    SELECT
+      RESV_ID, ROOM_ID, USER_NO, START_AT, END_AT, STATUS,
+      EVENT_ID, EXPIRES_AT, TITLE,
+      CREATE_DATE, UPDATE_DATE
+    FROM ROOM_RESERVATION
+    WHERE USER_NO = #{userNo}
+      <if test="roomId != null"> AND ROOM_ID = #{roomId} </if>
+      <if test="from != null">   AND END_AT   &gt;= #{from} </if>
+      <if test="to != null">     AND START_AT &lt;= #{to}   </if>
+      AND STATUS &lt;&gt; 'DELETED'
+    ORDER BY START_AT DESC
+  </select>
+
+  <insert id="insertReservation" parameterType="map">
+    <selectKey keyProperty="resvId" resultType="long" order="BEFORE">
+      SELECT ROOM_RESERVATION_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO ROOM_RESERVATION (
+      RESV_ID, ROOM_ID, USER_NO, START_AT, END_AT, STATUS, TITLE, EXPIRES_AT, EVENT_ID,
+      CREATE_USER_NO, CREATE_DATE, UPDATE_USER_NO, UPDATE_DATE
+    ) VALUES (
+      #{resvId}, #{roomId}, #{userNo}, #{startAt}, #{endAt}, 'CONFIRMED', #{title}, NULL, #{eventId},
+      #{userNo}, SYSTIMESTAMP, #{userNo}, SYSTIMESTAMP
+    )
+  </insert>
+
+  <update id="updateReservationStatus" parameterType="map">
+    UPDATE ROOM_RESERVATION
+       SET STATUS = #{status},
+           UPDATE_USER_NO = #{userNo},
+           UPDATE_DATE = SYSTIMESTAMP
+     WHERE RESV_ID = #{resvId}
+  </update>
+
+  <update id="updateReservationTime" parameterType="map">
+    UPDATE ROOM_RESERVATION
+       SET START_AT = #{startAt},
+           END_AT   = #{endAt},
+           UPDATE_USER_NO = #{userNo},
+           UPDATE_DATE    = SYSTIMESTAMP
+     WHERE RESV_ID = #{resvId}
+  </update>
+
+  <update id="attachReservationEvent" parameterType="map">
+    UPDATE ROOM_RESERVATION
+       SET EVENT_ID = #{eventId},
+           UPDATE_USER_NO = #{userNo},
+           UPDATE_DATE    = SYSTIMESTAMP
+     WHERE RESV_ID = #{resvId}
+  </update>
+
+  <select id="selectAvailability"
+          parameterType="map"
+          resultType="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$AvailabilityRes">
+    SELECT
+      c.ROOM_ID        AS roomId,
+      c.ROOM_NAME      AS roomName,
+      c.CAPACITY       AS capacity,
+      c.BUILDING_NAME  AS buildingName,
+      c.FLOOR          AS floor,
+      CASE WHEN EXISTS (
+        SELECT 1
+          FROM ROOM_RESERVATION r
+         WHERE r.ROOM_ID = c.ROOM_ID
+           AND r.STATUS = 'CONFIRMED'
+           AND r.START_AT &lt; #{endAt}
+           AND #{startAt} &lt; r.END_AT
+      ) THEN 0 ELSE 1 END AS available
+    FROM CONFERENCE_ROOM c
+    <where>
+      <if test="minCapacity != null"> AND c.CAPACITY &gt;= #{minCapacity} </if>
+      <if test="buildingName != null and buildingName != ''"> AND c.BUILDING_NAME = #{buildingName} </if>
+      <if test="floor != null and floor != ''"> AND c.FLOOR = #{floor} </if>
+      AND c.STATUS = 'ACTIVE'
+    </where>
+    ORDER BY NVL(c.BUILDING_NAME,'~'), NVL(c.FLOOR,'~'), NVL(c.ROOM_NAME,'~')
+  </select>
+
+  <select id="findEventTime" parameterType="long" resultType="map">
+    SELECT START_AT AS startAt, END_AT AS endAt
+      FROM EVENT
+     WHERE EVENT_ID = #{eventId}
+  </select>
+
+  <update id="deleteReservationsByEventId" parameterType="map">
+    UPDATE ROOM_RESERVATION
+       SET STATUS        = 'CANCELLED',
+           UPDATE_USER_NO= #{userNo},
+           UPDATE_DATE   = SYSTIMESTAMP
+     WHERE EVENT_ID      = #{eventId}
+       AND STATUS       &lt;&gt; 'DELETED'
+  </update>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

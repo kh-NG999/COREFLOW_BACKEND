@@ -3,11 +3,15 @@ package com.kh.coreflow.humanmanagement.model.service;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+
 
 public interface MemberService {
 
@@ -26,4 +30,8 @@ public interface MemberService {
 	int memberUpdate(MemberPatch member);
 
 	int memberDelete(Long userNo);
+	
+	List<MemberDto.MemberLite> search(String query, Integer limit, Long depId);
+	
+	List<MemberDto.DepartmentLite> findAll();
 }

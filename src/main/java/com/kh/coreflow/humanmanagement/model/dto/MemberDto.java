@@ -5,6 +5,7 @@ import java.util.Date;
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -84,5 +85,28 @@ public class MemberDto {
 		private String addressDetail;
 		private Date updateDate;
 		private String status;
+	}
+	
+	// 남건후
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class MemberLite{
+		private Long userNo;
+		private Long depId;
+		private Long posId;
+		private String userName;
+		private String email;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class DepartmentLite{
+		private Long depId;
+		private String depName;
+		private Long parentId;
 	}
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.humanmanagement.model.dao.MemberDao;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
+import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
@@ -65,10 +67,12 @@ public class MemberServiceImpl implements MemberService{
 		
 		//DB MEMBER에 저장하면서 자동으로 userNo생성
 		int result = dao.memberInsert(user);
+		
 		UserAuthority auth = new UserAuthority();
 		auth.setUserNo(authDao.findUserNoByEmail(user.getEmail()));
 		auth.setRoles(roles);
 		authDao.insertUserRole(auth);
+		
 		
 		mailService.sendTemporaryPassword(user, tempPwd);
 		
@@ -92,5 +96,17 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public int memberDelete(Long userNo) {
 		return dao.memberDelete(userNo);
+	}
+
+	@Override
+	public List<MemberLite> search(String query, Integer limit, Long depId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<DepartmentLite> findAll() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
