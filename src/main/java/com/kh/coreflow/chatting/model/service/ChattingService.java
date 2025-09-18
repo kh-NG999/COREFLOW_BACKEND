@@ -53,4 +53,6 @@ public interface ChattingService {
 
 	int changeMessage(chatMessages message);
 
+	int leaveRoom(Long roomId, Long userNo);
+
 }

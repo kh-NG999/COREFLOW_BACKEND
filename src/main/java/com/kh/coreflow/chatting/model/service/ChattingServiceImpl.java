@@ -41,7 +41,6 @@ public class ChattingServiceImpl implements ChattingService {
 	@Override
 	public chatProfile getMyProfile(Long userNo) {
 		chatProfile myProfile = chattingDao.getMyProfile(userNo);
-		System.out.println(userNo);
 		if(myProfile==null) {
 			User myInfo = chattingDao.findUserByUserNo(userNo);
 			myProfile = new chatProfile().builder()
@@ -181,6 +180,11 @@ public class ChattingServiceImpl implements ChattingService {
 	@Override
 	public int changeMessage(chatMessages message) {
 		return chattingDao.changeMessage(message);
+	}
+
+	@Override
+	public int leaveRoom(Long roomId, Long userNo) {
+		return chattingDao.leaveRoom(roomId,userNo);
 	}
 
 }
