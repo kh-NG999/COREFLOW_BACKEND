@@ -1,23 +1,12 @@
 package com.kh.coreflow.personal.model.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kh.coreflow.common.model.service.FileService;
-import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserUpdate;
@@ -35,7 +24,6 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	private final AuthDao authDao;
 	private final PasswordEncoder encoder;
-	private final FileService fileService;
 	
 	@Override
 	public List<Object> getMySchedule(Long userNo) {

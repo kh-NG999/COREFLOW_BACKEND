@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.humanmanagement.model.dao.MemberDao;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
@@ -30,6 +33,7 @@ public class MemberServiceImpl implements MemberService{
 	private final PasswordEncoder encoder;
 	private final UserFactory userFactory;
 	private final MailService mailService;
+	private final FileService fileService;
 	
 	@Override
 	public List<Department> deptList() {
@@ -57,7 +61,7 @@ public class MemberServiceImpl implements MemberService{
 	}
 
 	@Override
-	public int memberInsert(MemberPost member) {
+	public int memberInsert(MemberPost member, MultipartFile image) {
 		User user = userFactory.createIncompleteUser(member);
 		
 		String tempPwd = user.getUserPwd();
@@ -67,12 +71,15 @@ public class MemberServiceImpl implements MemberService{
 		
 		//DB MEMBER에 저장하면서 자동으로 userNo생성
 		int result = dao.memberInsert(user);
+		user.setUserNo(authDao.findUserNoByEmail(user.getEmail()));
 		
 		UserAuthority auth = new UserAuthority();
-		auth.setUserNo(authDao.findUserNoByEmail(user.getEmail()));
+		auth.setUserNo(user.getUserNo());
 		auth.setRoles(roles);
 		authDao.insertUserRole(auth);
 		
+		customFile profile = fileService.setOrChangeOneImage(image, user.getUserNo(), "P");
+		user.setProfile(profile);
 		
 		mailService.sendTemporaryPassword(user, tempPwd);
 		
