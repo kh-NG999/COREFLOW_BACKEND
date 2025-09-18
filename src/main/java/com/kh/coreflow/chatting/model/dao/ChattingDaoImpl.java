@@ -173,4 +173,12 @@ public class ChattingDaoImpl implements ChattingDao {
 		return session.update("chat.changeMessage",message);
 	}
 
+	@Override
+	public int leaveRoom(Long roomId, Long userNo) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("roomId", roomId);
+	    params.put("userNo", userNo);
+		return session.delete("chat.leaveRoom",params);
+	}
+
 }

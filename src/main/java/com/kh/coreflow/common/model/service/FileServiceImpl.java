@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,19 +100,24 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
+	public List<customFile> getFiles(String imageCode, Long refId) {
+		return fileDao.getFiles(imageCode, refId);
+	}
+
+	@Override
 	@Transactional
-	public customFile setOrChangeOneImage(MultipartFile file, Long userNo, String fileCode) {
+	public customFile setOrChangeOneImage(MultipartFile file, Long refId, String fileCode) {
 		
 		customFile profileImage = new customFile();
 		profileImage.setOriginName(file.getOriginalFilename());
 		profileImage.setImageCode(fileCode);
 		String path = saveFile(file, fileCode);
 		profileImage.setChangeName(path);
-		profileImage.setImgOrder(0L);
-		profileImage.setRefId(userNo);
+		profileImage.setImgOrder(1L);
+		profileImage.setRefId(refId);
 		profileImage.setMimeType(file.getContentType());
 		
-		customFile existImage = fileDao.getFile(profileImage.getImageCode(), userNo);
+		customFile existImage = fileDao.getFile(profileImage.getImageCode(), refId);
 		if(existImage !=null) {
 			deleteFile(existImage.getChangeName(),existImage.getImageCode());
 			int answer = fileDao.changeOneImage(profileImage);
@@ -132,5 +139,44 @@ public class FileServiceImpl implements FileService {
 	public customFile findFile(String fileCode, String changeName) {
 		// TODO Auto-generated method stub
 		return fileDao.findFile(fileCode,changeName);
+	}
+	
+	@Override
+	@Transactional
+	public List<customFile> setOrChangeImage(List<MultipartFile> files,Long refId, String fileCode){
+		if(files.size()==0||files==null)
+			return null;
+		int answer = 0;
+		List<customFile> cFiles = new ArrayList<customFile>();
+		Long order = 1L;
+		for(MultipartFile file : files) {
+			customFile cFile = new customFile();
+			cFile.setOriginName(file.getOriginalFilename());
+			cFile.setImageCode(fileCode);
+			String path = saveFile(file, fileCode);
+			cFile.setChangeName(path);
+			cFile.setImgOrder(order++);
+			cFile.setRefId(refId);
+			cFile.setMimeType(file.getContentType());
+			cFiles.add(cFile);
+		}
+		List<customFile> existFiles = fileDao.getFiles(fileCode, refId);
+		if(existFiles.size()>0) {
+			answer=0;
+			for(customFile existFile : existFiles) {
+				deleteFile(existFile.getChangeName(),existFile.getImageCode());
+				answer+=fileDao.removeFile(fileCode,refId);
+			}
+			if(answer==0)
+				return null;
+		}
+		answer=0;
+		for(customFile file: cFiles ) {
+			answer+=fileDao.insertOneImage(file);
+		}
+		if(answer > 0 )
+			return cFiles;
+		else
+			return null;
 	}
 }
