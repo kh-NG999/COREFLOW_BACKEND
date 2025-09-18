@@ -24,15 +24,7 @@ public interface AuthDao {
 
 	void updateAddress(Long userNo, String string, String string2);
 
-	void updateProfileImage(Map<String, Object> imageUpdate);
-
-	int checkProfileImage(Long userNo);
-	
-	void insertProfileImage(Map<String, Object> imageUpdate);
-
 	UserAuthority findUserAuthorityByUserNo(Long userNo);
-
-	String findUserProfileByUserNo(Long userNo);
 
 	long findUserNoByEmail(String email);
 	

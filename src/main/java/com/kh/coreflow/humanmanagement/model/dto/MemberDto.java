@@ -1,10 +1,10 @@
 package com.kh.coreflow.humanmanagement.model.dto;
 
 import java.util.Date;
-import java.util.List;
+
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -57,7 +57,7 @@ public class MemberDto {
 		private Date hireDate;
 		private String depName;
 		private String posName;
-		private String profile;
+		private customFile profile;
 		private String phone;
 		private String extension;
 		private String address;

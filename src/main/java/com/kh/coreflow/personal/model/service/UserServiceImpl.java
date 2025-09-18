@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserUpdate;
@@ -31,10 +34,8 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private final AuthDao authDao;
-	
 	private final PasswordEncoder encoder;
-	
-	
+	private final FileService fileService;
 	
 	@Override
 	public List<Object> getMySchedule(Long userNo) {
@@ -67,50 +68,5 @@ public class UserServiceImpl implements UserService{
 	public void updateAddress(Long userNo, String string, String string2) {
 		authDao.updateAddress(userNo, string, string2);
 	}
-	
-	@Override
-	@Transactional
-	public String updateProfileImage(Long userNo, MultipartFile profile) {
-		String webPath = "/images/p/";
-        String serverFolderPath = "src/main/resources/static/images/p/";
-        File dir = new File(serverFolderPath);
-		System.out.println(dir.getAbsolutePath());
-        if(!dir.exists()) dir.mkdirs();
-        
-        System.out.println(profile.isEmpty());
-        
-        Map<String, Object> imageUpdate = new HashMap<>();
-
-        String originName = profile.getOriginalFilename();
-        String currentTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        String ext = originName.substring(originName.lastIndexOf("."));
-        String changeName = currentTime + ext;
-        try {
-            profile.transferTo(new File(dir.getAbsolutePath() + "\\" + changeName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        imageUpdate.put("originName", originName);
-        imageUpdate.put("changeName", changeName);
-        imageUpdate.put("currentTime", currentTime);
-        imageUpdate.put("userNo", userNo);
-        
-        int count = authDao.checkProfileImage(userNo);
-        
-        if(count > 0) authDao.updateProfileImage(imageUpdate);
-        else authDao.insertProfileImage(imageUpdate);
-        
-        System.out.println("DB 반영 결과: " + count);
-        
-        File savedFile = new File(dir.getAbsolutePath() + "\\" + changeName);
-        
-        System.out.println("파일 저장됨? " + savedFile.exists());
-
-        return webPath + changeName; // 반환할 URL
-	}
-
-	
-	
 	
 }

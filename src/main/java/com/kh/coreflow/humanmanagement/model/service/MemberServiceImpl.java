@@ -63,6 +63,7 @@ public class MemberServiceImpl implements MemberService{
 		List<String> roles = getAuth(user.getDepId());
 		user.setRoles(roles);
 		
+		//DB MEMBER에 저장하면서 자동으로 userNo생성
 		int result = dao.memberInsert(user);
 		UserAuthority auth = new UserAuthority();
 		auth.setUserNo(authDao.findUserNoByEmail(user.getEmail()));

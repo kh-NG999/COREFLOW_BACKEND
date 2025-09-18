@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
@@ -27,6 +29,7 @@ public class AuthServiceImpl implements AuthService{
 	private final AuthDao authDao;
 	private final MailService mailService;
 	private final PasswordEncoder encoder;
+	private final FileService fileService;
 	private final JWTProvider jwt;
 	
 	@Override
@@ -150,8 +153,6 @@ public class AuthServiceImpl implements AuthService{
 		    User user = userOpt.get();
 		    UserAuthority roles = authDao.findUserAuthorityByUserNo(userNo);
 		    user.setRoles(roles.getRoles());
-		    String profile = authDao.findUserProfileByUserNo(userNo);
-		    user.setProfile(profile);
 		}
 		return userOpt;
 	}

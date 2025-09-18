@@ -3,6 +3,8 @@ package com.kh.coreflow.model.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,13 +43,13 @@ public class UserDto {
 		private int depId;
 		private int posId;
 		private Date hireDate;
-		private String profile;
 		private String extension;
 		private String phone;
 		private String address;
 		private String addressDetail;
 		private Date updateDate;
 		private String status;
+		private customFile profile;
 	}
 	
 	@Data
@@ -69,7 +71,7 @@ public class UserDto {
 		private String phone;
 		private String address;
 		private String addressDetail;
-		private String profile;
+		private customFile profile;
 	}
 	
 	@Data
