@@ -47,8 +47,8 @@ public class NoticeDto {
 		private String essential;
 		private String endDate;
 		private String endTime;
-		private List<String> depName;
-		private List<String> posName;
-		private List<MultipartFile> fileList;
+		private Integer depId;
+		private Integer posId;
+//		private List<MultipartFile> fileList;
 	}
 }

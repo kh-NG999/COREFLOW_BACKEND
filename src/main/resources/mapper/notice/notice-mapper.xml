@@ -35,20 +35,39 @@
 	<!-- 공지 등록(첨부파일) -->
 	<insert id="notiInsert">
 		<selectKey keyProperty="notiId" resultType="int" order="BEFORE">
-			SELECT SEQ_NOTI_ID.NEXTVAL FROM DUAL
+			SELECT NOTI_ID_SEQ.NEXTVAL FROM DUAL
 		</selectKey>
-		INSERT INTO NOTICE(NOTI_ID, WRITER, TITLE, CONTENT, ESSENTIAL, END_DATE, END_TIME)
+		INSERT INTO NOTICE(NOTI_ID, WRITER, TITLE, CONTENT, ESSENTIAL
+			<if test="insertParams.endDate != null and issertParams.endDate.isEmpty()">
+				,END_DATE
+			</if>
+			<if test="insertParams.endTime != null and issertParams.endTime.isEmpty()">
+				,END_TIME
+			</if>
+			<if test="insertParams.endDate != null and issertParams.endDate.isEmpty()">
+				,DEP_ID
+			</if>
+			<if test="insertParams.endDate != null and issertParams.endDate.isEmpty()">
+				,POS_ID
+			</if>
+		)
 		VALUES(
 			#{notiId},
 			#{userNo},
-			#{title},
-			#{content},
-			#{essential},
-			<if test="endDate != null and !endDate.isEmpty()">
-				#{endDate},			
+			#{insertParams.title},
+			#{insertParams.content},
+			#{insertParams.essential},
+			<if test="insertParams.endDate != null and !insertParams.endDate.isEmpty()">
+				#{insertParams.endDate},			
 			</if>
-			<if test="endTime != null and !endTime.isEmpty()">
-				#{endTime}
+			<if test="insertParams.endTime != null and !insertParams.endTime.isEmpty()">
+				#{insertParams.endTime},
+			</if>
+			<if test="insertParams.depId != null and !insertParams.depId.isEmpty()">
+				#{insertParams.depId},
+			</if>
+			<if test="insertParams.posId != null and !insertParams.posId.isEmpty()">
+				#{insertParams.posId},
 			</if>
 			)
 	</insert>

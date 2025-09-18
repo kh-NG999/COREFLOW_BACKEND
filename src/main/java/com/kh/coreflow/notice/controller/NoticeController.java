@@ -1,5 +1,6 @@
 package com.kh.coreflow.notice.controller;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -49,9 +51,7 @@ public class NoticeController {
 		}else {
 			notiList = service.notiList();
 		}
-		
-		log.info("notiList : {}",notiList);
-		
+				
 		if(notiList != null && !notiList.isEmpty()) {
 			return ResponseEntity.ok(notiList);
 		}else {
@@ -64,13 +64,13 @@ public class NoticeController {
 	@PostMapping("/notice/insert")
 	public ResponseEntity<Void> noticeInsert(
 			@AuthenticationPrincipal UserDeptcode auth,
-			@RequestParam NoticeInsert insertParams,
-			@RequestParam("files") List<MultipartFile> file
+			@ModelAttribute NoticeInsert insertParams
+//			@RequestParam(value = "files", required=false) List<MultipartFile> file
 			){
 		//NOTICE 테이블에 저장하고 NOTI ID 갖고 오기
 		log.info("userNo : {}", auth.getUserNo());
 		log.info("isertParams : {}", insertParams);
-		log.info("file : {}", file);
+//		log.info("file : {}", file);
 		
 //		List<customFile> notiFile;
 //		if(file.size()>0) {
@@ -85,7 +85,7 @@ public class NoticeController {
 		int result = service.notiInsert(params);
 		
 		if(result > 0) {
-			return ResponseEntity.ok(null);
+			return ResponseEntity.created(URI.create("/notice/insert")).build();
 		}else {
 			return ResponseEntity.badRequest().build();
 		}
