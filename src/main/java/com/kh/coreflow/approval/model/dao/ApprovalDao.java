@@ -83,6 +83,14 @@ public class ApprovalDao {
 	public List<ApprovalDto> selectProcessedApprovalsByApproverNo(int userNo) {
 		return session.selectList("approvalMapper.selectProcessedApprovalsByApproverNo", userNo);
 	}
+	// 유저 이름가져오기
+	public String findUserNameByUserNo(int userNo) {
+        return session.selectOne("approvalMapper.findUserNameByUserNo", userNo);
+    }
+	// 참조문서함
+	public List<ApprovalDto> selectCcApprovalsByApproverNo(int userNo) {
+		return session.selectList("approvalMapper.selectCcApprovalsByApproverNo",userNo);
+	}
 	
 	
 	

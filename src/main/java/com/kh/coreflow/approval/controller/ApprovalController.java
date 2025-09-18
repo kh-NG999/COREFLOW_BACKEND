@@ -171,6 +171,13 @@ public class ApprovalController {
     	return ResponseEntity.ok(documents);
     }
     
+    @Operation(summary = "참조문서함")
+    @GetMapping("/cc-documents")
+    public ResponseEntity<List<ApprovalDto>> getCcDocuments(Principal principal){
+    	int userNo = getUserNoFromPrincipal(principal);
+    	List<ApprovalDto> documents = service.getCcDocumentsByUser(userNo);
+    	return ResponseEntity.ok(documents);
+    }
 }
 
 

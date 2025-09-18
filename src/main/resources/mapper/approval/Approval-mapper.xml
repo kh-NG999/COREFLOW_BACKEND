@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="approvalMapper">
 
+	
+
     <!-- 결재문서 등록 -->
     <insert id="insertApproval" parameterType="com.kh.coreflow.approval.model.dto.ApprovalDto">
     
@@ -15,7 +17,8 @@
 		approval_detail, 
 		approval_type, 
 		approval_status, 
-		start_date
+		start_date,
+		user_name
 		)
         VALUES 
         (
@@ -25,7 +28,10 @@
         #{approvalDetail}, 
         #{approvalType}, 
         #{approvalStatus}, 
-        #{startDate})
+        #{startDate},
+        #{userName}
+        )
+        
     </insert>
 
     <!-- 문서 상세조회 -->
@@ -57,10 +63,21 @@
 
     <!-- 결재선 조회 -->
     <select id="findLinesByApprovalId" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
-        SELECT *
-        FROM approval_line
-        WHERE approval_id = #{approvalId}
-        ORDER BY line_order
+        SELECT 
+        	L.LINE_ID,
+        	L.APPROVAL_ID,
+        	L.APPROVER_USER_NO,
+        	L.LINE_ORDER,
+        	L.LINE_STATUS,
+        	M.USER_NAME
+        FROM 
+        	APPROVAL_LINE L
+        JOIN
+        	MEMBER M ON L.APPROVER_USER_NO = M.USER_NO
+        WHERE 
+        	L.APPROVAL_ID = #{approvalId}
+        ORDER BY
+        	L.LINE_ORDER
     </select>
 
     <!-- 결재선 상태 변경 -->
@@ -182,9 +199,32 @@
     ORDER BY A.START_DATE DESC
 	</select>	
 
+	<select id="findUserNameByUserNo" parameterType="int" resultType="string">
+    SELECT USER_NAME 
+    FROM MEMBER
+    WHERE USER_NO = #{userNo}
+	</select>
 	
-	
-	
+	<!-- 참조문서함 -->
+	<select id="selectCcApprovalsByApproverNo" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalDto">
+		SELECT
+			A.approval_id,
+			A.user_no,
+			A.user_name,
+			A.approval_title,
+			A.approval_type,
+			A.approval_status,
+			A.start_date
+		FROM
+			approval A
+		INNER JOIN
+			approval_line L ON A.approval_id = L.approval_id
+		WHERE
+			L.approver_user_no = #{userNo}
+		AND L.line_status = 'PENDING'
+		ORDER BY
+			A.start_date DESC
+	</select>
 
 </mapper>
 

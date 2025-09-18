@@ -31,8 +31,10 @@ public class ApprovalService {
 
     @Transactional
     public int submitApproval(ApprovalDto approval,MultipartFile file, int userNo) {
-        approval.setUserNo(userNo);
-//        approval.setApprovalStatus(1);
+ 
+    	String userName = dao.findUserNameByUserNo(userNo);
+    	approval.setUserName(userName);
+    	approval.setUserNo(userNo);
         approval.setSaveDate(new Date());
         dao.insertApproval(approval);
 
@@ -213,6 +215,10 @@ public class ApprovalService {
         if (file != null && !file.isEmpty()) {
         }
     }
+
+	public List<ApprovalDto> getCcDocumentsByUser(int userNo) {
+		return dao.selectCcApprovalsByApproverNo(userNo);
+	}
 	
 
 }
