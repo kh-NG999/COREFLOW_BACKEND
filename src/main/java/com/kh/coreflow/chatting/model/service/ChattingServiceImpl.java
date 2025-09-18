@@ -41,7 +41,6 @@ public class ChattingServiceImpl implements ChattingService {
 	@Override
 	public chatProfile getMyProfile(Long userNo) {
 		chatProfile myProfile = chattingDao.getMyProfile(userNo);
-		System.out.println(userNo);
 		if(myProfile==null) {
 			User myInfo = chattingDao.findUserByUserNo(userNo);
 			myProfile = new chatProfile().builder()

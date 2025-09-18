@@ -350,23 +350,28 @@ public class ChattingController {
 			return ResponseEntity.badRequest().build();
 	}
 	
-	@PostMapping("/room/{roomId}/file")
-	public ResponseEntity<chatMessages> uploadFileOnRoom(
-			@RequestParam("file") MultipartFile file,
+	@PostMapping("/room/{roomId}/files")
+	public ResponseEntity<List<chatMessages>> uploadFileOnRoom(
+			@RequestParam("files") List<MultipartFile> files,
 			@PathVariable("roomId") Long roomId,
 	        @AuthenticationPrincipal UserDeptcode user
 			){
-		chatMessages message = new chatMessages();
-    	message.setUserNo(user.getUserNo());
-    	message.setIsFile("T");
-    	message.setType(chatMessages.MessageType.FILE);
-    	message.setRoomId(roomId);
-    	int result = chattingService.insertMessage(message);
-    	customFile image = fileService.setOrChangeOneImage(file,message.getMessageId(),"CM");
-    	message.setMessageText(image.getChangeName());
+		List<chatMessages> messages = new ArrayList<chatMessages>();
+		int result = 0;
+		for(MultipartFile file : files) {
+			chatMessages message = new chatMessages();
+			message.setUserNo(user.getUserNo());
+	    	message.setIsFile("T");
+	    	message.setType(chatMessages.MessageType.FILE);
+	    	message.setRoomId(roomId);
+	    	result += chattingService.insertMessage(message);
+	    	customFile image = fileService.setOrChangeOneImage(file,message.getMessageId(),"CM");
+	    	message.setMessageText(image.getChangeName());
+	    	messages.add(message);
+		}
     	
     	if(result >0)
-    		return ResponseEntity.ok(message);
+    		return ResponseEntity.ok(messages);
     	else {
     		return ResponseEntity.badRequest().build();
     	}
