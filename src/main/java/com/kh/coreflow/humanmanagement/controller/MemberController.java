@@ -85,14 +85,14 @@ public class MemberController {
 		if(!memberList.isEmpty()) {
 			return ResponseEntity.ok(memberList);
 		}else {
-			return ResponseEntity.ok(memberList);
+			return ResponseEntity.noContent().build();
 		}
 	}
 	
 	// 사원 상세 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@GetMapping("/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
 			@PathVariable int userNo
 			){
@@ -107,8 +107,8 @@ public class MemberController {
 	
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
-	@PostMapping("/members")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@PostMapping("/members")
 	public ResponseEntity<Void> memberInsert(
 			@RequestBody MemberPost member
 			){
@@ -123,15 +123,13 @@ public class MemberController {
 	
 	// 사원 정보 수정
 	@CrossOrigin(origins="http://localhost:5173")
-	@PatchMapping("/members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
 			@PathVariable int userNo,
 			@RequestBody MemberPatch member
 			){
 		member.setUserNo(userNo);
-		log.info("userNo : {}",userNo);
-		log.info("member : {}",member);
 		int result = service.memberUpdate(member);
 		
 		if(result > 0) {
@@ -143,8 +141,8 @@ public class MemberController {
 	
 	// 사원 정보 삭제
 	@CrossOrigin(origins="http://localhost:5173")
-	@DeleteMapping("members/{userNo}")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@DeleteMapping("members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
 			@PathVariable int userNo
 			) {
