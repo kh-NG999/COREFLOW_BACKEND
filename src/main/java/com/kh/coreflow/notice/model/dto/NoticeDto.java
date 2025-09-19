@@ -42,6 +42,7 @@ public class NoticeDto {
 	@AllArgsConstructor
 	public static class NoticeInsert{
 		private int notiId;
+		private long userNo;
 		private String title;
 		private String content;
 		private String essential;
@@ -49,6 +50,22 @@ public class NoticeDto {
 		private String endTime;
 		private Integer depId;
 		private Integer posId;
-//		private List<MultipartFile> fileList;
+//		private List<customFile> files;
+	}
+	
+	// 공지 상세 조회(첨부파일)
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class NoticeDetail{
+		private int notiId;
+		private String essential;
+		private String title;
+		private String userName;
+		private String depName;
+		private String posName;
+		private String enrollDate;
+		private String updateDate;
+		private String content;
 	}
 }

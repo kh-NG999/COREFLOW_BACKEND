@@ -11,12 +11,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeDetail;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeInsert;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeResponse;
 import com.kh.coreflow.notice.model.service.NoticeService;
@@ -35,7 +39,6 @@ public class NoticeController {
 	private final FileService fileService;
 	
 	// 공지 조회 + 검색(제목, 내용, 작성자) 
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/notice/main")
 	public ResponseEntity<List<NoticeResponse>> notice(
 			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
@@ -60,17 +63,14 @@ public class NoticeController {
 	}
 
 	// 공지 등록(첨부파일)
-	@CrossOrigin(origins="http://localhost5173")
 	@PostMapping("/notice/insert")
 	public ResponseEntity<Void> noticeInsert(
 			@AuthenticationPrincipal UserDeptcode auth,
-			@ModelAttribute NoticeInsert insertParams
+			@RequestBody NoticeInsert insertParams
 //			@RequestParam(value = "files", required=false) List<MultipartFile> file
 			){
 		//NOTICE 테이블에 저장하고 NOTI ID 갖고 오기
-		log.info("userNo : {}", auth.getUserNo());
-		log.info("isertParams : {}", insertParams);
-//		log.info("file : {}", file);
+		insertParams.setUserNo(auth.getUserNo());
 		
 //		List<customFile> notiFile;
 //		if(file.size()>0) {
@@ -78,17 +78,42 @@ public class NoticeController {
 //			log.info("notiFile : {}",notiFile);
 //		}
 		
-		Map<String, Object> params = new HashMap<>();
-		params.put("userNo", auth.getUserNo());
-		params.put("isertParams", insertParams);
-		
-		int result = service.notiInsert(params);
+		int result = service.notiInsert(insertParams);
+		log.info("userNo : {}", auth.getUserNo());
+		log.info("isertParams : {}", insertParams);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/notice/insert")).build();
 		}else {
 			return ResponseEntity.badRequest().build();
 		}
-		
 	}
+	
+	// 공지 상세 조회(첨부파일)
+	@GetMapping("/notice/detail/{notiId}")
+	public ResponseEntity<NoticeDetail> noticeDetail(
+			@PathVariable int notiId
+			){
+		NoticeDetail notiDetail = service.notiDetail(notiId);
+		
+		log.info("notiDetail : {}",notiDetail);
+		
+		if(notiDetail != null) {
+			return ResponseEntity.ok(notiDetail);
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

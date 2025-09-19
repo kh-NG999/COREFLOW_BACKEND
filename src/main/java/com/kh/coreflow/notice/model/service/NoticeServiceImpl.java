@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kh.coreflow.notice.model.dao.NoticeDao;
+import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeDetail;
+import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeInsert;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,13 @@ public class NoticeServiceImpl implements NoticeService{
 	}
 
 	@Override
-	public int notiInsert(Map<String, Object> params) {
-		return dao.notiInsert(params);
+	public int notiInsert(NoticeInsert insertParams) {
+		return dao.notiInsert(insertParams);
+	}
+
+	@Override
+	public NoticeDetail notiDetail(int notiId) {
+		return dao.notiDetail(notiId);
 	}
 
 }
