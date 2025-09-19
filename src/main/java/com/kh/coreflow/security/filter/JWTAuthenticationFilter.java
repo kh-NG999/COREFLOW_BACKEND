@@ -46,7 +46,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 				    .map(SimpleGrantedAuthority::new)
 				    .collect(Collectors.toList());
 			// 4) 권한에서 부서코드 추출
-			Long depId = jwt.getDeptcode(token);
+			int depId = jwt.getDeptcode(token);
 			
 			UserDeptcode principal =  UserDeptcode.builder()
 			        .userNo(userNo)
@@ -55,10 +55,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			
 			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
 		    	= new UsernamePasswordAuthenticationToken(principal, null, authorities);
-			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			// 인증처리 끝
 			SecurityContextHolder.getContext().setAuthentication(authToken);
+			
 			}catch (ExpiredJwtException e) {
 				SecurityContextHolder.clearContext();
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401상태

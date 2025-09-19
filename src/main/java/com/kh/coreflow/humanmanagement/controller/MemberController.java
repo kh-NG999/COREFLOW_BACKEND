@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
@@ -94,7 +96,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			){
 		MemberResponse member = service.memberDetail(userNo);
 		
@@ -110,9 +112,10 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PostMapping("/members")
 	public ResponseEntity<Void> memberInsert(
-			@RequestBody MemberPost member
+			@RequestPart("data") MemberPost member,
+			@RequestPart(value = "profile", required = false) MultipartFile profile
 			){
-		int result = service.memberInsert(member);
+		int result = service.memberInsert(member, profile);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/members")).build();
@@ -126,7 +129,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
-			@PathVariable int userNo,
+			@PathVariable Long userNo,
 			@RequestBody MemberPatch member
 			){
 		member.setUserNo(userNo);
@@ -144,7 +147,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@DeleteMapping("members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			) {
 		int result = service.memberDelete(userNo);
 		

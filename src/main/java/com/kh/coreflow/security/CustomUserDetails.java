@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails{
 		return null;
 	}
 	
-	public Long getDepId() {
+	public int getDepId() {
 		return user.getDepId();
 	}
 	
