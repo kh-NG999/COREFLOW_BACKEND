@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -390,5 +391,22 @@ public class ChattingController {
     	else {
     		return ResponseEntity.badRequest().build();
     	}
+	}
+	
+	@PatchMapping("/room/alarm")
+	public ResponseEntity<chatRooms> roomAlarmChange(
+			@RequestBody Map<String,Object> param,
+	        @AuthenticationPrincipal UserDeptcode user
+			){
+		log.info("body : {} ",param);
+		Long roomId = Long.valueOf((int)param.get("roomId"));
+		chatRooms bodyRoom = chattingService.getRoom(roomId);
+		bodyRoom.setAlarm((String)param.get("alarm"));
+		log.info("bodyRoom : {} ",bodyRoom);
+		int result = chattingService.alarmChange(bodyRoom);
+		if(result>0)
+    		return ResponseEntity.ok(bodyRoom);
+		else
+    		return ResponseEntity.badRequest().build();
 	}
 }

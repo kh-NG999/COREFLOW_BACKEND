@@ -187,4 +187,9 @@ public class ChattingServiceImpl implements ChattingService {
 		return chattingDao.leaveRoom(roomId,userNo);
 	}
 
+	@Override
+	public int alarmChange(chatRooms bodyRoom) {
+		return chattingDao.alarmChange(bodyRoom);
+	}
+
 }

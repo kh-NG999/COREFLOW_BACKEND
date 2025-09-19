@@ -65,4 +65,6 @@ public interface ChattingDao {
 
 	int leaveRoom(Long roomId, Long userNo);
 
+	int alarmChange(chatRooms bodyRoom);
+
 }

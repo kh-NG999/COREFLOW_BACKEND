@@ -55,4 +55,6 @@ public interface ChattingService {
 
 	int leaveRoom(Long roomId, Long userNo);
 
+	int alarmChange(chatRooms bodyRoom);
+
 }

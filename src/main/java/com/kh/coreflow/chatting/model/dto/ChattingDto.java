@@ -72,6 +72,8 @@ public class ChattingDto {
 		private Long roomId;
 		private Date joinedAt;
 		private Date lastReadAt;
+		private String alarm;
+		private String highlight;
 	}
 	
 	@Data
@@ -90,6 +92,8 @@ public class ChattingDto {
 		private int unreadCount;
 		
 		private List<chatProfile> partner;
+		
+		private String alarm;
 	}
 	
 	@Data

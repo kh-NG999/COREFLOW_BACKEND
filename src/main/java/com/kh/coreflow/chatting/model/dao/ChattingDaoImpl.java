@@ -181,4 +181,9 @@ public class ChattingDaoImpl implements ChattingDao {
 		return session.delete("chat.leaveRoom",params);
 	}
 
+	@Override
+	public int alarmChange(chatRooms bodyRoom) {
+		return session.update("chat.alarmChange",bodyRoom);
+	}
+
 }

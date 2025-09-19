@@ -75,7 +75,9 @@
 	</select>
 	
 	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT * FROM CHAT_ROOMS
+		SELECT A.*, B.ALARM FROM CHAT_ROOMS
+		INNER JOIN CHAT_ROOM_JOIN B
+		ON A.ROOM_ID = B.ROOM_ID
 		WHERE ROOM_ID=#{roomId}
 	</select>
 	
@@ -130,7 +132,7 @@
             FROM CHAT_MESSAGES CM
             WHERE CM.ROOM_ID = CRJ.ROOM_ID
             AND CM.SENT_AT > CRJ.LAST_READ_AT
-        ) AS UNREAD_COUNT
+        ) AS UNREAD_COUNT, CRJ.ALARM, CRJ.HIGHLIGHT
     FROM CHAT_ROOMS CR
     JOIN CHAT_ROOM_JOIN CRJ
     ON CR.ROOM_ID = CRJ.ROOM_ID
@@ -195,6 +197,7 @@
 			INNER JOIN CHAT_ROOM_JOIN B
 			ON A.USER_NO = B.USER_NO
 		WHERE ROOM_ID = #{roomId}
+		AND B.ALARM = 'T'
 	</select>
 	
 	<update id="updateLastReadAt" parameterType="map">
@@ -267,8 +270,15 @@
 	</update>
 	
 	<delete id="leaveRoom" parameterType="map">
-	DELETE FROM CHAT_ROOM_JOIN
-	WHERE USER_NO = #{userNo} AND
-	ROOM_ID = #{roomId}
+		DELETE FROM CHAT_ROOM_JOIN
+		WHERE USER_NO = #{userNo} AND
+		ROOM_ID = #{roomId}
 	</delete>
+	
+	<update id="alarmChange" useGeneratedKeys="true" keyProperty="alarm" keyColumn="ALARM">
+	UPDATE CHAT_ROOM_JOIN
+		SET ALARM = #{alarm}
+		WHERE USER_NO = #{userNo} AND
+		ROOM_ID = #{roomId}
+	</update>
 </mapper>
