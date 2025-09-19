@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="notice">
+
+	<!-- 공지 리스트 조회 -->
+	<select id="notiList" resultType="com.kh.coreflow.notice.model.dto.NoticeDto$NoticeResponse">
+		SELECT
+			N.NOTI_ID,
+			M.USER_NAME,
+			N.TITLE,
+			N.ENROLL_DATE,
+			N.ESSENTIAL
+		FROM NOTICE N
+		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER 
+		WHERE
+			N.STATUS = 'T'
+			<if test="keyword != null and keyword != ''">
+				<choose>
+					<when test="searchType == 'title'">
+						AND N.TITLE LIKE '%'||#{keyword}||'%'
+					</when>
+					<when test="searchType == 'content'">
+						AND N.CONTENT LIKE '%'||#{keyword}||'%'
+					</when>
+					<when test="searchType == 'writer'">
+						AND M.USER_NAME LIKE '%'||#{keyword}||'%'
+					</when>
+				</choose>
+			</if>
+		ORDER BY
+			N.ESSENTIAL DESC,
+			N.NOTI_ID DESC
+	</select>
+	
+	<!-- 공지 등록(첨부파일) -->
+	<insert id="notiInsert" parameterType="com.kh.coreflow.notice.model.dto.NoticeDto$NoticeInsert" useGeneratedKeys="true" keyProperty="notiId" keyColumn="NOTI_ID">
+		INSERT INTO NOTICE(WRITER, TITLE, CONTENT, ESSENTIAL
+			<trim suffixOverrides=",">
+				<if test="endDate != null and !endDate.isEmpty()">
+					,END_DATE
+				</if>
+				<if test="endTime != null and !endTime.isEmpty()">
+					,END_TIME
+				</if>
+				<if test="depId != null">
+					,DEP_ID
+				</if>
+				<if test="posId != null">
+					,POS_ID
+				</if>
+			</trim>
+		)
+		VALUES(
+			#{userNo},
+			#{title},
+			#{content},
+			#{essential}
+			<trim suffixOverrides=",">
+				<if test="endDate != null and !endDate.isEmpty()">
+					,#{endDate}			
+				</if>
+				<if test="endTime != null and !endTime.isEmpty()">
+					,#{endTime}
+				</if>
+				<if test="depId != null">
+					,#{depId}
+				</if>
+				<if test="posId != null">
+					,#{posId}
+				</if>
+			</trim>
+			)
+	</insert>
+	
+	<!-- 공지 상세 조회(첨부파일) -->
+	<select id="notiDetail" resultType="com.kh.coreflow.notice.model.dto.NoticeDto$NoticeDetail">
+		SELECT
+			N.ESSENTIAL,
+			N.TITLE,
+			M.USER_NAME,
+			D.DEP_NAME,
+			P.POS_NAME,
+			N.ENROLL_DATE,
+			N.UPDATE_DATE,
+			N.CONTENT
+		FROM NOTICE N
+		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
+		WHERE NOTI_ID = #{notiId}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

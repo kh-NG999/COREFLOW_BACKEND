@@ -13,5 +13,4 @@ public interface OrganizationDao {
 	List<ChildDep> childDeptList(int parentId);
 
 	List<MemberResponse> memberList(int depId);
-
 }
