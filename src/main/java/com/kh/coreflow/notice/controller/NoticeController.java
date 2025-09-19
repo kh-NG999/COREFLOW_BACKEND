@@ -41,9 +41,12 @@ public class NoticeController {
 	// 공지 조회 + 검색(제목, 내용, 작성자) 
 	@GetMapping("/notice/main")
 	public ResponseEntity<List<NoticeResponse>> notice(
+			@AuthenticationPrincipal UserDeptcode auth,
 			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
 			@RequestParam(value="keyword", required=false) String keyword
 			){
+		long userNo = auth.getUserNo();
+		
 		List<NoticeResponse> notiList;
 		
 		if(keyword != null && !keyword.trim().isEmpty()) {

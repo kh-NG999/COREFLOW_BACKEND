@@ -24,6 +24,8 @@ public class NoticeDto {
 		public String enrollDate;
 		public String essential;
 		public String status;
+		public int depId;
+		public int posId;
 	}
 	
 	// 공지 검색(제목, 내용, 작성자)

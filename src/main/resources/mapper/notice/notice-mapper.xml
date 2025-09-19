@@ -11,7 +11,7 @@
 			N.ENROLL_DATE,
 			N.ESSENTIAL
 		FROM NOTICE N
-		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER 
+		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
 		WHERE
 			N.STATUS = 'T'
 			<if test="keyword != null and keyword != ''">
@@ -75,6 +75,7 @@
 	<!-- 공지 상세 조회(첨부파일) -->
 	<select id="notiDetail" resultType="com.kh.coreflow.notice.model.dto.NoticeDto$NoticeDetail">
 		SELECT
+			N.NOTI_ID,
 			N.ESSENTIAL,
 			N.TITLE,
 			M.USER_NAME,
