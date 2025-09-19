@@ -45,17 +45,19 @@ public class NoticeController {
 			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
 			@RequestParam(value="keyword", required=false) String keyword
 			){
-		long userNo = auth.getUserNo();
 		
 		List<NoticeResponse> notiList;
+		long depId = auth.getDepId();
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("depId", depId);
 		
 		if(keyword != null && !keyword.trim().isEmpty()) {
-			Map<String, String> params = new HashMap<>();
 			params.put("searchType", searchType);
 			params.put("keyword", keyword);
 			notiList = service.notiList(params);
 		}else {
-			notiList = service.notiList();
+			notiList = service.notiList(params);
 		}
 				
 		if(notiList != null && !notiList.isEmpty()) {

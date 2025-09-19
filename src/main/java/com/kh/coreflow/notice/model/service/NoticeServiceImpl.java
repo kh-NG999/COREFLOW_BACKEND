@@ -16,14 +16,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService{
 	private final NoticeDao dao;
-
-	@Override
-	public List<NoticeResponse> notiList() {
-		return dao.notiList();
-	}
 	
 	@Override
-	public List<NoticeResponse> notiList(Map<String, String> params) {
+	public List<NoticeResponse> notiList(Map<String, Object> params) {
 		return dao.notiList(params);
 	}
 

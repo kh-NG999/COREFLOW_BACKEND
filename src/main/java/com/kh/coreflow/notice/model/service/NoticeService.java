@@ -9,9 +9,7 @@ import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeResponse;
 
 public interface NoticeService {
 
-	List<NoticeResponse> notiList();
-	
-	List<NoticeResponse> notiList(Map<String, String> params);
+	List<NoticeResponse> notiList(Map<String, Object> params);
 
 	int notiInsert(NoticeInsert insertParams);
 

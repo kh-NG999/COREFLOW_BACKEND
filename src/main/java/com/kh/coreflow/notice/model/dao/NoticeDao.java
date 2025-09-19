@@ -11,7 +11,7 @@ public interface NoticeDao {
 
 	List<NoticeResponse> notiList();
 	
-	List<NoticeResponse> notiList(Map<String, String> params);
+	List<NoticeResponse> notiList(Map<String, Object> params);
 
 	int notiInsert(NoticeInsert insertParams);
 

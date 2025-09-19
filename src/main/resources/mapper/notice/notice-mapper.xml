@@ -12,8 +12,15 @@
 			N.ESSENTIAL
 		FROM NOTICE N
 		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
 		WHERE
 			N.STATUS = 'T'
+			AND (
+				(N.DEP_ID IS NULL OR N.DEP_ID = #{depId})
+				AND
+				(N.POS_ID IS NULL OR N.POS_ID = #{posId})
+			)
 			<if test="keyword != null and keyword != ''">
 				<choose>
 					<when test="searchType == 'title'">
