@@ -2,6 +2,7 @@ package com.kh.coreflow.personal.model.service;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,18 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void updatePassword(Long userNo, String userPwd, String string) {
+	public void updatePassword(Long userNo, String currentPwd, String newPwd) {
+		// 사용자 조회
 		User user = authDao.findUserByUserNo(userNo)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-		String encodedPwd = encoder.encode(string);
+		
+		// 비밀번호 일치확인
+		if (!encoder.matches(currentPwd, user.getUserPwd())) {
+			throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+		}
+		
+		// 새 비밀번호 암호화 및 저장
+		String encodedPwd = encoder.encode(newPwd);
 		authDao.updatePwd(user.getEmail(), encodedPwd);
 	}
 

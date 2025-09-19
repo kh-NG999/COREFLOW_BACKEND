@@ -46,8 +46,8 @@
 	<select id="findUserByUserNo" resultMap="UserResult">
         SELECT M.*, I.*
         FROM MEMBER M
-        JOIN IMAGE I ON M.USER_NO = I.REF_ID
-        WHERE M.USER_NO = #{userNo} AND I.IMAGE_CODE = 'P'
+        LEFT JOIN IMAGE I ON M.USER_NO = I.REF_ID AND I.IMAGE_CODE = 'P'
+        WHERE M.USER_NO = #{userNo}
     </select>
     
     <select id="findUserPwd" parameterType="map" resultMap="UserResult">
@@ -85,6 +85,11 @@
 		SELECT IMAGE_CODE, CHANGE_NAME
 		FROM IMAGE
 		WHERE REF_ID = #{userNo}
+	</select>
+	
+	<select id="isEmailExists" parameterType="String" resultType="boolean">
+		SELECT COUNT(*) > 0 FROM USERS
+		WHERE EMAIL = #{email}
 	</select>
 	
 </mapper>

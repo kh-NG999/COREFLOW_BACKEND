@@ -91,6 +91,11 @@ public class AuthDaoImpl implements AuthDao{
 	public long findUserNoByEmail(String email) {
 		return session.selectOne("auth.findUserNoByEmail", email);
 	}
+
+	@Override
+	public boolean isEmailExists(String email) {
+		return session.selectOne("auth.isEmailExists", email);
+	}
 	
 	
 }

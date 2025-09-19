@@ -28,4 +28,6 @@ public interface AuthDao {
 
 	long findUserNoByEmail(String email);
 	
+	boolean isEmailExists(String email);
+	
 }

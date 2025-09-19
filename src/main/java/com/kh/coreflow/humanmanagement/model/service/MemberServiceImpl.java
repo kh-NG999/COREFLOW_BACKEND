@@ -22,6 +22,8 @@ import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
 import com.kh.coreflow.security.factory.UserFactory;
+import com.kh.coreflow.validator.UserValidator;
+import com.kh.coreflow.validator.ValidationResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,7 @@ public class MemberServiceImpl implements MemberService{
 	private final UserFactory userFactory;
 	private final MailService mailService;
 	private final FileService fileService;
+	private final UserValidator validator;
 	
 	@Override
 	public List<Department> deptList() {
@@ -62,6 +65,11 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public int memberInsert(MemberPost member, MultipartFile image) {
+		// 유효성 검사
+		ValidationResult validation = validator.validateStep1(member);
+		if(!validation.isValid()) {
+			throw new IllegalArgumentException(validation.getMessage());
+		}
 		User user = userFactory.createIncompleteUser(member);
 		
 		String tempPwd = user.getUserPwd();
