@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeDetail;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeInsert;
 import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeResponse;
+import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeSearch;
 import com.kh.coreflow.notice.model.service.NoticeService;
 import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
@@ -42,23 +43,31 @@ public class NoticeController {
 	@GetMapping("/notice/main")
 	public ResponseEntity<List<NoticeResponse>> notice(
 			@AuthenticationPrincipal UserDeptcode auth,
-			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
-			@RequestParam(value="keyword", required=false) String keyword
+//			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
+//			@RequestParam(value="keyword", required=false) String keyword,
+			@ModelAttribute NoticeSearch noticeSearch
 			){
 		
 		List<NoticeResponse> notiList;
+		
 		long depId = auth.getDepId();
+		int posId = noticeSearch.getPosId();
+		String searchType = noticeSearch.getSearchType();
+		String keyword = noticeSearch.getKeyword();
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("depId", depId);
+		params.put("posId", posId);
+		
+		log.info("depId : {}",depId);
+		log.info("posId : {}",posId);
 		
 		if(keyword != null && !keyword.trim().isEmpty()) {
 			params.put("searchType", searchType);
 			params.put("keyword", keyword);
-			notiList = service.notiList(params);
-		}else {
-			notiList = service.notiList(params);
 		}
+		
+		notiList = service.notiList(params);
 				
 		if(notiList != null && !notiList.isEmpty()) {
 			return ResponseEntity.ok(notiList);
@@ -84,8 +93,6 @@ public class NoticeController {
 //		}
 		
 		int result = service.notiInsert(insertParams);
-		log.info("userNo : {}", auth.getUserNo());
-		log.info("isertParams : {}", insertParams);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/notice/insert")).build();
@@ -100,9 +107,7 @@ public class NoticeController {
 			@PathVariable int notiId
 			){
 		NoticeDetail notiDetail = service.notiDetail(notiId);
-		
-		log.info("notiDetail : {}",notiDetail);
-		
+				
 		if(notiDetail != null) {
 			return ResponseEntity.ok(notiDetail);
 		}else {

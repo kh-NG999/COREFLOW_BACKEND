@@ -33,6 +33,8 @@ public class NoticeDto {
 	public static class NoticeSearch{
 		private String searchType;
 		private String keyword;
+		private long depId;
+		private int posId;
 	}
 	
 	

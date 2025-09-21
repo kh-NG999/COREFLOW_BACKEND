@@ -16,11 +16,14 @@
 		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
 		WHERE
 			N.STATUS = 'T'
-			AND (
-				(N.DEP_ID IS NULL OR N.DEP_ID = #{depId})
-				AND
-				(N.POS_ID IS NULL OR N.POS_ID = #{posId})
-			)
+			<!--<trim suffixOverrides=",">
+				<if test="depId != null">
+					N.DEP_ID = #{depId}
+				</if>
+				<if test="posId != null">
+					N.POS_ID = 
+				</if>
+			</trim>-->
 			<if test="keyword != null and keyword != ''">
 				<choose>
 					<when test="searchType == 'title'">
