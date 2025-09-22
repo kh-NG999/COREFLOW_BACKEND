@@ -37,5 +37,5 @@ public class NoticeDaoImpl implements NoticeDao{
 		return session.selectOne("notice.notiDetail",notiId);
 	}
 
-
+	
 }
