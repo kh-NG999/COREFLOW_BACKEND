@@ -54,7 +54,7 @@ public class NoticeController {
 		}else {
 			notiList = service.notiList();
 		}
-				
+		
 		if(notiList != null && !notiList.isEmpty()) {
 			return ResponseEntity.ok(notiList);
 		}else {
