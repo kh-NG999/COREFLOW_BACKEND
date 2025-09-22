@@ -31,9 +31,9 @@ public interface ChattingService {
 
 	Long makeChat(Long userNo, Map<String, Object> newChatParam, String string);
 
-	chatRooms openChat(List<Long> privateMember, String string);
+	chatRooms openChat(Long userNo, List<Long> privateMember, String string);
 
-	chatRooms getRoom(Long roomId);
+	chatRooms getRoom(Long userNo,Long roomId);
 
 	List<Long> getParticipantUserNos(Long roomId);
 
@@ -56,5 +56,7 @@ public interface ChattingService {
 	int leaveRoom(Long roomId, Long userNo);
 
 	int alarmChange(chatRooms bodyRoom);
+	
+	chatMessages createMissedCallMessage(Long userNo, Long partnerNo);
 
 }
