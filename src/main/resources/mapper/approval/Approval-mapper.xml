@@ -147,6 +147,9 @@
         	approval
         WHERE 
         	user_no = #{userNo}
+        <if test="keyword != null and keyword != ''">
+        	AND approval_title LIKE '%' || #{keyword} || '%'
+        </if>
         ORDER BY start_date DESC
     </select>
 
@@ -156,7 +159,8 @@
         	A.approval_id,
         	A.approval_title,
         	A.approval_type,
-        	A.start_date
+        	A.start_date,
+        	A.user_name
         FROM 
         	approval A
         INNER JOIN 
@@ -164,6 +168,10 @@
         WHERE 
         	L.approver_user_no = #{userNo}
           AND L.line_status = 'WAITING'
+          <if test="keyword != null and keyword != ''">
+          		AND A.approval_title LIKE '%' || #{keyword} || '%'
+          </if>
+          ORDER BY A.start_date DESC
     </select>
 
     <!-- 검색 (예시: 제목/내용) -->
@@ -196,6 +204,9 @@
         APPROVAL_LINE L ON A.APPROVAL_ID = L.APPROVAL_ID WHERE
         L.APPROVER_USER_NO = #{userNo}
       AND L.LINE_STATUS IN ('APPROVED', 'REJECTED')
+      <if test="keyword != null and keyword != ''">
+        	AND A.approval_title LIKE '%' || #{keyword} || '%'
+      </if>
     ORDER BY A.START_DATE DESC
 	</select>	
 
@@ -222,10 +233,42 @@
 		WHERE
 			L.approver_user_no = #{userNo}
 		AND L.line_status = 'PENDING'
+		<if test="keyword != null and keyword != ''">
+        	AND A.approval_title LIKE '%' || #{keyword} || '%'
+        </if>
 		ORDER BY
 			A.start_date DESC
 	</select>
 
+	<!-- 파일다운로드 -->
+	<select id="findFileById" parameterType="int" resultType="com.kh.coreflow.approval.model.dto.ApprovalFileDto">
+		SELECT
+			FILE_ID AS fileId,
+			APPROVAL_ID AS approvalId,
+			ORIGINAL_FILE_NAME AS originalFileName,
+			SAVED_FILE_NAME AS savedFileName,
+			FILE_PATH AS filePath,
+			FILE_SIZE AS fileSize
+		FROM
+			approval_file
+		WHERE
+			file_id = #{fileId}
+	</select>
+	
+	<!--사이드바 알림-->
+	<select id="selectReceivedApprovalsCount" parameterType="int" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM	
+			APPROVAL A
+		INNER JOIN
+			APPROVAL_LINE L ON A.APPROVAL_ID = L.APPROVAL_ID
+		WHERE
+			L.APPROVER_USER_NO = #{userNo}
+		AND L.LINE_STATUS = 'WAITING'
+	</select>
+	
+	
 </mapper>
 
 

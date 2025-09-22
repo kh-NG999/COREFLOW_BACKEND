@@ -2,6 +2,7 @@ package com.kh.coreflow.approval.model.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,26 +73,45 @@ public class ApprovalDao {
 		return session.selectList("approvalMapper.findPendingApprovals", userId);
 	}
 	// 내문서 조회
-	public List<ApprovalDto> selectApprovalsByUserNo(int userNo) {
-		return session.selectList("approvalMapper.selectApprovalsByUserNo", userNo);
+	public List<ApprovalDto> selectApprovalsByUserNo(int userNo, String keyword) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("keyword", keyword);
+		return session.selectList("approvalMapper.selectApprovalsByUserNo", params);
 	}
 	// 받은 문서함
-	public List<ApprovalDto> selectReceivedApprovalsByApproverNo(int userNo) {
-		return session.selectList("approvalMapper.selectReceivedApprovalsByApproverNo", userNo);
+	public List<ApprovalDto> selectReceivedApprovalsByApproverNo(int userNo, String keyword) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("keyword", keyword);		
+		return session.selectList("approvalMapper.selectReceivedApprovalsByApproverNo", params);
 	}
 	// 결재완료 문서함
-	public List<ApprovalDto> selectProcessedApprovalsByApproverNo(int userNo) {
-		return session.selectList("approvalMapper.selectProcessedApprovalsByApproverNo", userNo);
+	public List<ApprovalDto> selectProcessedApprovalsByApproverNo(int userNo, String keyword){
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("keyword", keyword);
+		return session.selectList("approvalMapper.selectProcessedApprovalsByApproverNo", params);
 	}
 	// 유저 이름가져오기
 	public String findUserNameByUserNo(int userNo) {
         return session.selectOne("approvalMapper.findUserNameByUserNo", userNo);
     }
 	// 참조문서함
-	public List<ApprovalDto> selectCcApprovalsByApproverNo(int userNo) {
-		return session.selectList("approvalMapper.selectCcApprovalsByApproverNo",userNo);
+	public List<ApprovalDto> selectCcApprovalsByApproverNo(int userNo, String keyword) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userNo", userNo);
+		params.put("keyword", keyword);
+		return session.selectList("approvalMapper.selectCcApprovalsByApproverNo", params);
 	}
-	
+	// 파일다운로드
+	public ApprovalFileDto findFileById(int fileId) {
+		return session.selectOne("approvalMapper.findFileById", fileId);
+	}
+	// 사이드바 알림
+	public int selectReceivedApprovalsCount(int userNo) {
+		return session.selectOne("approvalMapper.selectReceivedApprovalsCount", userNo);
+	}
 	
 	
 }

@@ -1,29 +1,33 @@
 package com.kh.coreflow.approval.controller;
 
+import org.springframework.http.HttpHeaders; 
+import org.springframework.core.io.Resource; 
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
+import com.kh.coreflow.approval.model.dto.ApprovalFileDto;
 import com.kh.coreflow.approval.model.service.ApprovalService;
-import com.kh.coreflow.model.dto.UserDto;
-import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -104,9 +108,11 @@ public class ApprovalController {
 
     @Operation(summary = "내문서함 문서 조회")
     @GetMapping("/my-documents")
-    public ResponseEntity<List<ApprovalDto>> getDocuments(Principal principal) {
+    public ResponseEntity<List<ApprovalDto>> getDocuments(
+            Principal principal,
+            @RequestParam(value = "keyword", required = false) String keyword) { // [수정] keyword 파라미터 추가
         int userNo = getUserNoFromPrincipal(principal);
-        List<ApprovalDto> documents = service.getDocumentsByUser(userNo);
+        List<ApprovalDto> documents = service.getDocumentsByUser(userNo, keyword); // [수정] keyword 전달
         return ResponseEntity.ok(documents);
     }
     //결재
@@ -157,28 +163,85 @@ public class ApprovalController {
 
     @Operation(summary = "받은문서함")
     @GetMapping("/received-documents")
-    public ResponseEntity<List<ApprovalDto>> getReceivedDocuments(Principal principal) {
+    public ResponseEntity<List<ApprovalDto>> getReceivedDocuments(
+            Principal principal,
+            @RequestParam(value = "keyword", required = false) String keyword) { // [수정] keyword 파라미터 추가
         int userNo = getUserNoFromPrincipal(principal);
-        List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo);
+        List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo, keyword); // [수정] keyword 전달
         return ResponseEntity.ok(documents);
     }
     
     @Operation(summary = "결재완료함")
     @GetMapping("/processed-documents")
-    public ResponseEntity<List<ApprovalDto>> getProcessedDocuments(Principal principal){
+    public ResponseEntity<List<ApprovalDto>> getProcessedDocuments(
+            Principal principal,
+            @RequestParam(value = "keyword", required = false) String keyword){ // [수정] keyword 파라미터 추가
     	int userNo = getUserNoFromPrincipal(principal);
-    	List<ApprovalDto> documents = service.getProcessedDocumentsByUser(userNo);
+    	List<ApprovalDto> documents = service.getProcessedDocumentsByUser(userNo, keyword); // [수정] keyword 전달
     	return ResponseEntity.ok(documents);
     }
     
     @Operation(summary = "참조문서함")
     @GetMapping("/cc-documents")
-    public ResponseEntity<List<ApprovalDto>> getCcDocuments(Principal principal){
+    public ResponseEntity<List<ApprovalDto>> getCcDocuments(
+            Principal principal,
+            @RequestParam(value = "keyword", required = false) String keyword){ // [수정] keyword 파라미터 추가
     	int userNo = getUserNoFromPrincipal(principal);
-    	List<ApprovalDto> documents = service.getCcDocumentsByUser(userNo);
+    	List<ApprovalDto> documents = service.getCcDocumentsByUser(userNo, keyword); // [수정] keyword 전달
     	return ResponseEntity.ok(documents);
     }
+    
+    //문서에 첨부된 파일 다운로드 컨트롤러
+    @Operation(summary = "첨부파일 다운로드")
+    @GetMapping("/files/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable int fileId){
+    	
+    	ApprovalFileDto fileDto = service.findFileById(fileId);
+    	
+    	if (fileDto == null) {
+    		return ResponseEntity.notFound().build();
+    	}
+    	
+    	try {
+            Path filePath = Paths.get(fileDto.getFilePath());
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                String originalFileName = fileDto.getOriginalFileName();
+                String encodedFileName = new String(originalFileName.getBytes("UTF-8"), "ISO-8859-1");
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                        .body(resource);
+            } else {
+                throw new RuntimeException("파일을 읽을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            throw new RuntimeException("파일 다운로드 중 오류 발생: " + e.getMessage());
+        }
+    }
+    
+    @Operation(summary = "받은문서함 알림")
+    @GetMapping("/received-documents/count")
+    public ResponseEntity<Map<String,Integer>> getReceivedDocumentsCount(Principal principal){
+    	int userNo = getUserNoFromPrincipal(principal);
+    	int count = service.getReceivedApprovalsCount(userNo);
+    	Map<String, Integer> response = new HashMap<>();
+    	response.put("count", count);
+    	return ResponseEntity.ok(response);
+    }
+    
 }
+
+
+
+
+
+
+
+
 
 
 

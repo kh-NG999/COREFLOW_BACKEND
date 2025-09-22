@@ -126,13 +126,6 @@ public class ApprovalService {
         }
     }
 
-//    public ApprovalDto getApproval(int approvalId) {
-//        ApprovalDto approval = dao.findById(approvalId);
-//        approval.setLines(dao.findLinesByApprovalId(approvalId));
-//        approval.setFiles(dao.findFilesByApprovalId(approvalId));
-//        return approval;
-//    }
-
     public List<ApprovalDto> getAllDocuments() {
         return dao.selectAllApprovals();
     }
@@ -148,9 +141,9 @@ public class ApprovalService {
     public List<ApprovalFileDto> getApprovalFiles(int approvalId){
     	return dao.findFilesByApprovalId(approvalId);
     }
-
-	public List<ApprovalDto> getDocumentsByUser(int userNo) {
-		return dao.selectApprovalsByUserNo(userNo);
+    // 내문서함
+	public List<ApprovalDto> getDocumentsByUser(int userNo, String keyword) {
+		return dao.selectApprovalsByUserNo(userNo, keyword);
 	}
 
 	public ApprovalDto getApprovalDetails(int approvalId) {
@@ -164,9 +157,9 @@ public class ApprovalService {
 		return approval;
 		
 	}
-
-	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo) {
-		return dao.selectReceivedApprovalsByApproverNo(userNo);
+	// 받은문서함
+	public List<ApprovalDto> getReceivedDocumentsByUser(int userNo, String keyword) {
+		return dao.selectReceivedApprovalsByApproverNo(userNo, keyword);
 	}
 
 	public void updateApprovalStatus(int approvalId, Integer newStatus) {
@@ -182,9 +175,9 @@ public class ApprovalService {
 			throw new RuntimeException("문서 상태변경 실패 (ID: \" + approvalId + \")");
 		}
 	}
-	
-	public List<ApprovalDto> getProcessedDocumentsByUser(int userNo){
-		return dao.selectProcessedApprovalsByApproverNo(userNo);
+	// 결재 완료함
+	public List<ApprovalDto> getProcessedDocumentsByUser(int userNo, String keyword){
+		return dao.selectProcessedApprovalsByApproverNo(userNo, keyword);
 	}
 	
 	
@@ -215,12 +208,18 @@ public class ApprovalService {
         if (file != null && !file.isEmpty()) {
         }
     }
-
-	public List<ApprovalDto> getCcDocumentsByUser(int userNo) {
-		return dao.selectCcApprovalsByApproverNo(userNo);
+	// 참조문서함
+	public List<ApprovalDto> getCcDocumentsByUser(int userNo, String keyword) {
+		return dao.selectCcApprovalsByApproverNo(userNo, keyword);
 	}
-	
-
+	// 파일 다운로드
+	public ApprovalFileDto findFileById(int fileId) {
+		return dao.findFileById(fileId);
+	}
+	// 사이드바 알림
+	public int getReceivedApprovalsCount(int userNo) {
+		return dao.selectReceivedApprovalsCount(userNo);
+	}
 }
 
 	
