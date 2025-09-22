@@ -13,5 +13,4 @@ public interface OrganizationService {
 	List<ChildDep> childDeptList(int parentId);
 
 	List<MemberResponse> memberList(int depId);
-
 }

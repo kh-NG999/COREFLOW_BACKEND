@@ -21,7 +21,7 @@
 		IMG_ORDER = #{imgOrder},
 		CREATE_DATE = SYSDATE
 		WHERE IMAGE_CODE = #{imageCode} AND
-		REF_ID = #{refId}
+		REF_ID = #{refId} AND
 		MIME_TYPE= #{mimeType}
 	</update>
 	

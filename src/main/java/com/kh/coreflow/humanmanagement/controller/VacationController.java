@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,7 @@ public class VacationController {
 	
 	// 모든 사원 휴가 내역 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/vacation/member")
 	public ResponseEntity<List<MemberVacation>> allVacation(
 			@RequestParam int year,
@@ -71,6 +73,7 @@ public class VacationController {
 	
 	// 검색 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/vacation/member/search")
 	public ResponseEntity<List<MemberChoice>> memberChoice(
 			@RequestParam(value="userName", required=false) String userName
@@ -86,6 +89,7 @@ public class VacationController {
 	
 	// 검색 사원 휴가 내역 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/vacation/member/{userNo}")
 	public ResponseEntity<List<MemberVacation>> MemberVacation(
 			@PathVariable int userNo,
@@ -109,6 +113,7 @@ public class VacationController {
 	
 	// 휴가 상태 변경
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PatchMapping("/vacation/member/{vacId}")
 	public ResponseEntity<Void> vacStatusUpdate(
 			@PathVariable int vacId,
@@ -167,6 +172,7 @@ public class VacationController {
 	
 	// 휴가 종류 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/vacation/type")
 	public ResponseEntity<List<VacType>> vacType() {
 		List<VacType> vacList = service.vacType();
@@ -181,7 +187,6 @@ public class VacationController {
 	// 로그인 회원 휴가 신청
 	@CrossOrigin(origins="http://localhost:5173")
 	@PutMapping("/vacation/personal")
-//	@PreAuthorize("ROLE_HUMAN")
 	public ResponseEntity<Void> putPerVac(
 			Authentication auth,
 			@RequestBody PutVacation putVacation
@@ -197,7 +202,7 @@ public class VacationController {
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
 		}else {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.badRequest().build();
 		}
 	}
 }

@@ -119,6 +119,7 @@ public class FileServiceImpl implements FileService {
 		
 		customFile existImage = fileDao.getFile(profileImage.getImageCode(), refId);
 		if(existImage !=null) {
+			profileImage.setImgId(existImage.getImgId());
 			deleteFile(existImage.getChangeName(),existImage.getImageCode());
 			int answer = fileDao.changeOneImage(profileImage);
 			if(answer>0)

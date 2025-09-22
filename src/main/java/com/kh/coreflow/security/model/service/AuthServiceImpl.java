@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService{
 	private final AuthDao authDao;
 	private final MailService mailService;
 	private final PasswordEncoder encoder;
+	private final FileService fileService;
 	private final JWTProvider jwt;
 	
 	@Override
@@ -169,7 +171,8 @@ public class AuthServiceImpl implements AuthService{
 		return true;
 	}
 
-	private String createTempPwd() {
+	@Override
+	public String createTempPwd() {
 		return UUID.randomUUID().toString().replace("-", "").substring(0,10);
 	}
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,12 +36,14 @@ public class AttendanceController {
 	
 	// 전체 사원 근태 정보 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/attendance/member")
 	public ResponseEntity<List<AttendanceInfo>> allAttendance(
 			@RequestParam(value="attDate", required=true) String attDateStr,
 			@RequestParam(value="userNo", required=false) Integer userNo
 			) {
 		LocalDate attDate = LocalDate.parse(attDateStr,DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		
 		Map<String,Object> params = new HashMap<>();
 		params.put("attDate", attDate);
 		params.put("userNo", userNo);
@@ -97,7 +100,7 @@ public class AttendanceController {
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
 		}else {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.badRequest().build();
 		}
 	}
 	
@@ -112,18 +115,18 @@ public class AttendanceController {
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
 		}else {
-			return ResponseEntity.notFound().build();
+			return ResponseEntity.badRequest().build();
 		}
 	}
 	
 	// 비고 종류 조회
 	@CrossOrigin(origins="http://localhost:5173")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/attendance/vacType")
 	public ResponseEntity<List<VacType>> vacationType(
 			VacType vacType
 			){
 		List<VacType> vacTypeList = service.vacTypeList(vacType);
-		log.info("vacTypeList : {}", vacTypeList);
 		
 		if(vacTypeList != null && !vacTypeList.isEmpty()) {
 			return ResponseEntity.ok(vacTypeList);
@@ -137,9 +140,7 @@ public class AttendanceController {
 	@PatchMapping("/attendance/vacType")
 	public ResponseEntity<Void> vacationTypeUpdate(
 			@RequestBody VacTypeUpdate vacTypeUpdate
-			){
-		log.info("vacTypeUpdate : {}",vacTypeUpdate);
-		
+			){		
 		int result = service.vacUpdate(vacTypeUpdate);
 		
 		if(result > 0) {

@@ -27,7 +27,7 @@ public class OrganizationController {
 	@GetMapping("/organization/departments")
 	public ResponseEntity<List<ParentDep>> parentDepartment(){
 		List<ParentDep> parentDeptList = service.parentDeptList();
-		log.info("parentDeptList : {}",parentDeptList);
+
 		if(parentDeptList != null && !parentDeptList.isEmpty()) {
 			return ResponseEntity.ok(parentDeptList);
 		}else {
@@ -42,7 +42,7 @@ public class OrganizationController {
 			@PathVariable int parentId
 			){
 		List<ChildDep> childDeptList = service.childDeptList(parentId);
-		log.info("childDeptList : {}",childDeptList);
+
 		if(childDeptList != null && !childDeptList.isEmpty()) {
 			return ResponseEntity.ok(childDeptList);
 		}else {
@@ -57,7 +57,6 @@ public class OrganizationController {
 			@PathVariable int depId
 			){
 		List<MemberResponse> memberList = service.memberList(depId);
-		log.info("memberList : {}",memberList);
 		
 		if(memberList != null && !memberList.isEmpty()) {
 			return ResponseEntity.ok(memberList);
@@ -65,30 +64,4 @@ public class OrganizationController {
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }	

@@ -55,10 +55,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 			
 			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
 		    	= new UsernamePasswordAuthenticationToken(principal, null, authorities);
-			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			// 인증처리 끝
 			SecurityContextHolder.getContext().setAuthentication(authToken);
+			
 			}catch (ExpiredJwtException e) {
 				SecurityContextHolder.clearContext();
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401상태

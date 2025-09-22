@@ -3,6 +3,8 @@ package com.kh.coreflow.humanmanagement.model.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
@@ -23,13 +25,16 @@ public interface MemberService {
 	
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	MemberResponse memberDetail(int userNo);
+	MemberResponse memberDetail(Long userNo);
 
-	int memberInsert(MemberPost member);
+	int memberInsert(MemberPost member, MultipartFile image);
 	
 	int memberUpdate(MemberPatch member);
+
+	int memberDelete(Long userNo);
 	
 	List<MemberDto.MemberLite> search(String query, Integer limit, Long depId);
+	
 	List<MemberDto.DepartmentLite> findAll();
-	int memberDelete(int userNo);
+
 }
