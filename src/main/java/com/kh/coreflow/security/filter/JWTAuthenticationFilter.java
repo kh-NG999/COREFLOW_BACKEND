@@ -46,7 +46,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 				    .map(SimpleGrantedAuthority::new)
 				    .collect(Collectors.toList());
 			// 4) 권한에서 부서코드 추출
-			int depId = jwt.getDeptcode(token);
+			Long depId = jwt.getDeptcode(token);
 			
 			UserDeptcode principal =  UserDeptcode.builder()
 			        .userNo(userNo)

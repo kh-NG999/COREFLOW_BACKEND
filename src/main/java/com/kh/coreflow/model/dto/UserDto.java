@@ -99,7 +99,7 @@ public class UserDto {
 	@Builder
 	public static class UserDeptcode {
 		private Long userNo;
-		private int depId;
+		private Long depId;
 		
 		@Override
 	    public String toString() {

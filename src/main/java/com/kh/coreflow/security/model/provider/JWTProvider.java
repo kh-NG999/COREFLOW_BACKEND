@@ -100,14 +100,14 @@ public class JWTProvider {
 	    return List.of();
 	}
 	
-	public int getDeptcode(String token) {
+	public Long getDeptcode(String token) {
 		Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 		
-		return getIntValue(claims.get("depId"));
+		return getLongValue(claims.get("depId"));
 	}
 	
 	private int getIntValue(Object obj) {
