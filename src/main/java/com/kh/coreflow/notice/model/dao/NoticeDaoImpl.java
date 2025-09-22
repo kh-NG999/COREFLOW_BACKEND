@@ -37,5 +37,15 @@ public class NoticeDaoImpl implements NoticeDao{
 		return session.selectOne("notice.notiDetail",notiId);
 	}
 
+	@Override
+	public int notiUpdate(Map<String, Object> params) {
+		return session.update("notice.notiUpdate",params);
+	}
+
+	@Override
+	public int notiDelete(Map<String, Object> params) {
+		return session.delete("notice.notiDelete",params);
+	}
+
 
 }

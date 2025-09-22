@@ -32,4 +32,14 @@ public class NoticeServiceImpl implements NoticeService{
 		return dao.notiDetail(notiId);
 	}
 
+	@Override
+	public int notiUpdate(Map<String, Object> params) {
+		return dao.notiUpdate(params);
+	}
+
+	@Override
+	public int notiDelete(Map<String, Object> params) {
+		return dao.notiDelete(params);
+	}
+
 }

@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,12 +54,12 @@ public class NoticeController {
 		
 		long depId = auth.getDepId();
 		int posId = noticeSearch.getPosId();
+		
 		String searchType = noticeSearch.getSearchType();
 		String keyword = noticeSearch.getKeyword();
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("depId", depId);
-		params.put("posId", posId);
 		
 		log.info("depId : {}",depId);
 		log.info("posId : {}",posId);
@@ -110,6 +112,51 @@ public class NoticeController {
 				
 		if(notiDetail != null) {
 			return ResponseEntity.ok(notiDetail);
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	// 공지 수정(첨부파일)
+	@PatchMapping("/notice/update/{notiId}")
+	public ResponseEntity<Void> noticeUpdate(
+			@PathVariable int notiId,
+			@AuthenticationPrincipal UserDeptcode auth,
+			@RequestBody NoticeInsert insertParams
+			){
+		long userNo = auth.getUserNo();
+		
+		Map<String,Object> params = new HashMap<>();
+//		params.put("notiId", notiId);
+//		params.put("userNo", userNo);
+//		params.put("insertParams", insertParams);
+		
+		log.info("insertParams : {}",insertParams);
+		
+		int result = service.notiUpdate(params);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
+		}else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	// 공지 삭제
+	@DeleteMapping("/notice/detail/{notiId}")
+	public ResponseEntity<Void> noticeDelete(
+			@PathVariable int notiId,
+			@AuthenticationPrincipal UserDeptcode auth
+			){
+		long userNo = auth.getUserNo();
+		Map<String,Object> params = new HashMap<>();
+		params.put("notiId", notiId);
+		params.put("userNo", userNo);
+		
+		int result = service.notiDelete(params);
+		
+		if(result > 0) {
+			return ResponseEntity.noContent().build();
 		}else {
 			return ResponseEntity.notFound().build();
 		}

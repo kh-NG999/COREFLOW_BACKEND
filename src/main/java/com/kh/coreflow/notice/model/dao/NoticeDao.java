@@ -17,4 +17,8 @@ public interface NoticeDao {
 
 	NoticeDetail notiDetail(int notiId);
 
+	int notiUpdate(Map<String, Object> params);
+
+	int notiDelete(Map<String, Object> params);
+
 }
