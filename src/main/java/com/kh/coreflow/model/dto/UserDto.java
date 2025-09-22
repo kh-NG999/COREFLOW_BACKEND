@@ -41,8 +41,8 @@ public class UserDto {
 		private String email;
 		private String userPwd;
 		private List<String> roles;
-		private int depId;
-		private int posId;
+		private Long depId;
+		private Long posId;
 		private Date hireDate;
 		private String extension;
 		private String phone;
@@ -99,7 +99,7 @@ public class UserDto {
 	@Builder
 	public static class UserDeptcode {
 		private Long userNo;
-		private int depId;
+		private Long depId;
 		
 		@Override
 	    public String toString() {

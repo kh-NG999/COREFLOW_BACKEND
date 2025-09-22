@@ -94,7 +94,7 @@ public class MemberServiceImpl implements MemberService{
 		return result;
 	}
 	
-	private List<String> getAuth(int depId){
+	private List<String> getAuth(Long depId){
 		List<String> roles = new ArrayList<String>();
 		roles.add("ROLE_USER");
 		if(depId == 3 || depId == 4 || depId == 5) {
