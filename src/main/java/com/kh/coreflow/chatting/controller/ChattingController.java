@@ -394,7 +394,7 @@ public class ChattingController {
     	}
 	}
 	
-	@PostMapping("/chatting/room/missed-call")
+	@PostMapping("/room/missed-call")
     public ResponseEntity<chatMessages> createMissedCallMessage(
     		@RequestBody MissedCallRequest request,
 	        @AuthenticationPrincipal UserDeptcode user) {

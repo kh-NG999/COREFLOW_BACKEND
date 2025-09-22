@@ -29,35 +29,35 @@ public class WebRTCController {
     @MessageMapping("/webrtc/signal")
     public void sendSignal(@Payload SignalMessage signalMessage) {
         String recipientId = String.valueOf(signalMessage.getTo());
-        SimpUser user = userRegistry.getUser(recipientId);
-        boolean isReadyForCall = false;
-        // 1. 사용자가 온라인 상태인지 먼저 확인합니다.
-        if (user != null) {
-            log.info("sender : {}, sessions : {}",String.valueOf(signalMessage.getFrom()),user.getSessions());
-            // 2. 해당 사용자의 모든 구독 정보를 확인하여,
-            //    WebRTC 시그널링 채널('/user/queue/webrtc')을 구독 중인지 체크합니다.
-        	 isReadyForCall = user.getSessions().stream()
-        	            .flatMap(session -> session.getSubscriptions().stream())
-        	            .anyMatch(sub -> sub.getDestination() != null && sub.getDestination().endsWith("/queue/webrtc"));
+        
+        if ("offer".equals(signalMessage.getType())) {
+            SimpUser user = userRegistry.getUser(recipientId);
+            boolean isReadyForCall = false;
+            if (user != null) {
+                isReadyForCall = user.getSessions().stream()
+                    .flatMap(session -> session.getSubscriptions().stream())
+                    .anyMatch(sub -> sub.getDestination() != null && sub.getDestination().endsWith("/queue/webrtc"));
+            }
+
+            if (!isReadyForCall) {
+                // 오프라인이거나 준비되지 않았다면, 'user-offline' 응답을 보내고 여기서 종료합니다.
+                log.info("User {} is offline or not ready for a call. Sending offline signal back to {}.", recipientId, signalMessage.getFrom());
+                SignalMessage offlineResponse = new SignalMessage("user-offline", signalMessage.getTo(), signalMessage.getFrom(), null);
+                messagingTemplate.convertAndSendToUser(
+                    String.valueOf(signalMessage.getFrom()),
+                    "/queue/webrtc",
+                    offlineResponse
+                );
+                return; // 여기서 함수를 종료하여 아래 전달 로직이 실행되지 않도록 함
+            }
         }
 
-        // 3. 사용자가 화상채팅을 받을 준비가 된 경우에만 시그널을 전달합니다.
-        if (isReadyForCall) {
-            log.info("sender : {}, User {} is ready for a call. Forwarding signal: {}", signalMessage.getFrom(), recipientId, signalMessage.getType());
-            messagingTemplate.convertAndSendToUser(
-                recipientId,
-                "/queue/webrtc",
-                signalMessage
-            );
-        } else {
-            // 4. 오프라인이거나, WebRTC 채널을 구독하고 있지 않은 경우
-            log.info("sender : {}, User {} is offline or not ready for a call.", signalMessage.getFrom(),  recipientId);
-            SignalMessage offlineResponse = new SignalMessage("user-offline", signalMessage.getTo(), signalMessage.getFrom(), null);
-            messagingTemplate.convertAndSendToUser(
-                String.valueOf(signalMessage.getFrom()),
-                "/queue/webrtc",
-                offlineResponse
-            );
-        }
+        // 2. 'offer'가 정상이거나, 'answer', 'ice' 등 다른 모든 시그널은 상태 체크 없이 바로 상대방에게 전달합니다.
+        log.info("Forwarding signal '{}' from {} to {}", signalMessage.getType(), signalMessage.getFrom(), recipientId);
+        messagingTemplate.convertAndSendToUser(
+            recipientId,
+            "/queue/webrtc",
+            signalMessage
+        );
     }
 }
