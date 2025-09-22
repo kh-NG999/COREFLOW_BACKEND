@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="chat">
 
-
 	<select id="getMyProfile" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
 		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
 		CHAT_PROFILE A INNER JOIN MEMBER B
@@ -73,12 +72,13 @@
 		ON A.ROOM_ID = B.ROOM_ID
 		WHERE B.ROOM_TYPE = #{type}
 	</select>
-	
-	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT * FROM CHAT_ROOMS
-		WHERE ROOM_ID=#{roomId}
+    
+	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT DISTINCT *
+	    FROM CHAT_ROOMS
+		WHERE ROOM_ID = #{roomId}
 	</select>
-	
+    
 	<insert id="makeChatRoom" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
 		INSERT INTO CHAT_ROOMS (
 			USER_NO, ROOM_NAME, ROOM_TYPE
@@ -171,12 +171,6 @@
 	<select id="findUserByUserNo" resultType="com.kh.coreflow.model.dto.UserDto$User">
 		SELECT * FROM
 		MEMBER WHERE USER_NO = #{userNo}
-	</select>
-	
-	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT DISTINCT *
-	    FROM CHAT_ROOMS
-		WHERE ROOM_ID = #{roomId}
 	</select>
 	
 	

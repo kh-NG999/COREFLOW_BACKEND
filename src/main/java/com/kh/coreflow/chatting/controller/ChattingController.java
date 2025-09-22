@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.chatting.model.dto.ChattingDto.MissedCallRequest;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatMessages;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
@@ -176,10 +177,10 @@ public class ChattingController {
 		
 		mappingParameter.put("participantUserNos",privateMember);
 		mappingParameter.put("partner", partnerUserNo);
-		chatRooms resultRoom = chattingService.openChat(privateMember,"PRIVATE");
+		chatRooms resultRoom = chattingService.openChat(user.getUserNo(),privateMember,"PRIVATE");
 		if(resultRoom == null) {
 			Long answer = chattingService.makeChat(user.getUserNo(),mappingParameter,"PRIVATE");
-			resultRoom = chattingService.openChat(privateMember,"PRIVATE");
+			resultRoom = chattingService.openChat(user.getUserNo(),privateMember,"PRIVATE");
 			if(resultRoom==null) {
 				return ResponseEntity.badRequest().build();
 			}
@@ -221,15 +222,16 @@ public class ChattingController {
 			@RequestBody Map<String,Object> newChatParam
 			){
 		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
-		chatRooms returnRoom = chattingService.getRoom(roomId);
+		chatRooms returnRoom = chattingService.getRoom(user.getUserNo(),roomId);
 		return ResponseEntity.ok(returnRoom);
 	}
 	
 	@GetMapping("/room/{roomId}")
 	public ResponseEntity<chatRooms> getChatRoom(
-			@PathVariable("roomId") Long roomId
+			@PathVariable("roomId") Long roomId,
+			@AuthenticationPrincipal UserDeptcode user
 			){
-		chatRooms getRoom = chattingService.getRoom(roomId);
+		chatRooms getRoom = chattingService.getRoom(user.getUserNo(),roomId);
 		return ResponseEntity.ok(getRoom);
 	}
 	
@@ -391,4 +393,17 @@ public class ChattingController {
     		return ResponseEntity.badRequest().build();
     	}
 	}
+	
+	@PostMapping("/chatting/room/missed-call")
+    public ResponseEntity<chatMessages> createMissedCallMessage(
+    		@RequestBody MissedCallRequest request,
+	        @AuthenticationPrincipal UserDeptcode user) {
+		chatMessages resultMessages = chattingService.createMissedCallMessage(user.getUserNo(), request.getPartnerNo());
+
+    	if(resultMessages !=null)
+    		return ResponseEntity.ok(resultMessages);
+    	else {
+    		return ResponseEntity.badRequest().build();
+    	}
+    }
 }

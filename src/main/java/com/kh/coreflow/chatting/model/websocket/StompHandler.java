@@ -32,7 +32,6 @@ public class StompHandler implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        //StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         StompHeaderAccessor accessor = MessageHeaderAccessor
                 .getAccessor(message, StompHeaderAccessor.class);
@@ -41,6 +40,7 @@ public class StompHandler implements ChannelInterceptor {
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             // 2. 헤더에서 토큰 추출 ("Bearer " 제거 포함)
             String authHeader = accessor.getFirstNativeHeader("Authorization");
+            log.info("header : {}",authHeader);
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String jwtToken = authHeader.substring(7);
                 
@@ -81,6 +81,5 @@ public class StompHandler implements ChannelInterceptor {
         }
         return message;
     }
-    
     
 }
