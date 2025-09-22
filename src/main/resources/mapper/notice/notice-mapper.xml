@@ -105,13 +105,18 @@
 			M.USER_NAME,
 			D.DEP_NAME,
 			P.POS_NAME,
+			N.POS_ID,
+			N.DEP_ID AS CHILD_DEP_ID,
+			D.PARENT_ID AS PARENT_DEP_ID,
 			N.ENROLL_DATE,
 			N.UPDATE_DATE,
-			N.CONTENT
+			N.CONTENT,
+			N.END_DATE,
+			N.END_TIME
 		FROM NOTICE N
 		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
-		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
-		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = N.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = N.POS_ID
 		WHERE NOTI_ID = #{notiId}
 	</select>
 	
@@ -119,15 +124,17 @@
 	<update id="notiUpdate">
 		UPDATE NOTICE
 		<set>
-			<if test="title != null and title != ''">TITLE = #{title},</if>
-			<if test="depId != null">DEP_ID = #{depId},</if>
-			<if test="posId != null">POS_ID = #{pos_id},</if>
-			<if test="endDate != null and !endDate.isEmpty()">END_DATE = #{endDate},</if>
-			<if test="endTime != null and !endTime.isEmpty()">END_TIME = #{endTime},</if>
-			<if test="content != null and content != ''">CONTENT = #{content},</if>
+			<if test="insertParams.title != null and insertParams.title != ''">TITLE = #{insertParams.title},</if>
+			<if test="insertParams.depId != null">DEP_ID = #{insertParams.depId},</if>
+			<if test="insertParams.posId != null">POS_ID = #{insertParams.posId},</if>
+			<if test="insertParams.endDate != null and !insertParams.endDate.isEmpty()">END_DATE = #{insertParams.endDate},</if>
+			<if test="insertParams.endTime != null and !insertParams.endTime.isEmpty()">END_TIME = #{insertParams.endTime},</if>
+			<if test="insertParams.content != null and insertParams.content != ''">CONTENT = #{insertParams.content},</if>
 			UPDATE_DATE = SYSDATE
 		</set>
-		WHERE WRITER = #{userNo}
+		WHERE
+			NOTI_ID = #{notiId} AND 
+			WRITER = #{userNo}
 	</update>
 	
 	<!-- 공지 삭제 -->

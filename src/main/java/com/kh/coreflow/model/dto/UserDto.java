@@ -126,7 +126,4 @@ public class UserDto {
 	        return String.valueOf(userNo);
 	    }
 	}
-	
-	
-	 
 }

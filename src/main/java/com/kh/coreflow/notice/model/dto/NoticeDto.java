@@ -33,6 +33,7 @@ public class NoticeDto {
 	public static class NoticeSearch{
 		private String searchType;
 		private String keyword;
+		private int posId;
 	}
 	
 	
@@ -63,11 +64,16 @@ public class NoticeDto {
 		private String title;
 		private long writer;
 		private String userName;
-		private String depName;
 		private String posName;
+		private Long depId;
+		private Long posId;
 		private String enrollDate;
 		private String updateDate;
 		private String content;
+		private Long parentDepId;
+		private Long childDepId;
+		private String endDate;
+		private String endTime;
 	}
 	
 	// 공지 삭제

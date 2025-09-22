@@ -53,6 +53,7 @@ public class NoticeController {
 		List<NoticeResponse> notiList;
 		
 		long depId = auth.getDepId();
+//		long posId = auth.getPosId();
 		int posId = noticeSearch.getPosId();
 		
 		String searchType = noticeSearch.getSearchType();
@@ -60,9 +61,10 @@ public class NoticeController {
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("depId", depId);
+		params.put("posId", posId);
 		
-		log.info("depId : {}",depId);
-		log.info("posId : {}",posId);
+//		log.info("depId : {}",depId);
+//		log.info("posId : {}",posId);
 		
 		if(keyword != null && !keyword.trim().isEmpty()) {
 			params.put("searchType", searchType);
@@ -87,7 +89,7 @@ public class NoticeController {
 			){
 		//NOTICE 테이블에 저장하고 NOTI ID 갖고 오기
 		insertParams.setUserNo(auth.getUserNo());
-		
+		log.info("insert Params : {}",insertParams);
 //		List<customFile> notiFile;
 //		if(file.size()>0) {
 //			notiFile = fileService.setOrChangeOneImage(file, insertParams.getNotiId(), "N");
@@ -109,8 +111,12 @@ public class NoticeController {
 			@PathVariable int notiId
 			){
 		NoticeDetail notiDetail = service.notiDetail(notiId);
-				
+		
 		if(notiDetail != null) {
+			if(notiDetail.getParentDepId() == null) {
+				notiDetail.setParentDepId(notiDetail.getChildDepId());
+				notiDetail.setChildDepId(null);
+			}
 			return ResponseEntity.ok(notiDetail);
 		}else {
 			return ResponseEntity.notFound().build();
@@ -127,9 +133,9 @@ public class NoticeController {
 		long userNo = auth.getUserNo();
 		
 		Map<String,Object> params = new HashMap<>();
-//		params.put("notiId", notiId);
-//		params.put("userNo", userNo);
-//		params.put("insertParams", insertParams);
+		params.put("notiId", notiId);
+		params.put("userNo", userNo);
+		params.put("insertParams", insertParams);
 		
 		log.info("insertParams : {}",insertParams);
 		
