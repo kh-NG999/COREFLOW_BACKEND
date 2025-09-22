@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -399,11 +398,9 @@ public class ChattingController {
 			@RequestBody Map<String,Object> param,
 	        @AuthenticationPrincipal UserDeptcode user
 			){
-		log.info("body : {} ",param);
 		Long roomId = Long.valueOf((int)param.get("roomId"));
 		chatRooms bodyRoom = chattingService.getRoom(user.getUserNo(),roomId);
 		bodyRoom.setAlarm((String)param.get("alarm"));
-		log.info("bodyRoom : {} ",bodyRoom);
 		int result = chattingService.alarmChange(bodyRoom);
 		if(result>0)
     		return ResponseEntity.ok(bodyRoom);

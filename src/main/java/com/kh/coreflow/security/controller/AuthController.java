@@ -94,10 +94,10 @@ public class AuthController {
 		// 전체 쿠키 확인
 	    if (request.getCookies() != null) {
 	        for (var c : request.getCookies()) {
-	            System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
+	            //System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
 	        }
 	    } else {
-	        System.out.println("No cookies received");
+	        //System.out.println("No cookies received");
 	    }
 		
 		if(refreshCookie == null || refreshCookie.isBlank()) {

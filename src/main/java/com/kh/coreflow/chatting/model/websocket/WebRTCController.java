@@ -41,7 +41,6 @@ public class WebRTCController {
 
             if (!isReadyForCall) {
                 // 오프라인이거나 준비되지 않았다면, 'user-offline' 응답을 보내고 여기서 종료합니다.
-                log.info("User {} is offline or not ready for a call. Sending offline signal back to {}.", recipientId, signalMessage.getFrom());
                 SignalMessage offlineResponse = new SignalMessage("user-offline", signalMessage.getTo(), signalMessage.getFrom(), null);
                 messagingTemplate.convertAndSendToUser(
                     String.valueOf(signalMessage.getFrom()),
@@ -53,7 +52,6 @@ public class WebRTCController {
         }
 
         // 2. 'offer'가 정상이거나, 'answer', 'ice' 등 다른 모든 시그널은 상태 체크 없이 바로 상대방에게 전달합니다.
-        log.info("Forwarding signal '{}' from {} to {}", signalMessage.getType(), signalMessage.getFrom(), recipientId);
         messagingTemplate.convertAndSendToUser(
             recipientId,
             "/queue/webrtc",

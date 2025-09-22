@@ -109,7 +109,6 @@ public class ChattingDaoImpl implements ChattingDao {
 		chatRooms result = session.selectOne("chat.getRoom",roomId);
 		List<chatProfile> partners = getRoomUsers(roomId);
 		result.setPartner(partners.stream().filter(partner->(userNo!=partner.getUserNo())).collect(Collectors.toList()));
-		log.info("result : {}",result);
 		return result;
 	}
 
