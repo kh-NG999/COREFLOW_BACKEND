@@ -38,15 +38,23 @@ public class ApprovalService {
         approval.setSaveDate(new Date());
         dao.insertApproval(approval);
 
-        // 결재선 정보
+        // 결재선 정보 순서결재
         if (approval.getApproverUserNo() != null) {
+        	int order = 1;
             for (Integer approverNo : approval.getApproverUserNo()) {
             	ApprovalLineDto line = new ApprovalLineDto();
                 line.setApprovalId(approval.getApprovalId());
                 line.setApproverUserNo(approverNo);
-                line.setLineOrder(1);
-                line.setLineStatus("WAITING");
+                
+                line.setLineOrder(order);
+                
+                if (order == 1) {
+                	line.setLineStatus("WAITING");                	
+                } else {
+                	line.setLineStatus("PENDING");                	                	
+                }
                 dao.insertApprovalLine(line);
+                order++;
             }
         }
         // 참조자 저장
@@ -55,8 +63,8 @@ public class ApprovalService {
         		ApprovalLineDto line = new ApprovalLineDto();
         		line.setApprovalId(approval.getApprovalId());
         		line.setApproverUserNo(ccNo);
-        		line.setLineOrder(2);
-        		line.setLineStatus("PENDING");
+        		line.setLineOrder(99);
+        		line.setLineStatus("CC");
         		dao.insertApprovalLine(line);
         	}
         }
@@ -94,35 +102,40 @@ public class ApprovalService {
 
         return approval.getApprovalId();
     }
-
+    
+    //순차결재
     @Transactional
     public void processApproval(int approvalId, int approverUserId, String action) {
-        List<ApprovalLineDto> waiting = dao.findWaitingLinesByApprover(approvalId, approverUserId);
-        if (waiting == null || waiting.isEmpty()) {
-            throw new IllegalStateException("현재 결재자가 대기 상태가 아닙니다");
-        }
+        ApprovalLineDto currentLine = dao.findWaitingLineByApprover(approvalId, approverUserId);
 
-        ApprovalLineDto currentLine = waiting.get(0);
+        if (currentLine == null) {
+            throw new IllegalStateException("결재할 순서가 아니거나 이미 처리된 문서입니다.");
+        }
 
         if ("APPROVE".equalsIgnoreCase(action)) {
             dao.updateApprovalLineStatus(currentLine.getLineId(), "APPROVED");
+
             ApprovalLineDto nextLine = dao.findLineByApprovalIdAndOrder(approvalId, currentLine.getLineOrder() + 1);
+
             if (nextLine != null) {
                 dao.updateApprovalLineStatus(nextLine.getLineId(), "WAITING");
             } else {
                 ApprovalDto approval = new ApprovalDto();
                 approval.setApprovalId(approvalId);
-                approval.setApprovalStatus(2);
+                approval.setApprovalStatus(2); // 2: 승인
                 dao.updateApprovalStatus(approval);
             }
+
         } else if ("REJECT".equalsIgnoreCase(action)) {
             dao.updateApprovalLineStatus(currentLine.getLineId(), "REJECTED");
+            
             ApprovalDto approval = new ApprovalDto();
-                approval.setApprovalId(approvalId);
-                approval.setApprovalStatus(3);
-                dao.updateApprovalStatus(approval);
+            approval.setApprovalId(approvalId);
+            approval.setApprovalStatus(3); // 3: 반려
+            dao.updateApprovalStatus(approval);
+
         } else {
-            throw new IllegalArgumentException("action은 APPROVE 또는 REJECT만 가능합니다");
+            throw new IllegalArgumentException("action은 'APPROVE' 또는 'REJECT'만 가능합니다.");
         }
     }
 

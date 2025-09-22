@@ -51,14 +51,13 @@ public class ApprovalController {
 
     private final ApprovalService service;
     
-    // --- 유틸리티 메소드 (클래스 하단에서 위로 이동하여 가독성 향상) ---
     private int getUserNoFromPrincipal(Principal principal) {
         Authentication authentication = (Authentication) principal;
         UserDeptcode userDetails = (UserDeptcode) authentication.getPrincipal();
         return userDetails.getUserNo();
     }
 
-    // --- API 메소드 ---
+    // --- API ---
 
     @Operation(summary = "결재문서 작성")
     @PostMapping(consumes = {"multipart/form-data"})
@@ -83,17 +82,16 @@ public class ApprovalController {
             Principal principal) {
 
         try {
-            // 클래스 내 유틸리티 메소드를 사용하여 사용자 번호 조회
+           
             int approverUserId = getUserNoFromPrincipal(principal);
 
-            // 주입받은 service 객체의 메소드를 호출
             service.processApproval(approvalId, approverUserId, request.getAction());
 
             return ResponseEntity.ok("결재가 성공적으로 처리되었습니다.");
         } catch (IllegalStateException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            log.error("결재 처리 중 오류 발생", e); // 서버 로그에 에러 기록
+            log.error("결재 처리 중 오류 발생", e); 
             return ResponseEntity.status(500).body("결재 처리 중 서버 오류가 발생했습니다.");
         }
     }

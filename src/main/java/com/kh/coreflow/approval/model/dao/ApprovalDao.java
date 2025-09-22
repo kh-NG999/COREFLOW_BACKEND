@@ -112,6 +112,14 @@ public class ApprovalDao {
 	public int selectReceivedApprovalsCount(int userNo) {
 		return session.selectOne("approvalMapper.selectReceivedApprovalsCount", userNo);
 	}
+	// 순차결재
+	public ApprovalLineDto findWaitingLineByApprover(int approvalId, int approverUserId) {
+		Map<String, Object> params = new HashMap<>();
+		
+		params.put("approvalId", approvalId);
+		params.put("approverUserId", approverUserId);
+		return session.selectOne("approvalMapper.findWaitingLineByApprover", params);
+	}
 	
 	
 }

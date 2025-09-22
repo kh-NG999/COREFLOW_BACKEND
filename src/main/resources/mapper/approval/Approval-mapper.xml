@@ -268,6 +268,18 @@
 		AND L.LINE_STATUS = 'WAITING'
 	</select>
 	
+	<select id="findWaitingLineByApprover" resultType="com.kh.coreflow.approval.model.dto.ApprovalLineDto">
+		SELECT
+			*
+		FROM
+			APPROVAL_LINE
+		WHERE
+			approval_id = #{approvalId}
+		AND
+			approver_user_no = #{approverUserId}
+		AND
+			line_status = 'WAITING'
+	</select>
 	
 </mapper>
 
