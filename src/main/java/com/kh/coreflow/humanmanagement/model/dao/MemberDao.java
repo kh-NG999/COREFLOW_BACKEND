@@ -29,11 +29,9 @@ public interface MemberDao {
 
 	int memberDelete(Long userNo);
 	
-	int findDepId(String depName);
+	Long findDepId(String depName);
 
-	int findPodId(String posName);
-	
-	int memberDelete(int userNo);
+	Long findPodId(String posName);
 
 	List<MemberLite> searchMembers(String query, Integer limit, Long depId);
 

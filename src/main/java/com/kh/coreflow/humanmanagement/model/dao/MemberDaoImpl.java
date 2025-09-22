@@ -58,7 +58,7 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public int memberDelete(int userNo) {
+	public int memberDelete(Long userNo) {
 		return session.delete("member.memberDelete", userNo);
 	}
 
@@ -78,17 +78,12 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public int memberDelete(Long userNo) {
-		return session.delete("member.memberDelete", userNo);
-	}
-
-	@Override
-	public int findDepId(String depName) {
+	public Long findDepId(String depName) {
 		return session.selectOne("member.findDepId", depName);
 	}
 
 	@Override
-	public int findPodId(String posName) {
+	public Long findPodId(String posName) {
 		return session.selectOne("member.findPodId", posName);
 	}
 }

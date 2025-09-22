@@ -1,7 +1,6 @@
 package com.kh.coreflow.security.model.provider;
 
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(Long userNo, int depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, Long depId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id

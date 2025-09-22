@@ -40,7 +40,7 @@ public class PersonalController {
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-		int depId = userDetails.getDepId();
+		Long depId = userDetails.getDepId();
 		
 		List<Object> mySchedule = userService.getMySchedule(userNo);
 		model.addAttribute("mySchedule" ,mySchedule);
