@@ -26,7 +26,7 @@ import com.kh.coreflow.notice.model.dto.NoticeDto.NoticeResponse;
 import com.kh.coreflow.notice.model.service.NoticeService;
 import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public class NoticeController {
 	// 공지 등록(첨부파일)
 	@PostMapping("/notice/insert")
 	public ResponseEntity<Void> noticeInsert(
-			@AuthenticationPrincipal UserDeptcode auth,
+			@AuthenticationPrincipal UserDeptPoscode auth,
 			@RequestBody NoticeInsert insertParams
 //			@RequestParam(value = "files", required=false) List<MultipartFile> file
 			){

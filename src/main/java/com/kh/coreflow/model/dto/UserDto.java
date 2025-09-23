@@ -97,9 +97,10 @@ public class UserDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Builder
-	public static class UserDeptcode {
+	public static class UserDeptPoscode {
 		private Long userNo;
 		private Long depId;
+		private Long posId;
 		
 		@Override
 	    public String toString() {

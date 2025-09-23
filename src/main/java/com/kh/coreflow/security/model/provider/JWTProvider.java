@@ -38,12 +38,13 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(Long userNo, Long depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, Long depId, Long posId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
 				.claim("roles", roles)
 				.claim("depId", depId)
+				.claim("posId", posId)
 				.setIssuedAt(now) // 토큰 발행시간
 				.setExpiration(new Date(now.getTime()+(1000L * 60 * minutes)))
 				.signWith(key, SignatureAlgorithm.HS256) // 서명에 사용할 키값과, 알고리즘
@@ -108,6 +109,16 @@ public class JWTProvider {
                 .getBody();
 		
 		return getLongValue(claims.get("depId"));
+	}
+	
+	public Long getPoscode(String token) {
+		Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+		
+		return getLongValue(claims.get("posId"));
 	}
 	
 	private int getIntValue(Object obj) {

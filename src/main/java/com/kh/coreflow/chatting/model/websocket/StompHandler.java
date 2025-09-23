@@ -1,7 +1,7 @@
 package com.kh.coreflow.chatting.model.websocket;
 
 
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 
 import java.util.List;
@@ -57,10 +57,13 @@ public class StompHandler implements ChannelInterceptor {
         				    .collect(Collectors.toList());
         			// 4) 권한에서 부서코드 추출
         			Long depId = jwtProvider.getDeptcode(jwtToken);
+        			// 5) 권한에서 직위코드 추출
+        			Long posId = jwtProvider.getPoscode(jwtToken);
         			
-        			UserDeptcode principal =  UserDeptcode.builder()
+        			UserDeptPoscode principal =  UserDeptPoscode.builder()
         			        .userNo(userNo)
         			        .depId(depId)
+        			        .posId(posId)
         			        .build();
         			
         			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
