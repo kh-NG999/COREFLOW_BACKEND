@@ -38,8 +38,8 @@ public class NoticeDaoImpl implements NoticeDao{
 	}
 
 	@Override
-	public int notiUpdate(Map<String, Object> params) {
-		return session.update("notice.notiUpdate",params);
+	public int notiUpdate(NoticeInsert insertParams) {
+		return session.update("notice.notiUpdate",insertParams);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.kh.coreflow.notice.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,6 @@ public class NoticeController {
 	@GetMapping("/notice/main")
 	public ResponseEntity<List<NoticeResponse>> notice(
 			@AuthenticationPrincipal UserDeptcode auth,
-//			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
-//			@RequestParam(value="keyword", required=false) String keyword,
 			@ModelAttribute NoticeSearch noticeSearch
 			){
 		
@@ -54,7 +53,7 @@ public class NoticeController {
 		
 		long depId = auth.getDepId();
 //		long posId = auth.getPosId();
-		int posId = noticeSearch.getPosId();
+		long posId = noticeSearch.getPosId();
 		
 		String searchType = noticeSearch.getSearchType();
 		String keyword = noticeSearch.getKeyword();
@@ -84,19 +83,12 @@ public class NoticeController {
 	@PostMapping("/notice/insert")
 	public ResponseEntity<Void> noticeInsert(
 			@AuthenticationPrincipal UserDeptcode auth,
-			@RequestBody NoticeInsert insertParams
-//			@RequestParam(value = "files", required=false) List<MultipartFile> file
+			@ModelAttribute NoticeInsert insertParams,
+			@RequestParam(value = "files", required=false) List<MultipartFile> files
 			){
-		//NOTICE 테이블에 저장하고 NOTI ID 갖고 오기
 		insertParams.setUserNo(auth.getUserNo());
-		log.info("insert Params : {}",insertParams);
-//		List<customFile> notiFile;
-//		if(file.size()>0) {
-//			notiFile = fileService.setOrChangeOneImage(file, insertParams.getNotiId(), "N");
-//			log.info("notiFile : {}",notiFile);
-//		}
 		
-		int result = service.notiInsert(insertParams);
+		int result = service.notiInsert(insertParams,files);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/notice/insert")).build();
@@ -111,6 +103,10 @@ public class NoticeController {
 			@PathVariable int notiId
 			){
 		NoticeDetail notiDetail = service.notiDetail(notiId);
+
+		List<customFile> files = fileService.getFiles("N",Long.valueOf(notiId));
+		
+		notiDetail.setFiles(files);
 		
 		if(notiDetail != null) {
 			if(notiDetail.getParentDepId() == null) {
@@ -126,20 +122,18 @@ public class NoticeController {
 	// 공지 수정(첨부파일)
 	@PatchMapping("/notice/update/{notiId}")
 	public ResponseEntity<Void> noticeUpdate(
-			@PathVariable int notiId,
+			@PathVariable long notiId,
 			@AuthenticationPrincipal UserDeptcode auth,
-			@RequestBody NoticeInsert insertParams
+			@ModelAttribute NoticeInsert insertParams,
+			@RequestParam(value = "files", required=false) List<MultipartFile> files
 			){
-		long userNo = auth.getUserNo();
-		
-		Map<String,Object> params = new HashMap<>();
-		params.put("notiId", notiId);
-		params.put("userNo", userNo);
-		params.put("insertParams", insertParams);
-		
+		insertParams.setUserNo(auth.getUserNo());
+		insertParams.setNotiId(notiId);
+
 		log.info("insertParams : {}",insertParams);
+		log.info("files : {}",files);
 		
-		int result = service.notiUpdate(params);
+		int result = service.notiUpdate(insertParams,files);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();

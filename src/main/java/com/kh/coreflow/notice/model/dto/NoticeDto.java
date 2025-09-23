@@ -33,7 +33,7 @@ public class NoticeDto {
 	public static class NoticeSearch{
 		private String searchType;
 		private String keyword;
-		private int posId;
+		private long posId;
 	}
 	
 	
@@ -42,7 +42,7 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeInsert{
-		private int notiId;
+		private long notiId;
 		private long userNo;
 		private String title;
 		private String content;
@@ -51,7 +51,7 @@ public class NoticeDto {
 		private String endTime;
 		private Integer depId;
 		private Integer posId;
-//		private List<customFile> files;
+		private List<customFile> initFile;
 	}
 	
 	// 공지 상세 조회(첨부파일)
@@ -59,7 +59,7 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeDetail{
-		private int notiId;
+		private long notiId;
 		private String essential;
 		private String title;
 		private long writer;
@@ -74,6 +74,7 @@ public class NoticeDto {
 		private Long childDepId;
 		private String endDate;
 		private String endTime;
+		private List<customFile> files;
 	}
 	
 	// 공지 삭제
@@ -81,6 +82,6 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NotiDelete{
-		private int notiId;
+		private long notiId;
 	}
 }
