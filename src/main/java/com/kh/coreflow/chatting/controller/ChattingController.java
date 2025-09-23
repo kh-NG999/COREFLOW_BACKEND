@@ -28,7 +28,7 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
 import com.kh.coreflow.chatting.model.service.ChattingService;
 import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class ChattingController {
 	
 	@GetMapping("myProfile")
 	public ResponseEntity<chatProfile> myProfile(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
 		chatProfile prof = chattingService.getMyProfile(user.getUserNo());
@@ -71,7 +71,7 @@ public class ChattingController {
 	
 	@GetMapping("/user")
 	public ResponseEntity<List<chatProfile>> chatUser(
-			@AuthenticationPrincipal UserDeptcode user
+			@AuthenticationPrincipal UserDeptPoscode user
 			){
 		List<chatProfile> list = chattingService.getChatProfiles(user.getUserNo());
 		for(chatProfile el : list) {
@@ -91,7 +91,7 @@ public class ChattingController {
 
 	@GetMapping("/searchUser")
 	public ResponseEntity<List<chatProfile>> searchUser(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@RequestParam(name = "query") String query
 			){
 		List<chatProfile> list = chattingService.findChatProfiles(user.getUserNo(),query);
@@ -115,7 +115,7 @@ public class ChattingController {
 	
 	@GetMapping("/favorites")
 	public ResponseEntity<List<chatProfile>> favoriteUser(
-			@AuthenticationPrincipal UserDeptcode user
+			@AuthenticationPrincipal UserDeptPoscode user
 			){
 		List<chatProfile> list = chattingService.getFavoriteProfiles(user.getUserNo());
 		
@@ -137,7 +137,7 @@ public class ChattingController {
 	
 	@PostMapping("/favorites")
 	public ResponseEntity<Void> insertFavorite(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@RequestBody userFavorite favUser
 			){
 		favUser.setUserNo(user.getUserNo());
@@ -150,7 +150,7 @@ public class ChattingController {
 
 	@DeleteMapping("/favorites/{favUserNo}")
 	public ResponseEntity<Void> deleteFavorite(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@PathVariable("favUserNo") Long favUserNo
 			){
 		userFavorite favUser = new userFavorite();
@@ -165,7 +165,7 @@ public class ChattingController {
 	
 	@GetMapping("/private/{userNo}")
 	public ResponseEntity<chatRooms> openPrivateChat(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@PathVariable("userNo") Long partnerUserNo
 			){
 		
@@ -191,7 +191,7 @@ public class ChattingController {
 	@GetMapping("/room/{roomId}/messages")
 	public ResponseEntity<List<chatMessages>> getMessages(
 			@PathVariable("roomId") Long roomId,
-			@AuthenticationPrincipal UserDeptcode user
+			@AuthenticationPrincipal UserDeptPoscode user
 			){
 		List<chatMessages> list = chattingService.getMessages(roomId);
 		if(list!=null) {
@@ -210,7 +210,7 @@ public class ChattingController {
 	
 	@GetMapping("/myChattingRooms")
 	public ResponseEntity<List<chatRooms>> myChattingRooms(
-			@AuthenticationPrincipal UserDeptcode user
+			@AuthenticationPrincipal UserDeptPoscode user
 			){
 		List<chatRooms> list = chattingService.getmyChattingRooms(user.getUserNo());
 		return ResponseEntity.ok(list);
@@ -218,7 +218,7 @@ public class ChattingController {
 	
 	@PostMapping("/public")
 	public ResponseEntity<chatRooms> MakePublicRoom(
-			@AuthenticationPrincipal UserDeptcode user,
+			@AuthenticationPrincipal UserDeptPoscode user,
 			@RequestBody Map<String,Object> newChatParam
 			){
 		Long roomId = chattingService.makeChat(user.getUserNo(),newChatParam,"PUBLIC");
@@ -229,7 +229,7 @@ public class ChattingController {
 	@GetMapping("/room/{roomId}")
 	public ResponseEntity<chatRooms> getChatRoom(
 			@PathVariable("roomId") Long roomId,
-			@AuthenticationPrincipal UserDeptcode user
+			@AuthenticationPrincipal UserDeptPoscode user
 			){
 		chatRooms getRoom = chattingService.getRoom(user.getUserNo(),roomId);
 		return ResponseEntity.ok(getRoom);
@@ -238,7 +238,7 @@ public class ChattingController {
 	@PostMapping("/room/{roomId}/read")
 	public ResponseEntity<?> updateLastReadAt(
 	        @PathVariable("roomId") Long roomId,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 	) {
 	    Long userNo = user.getUserNo();
 	    int answer = chattingService.updateLastReadAt(roomId, userNo);
@@ -253,7 +253,7 @@ public class ChattingController {
 	@PostMapping("/state")
 	public ResponseEntity<chatProfile> updateState(
 			@RequestBody Map<String,Object> statusParam,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 			){
 		Long userNo = user.getUserNo();
 		String status = (String)statusParam.get("state");
@@ -340,7 +340,7 @@ public class ChattingController {
 	@PostMapping("/profile/image")
 	public ResponseEntity<chatProfileDetail> changeProfileImage(
 			@RequestParam("file") MultipartFile file,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 			){
 		customFile profileImage = fileService.setOrChangeOneImage(file,user.getUserNo(),"CP");
 		if(profileImage!= null) {
@@ -356,7 +356,7 @@ public class ChattingController {
 	public ResponseEntity<List<chatMessages>> uploadFileOnRoom(
 			@RequestParam("files") List<MultipartFile> files,
 			@PathVariable("roomId") Long roomId,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 			){
 		List<chatMessages> messages = new ArrayList<chatMessages>();
 		int result = 0;
@@ -382,7 +382,7 @@ public class ChattingController {
 	@DeleteMapping("/room/{roomId}/leave")
 	public ResponseEntity<Void> leaveRoom(
 			@PathVariable("roomId") Long roomId,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 			){
 		
 		int result = chattingService.leaveRoom(roomId,user.getUserNo());
@@ -396,7 +396,7 @@ public class ChattingController {
 	@PatchMapping("/room/alarm")
 	public ResponseEntity<chatRooms> roomAlarmChange(
 			@RequestBody Map<String,Object> param,
-	        @AuthenticationPrincipal UserDeptcode user
+	        @AuthenticationPrincipal UserDeptPoscode user
 			){
 		Long roomId = Long.valueOf((int)param.get("roomId"));
 		chatRooms bodyRoom = chattingService.getRoom(user.getUserNo(),roomId);
@@ -411,7 +411,7 @@ public class ChattingController {
 	@PostMapping("/room/missed-call")
     public ResponseEntity<chatMessages> createMissedCallMessage(
     		@RequestBody MissedCallRequest request,
-	        @AuthenticationPrincipal UserDeptcode user) {
+	        @AuthenticationPrincipal UserDeptPoscode user) {
 		chatMessages resultMessages = chattingService.createMissedCallMessage(user.getUserNo(), request.getPartnerNo());
 
     	if(resultMessages !=null)

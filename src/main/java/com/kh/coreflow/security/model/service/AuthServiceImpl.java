@@ -53,9 +53,10 @@ public class AuthServiceImpl implements AuthService{
 				}
 				log.info("권한 조회: userNo={} roles={} depId={}", userNo, userAuth.getRoles(), user.getDepId());
 				Long depId = user.getDepId();
-
+				Long posId = user.getPosId();
+				
 				// 2. 토큰 발급
-				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+				String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분
 				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
 				User userNoPassword = User.builder()
@@ -99,9 +100,10 @@ public class AuthServiceImpl implements AuthService{
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
 		Long depId = user.getDepId();
+		Long posId = user.getPosId();
 		
 		//토큰 발급
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+		String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분
 		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
 		user = authDao.findUserByUserNo(user.getUserNo())	// 비밀번호 제외 필요
@@ -125,9 +127,10 @@ public class AuthServiceImpl implements AuthService{
 			throw new IllegalArgumentException("권한 정보 없음");
 		}
 		Long depId = user.getDepId();
+		Long posId = user.getPosId();
 
 		// 2. 토큰 발급
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분			
+		String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분			
 		
 		User userNoPassword = User.builder()
 								.userNo(user.getUserNo())

@@ -23,7 +23,7 @@ import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
 import com.kh.coreflow.humanmanagement.model.service.AttendanceService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +66,7 @@ public class AttendanceController {
 			@RequestParam int year,
 			@RequestParam int month
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 				
 		Map<String,Object> params = new HashMap<>();
 		params.put("userNo", userNo);
@@ -89,7 +89,7 @@ public class AttendanceController {
 			Authentication auth,
 			@RequestBody PutCheckIn checkIn
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);

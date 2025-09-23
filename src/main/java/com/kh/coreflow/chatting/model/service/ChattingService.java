@@ -9,7 +9,7 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 public interface ChattingService {
 
