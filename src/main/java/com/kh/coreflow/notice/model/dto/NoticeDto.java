@@ -1,9 +1,6 @@
 package com.kh.coreflow.notice.model.dto;
 
-import java.util.Date;
 import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
@@ -33,9 +30,7 @@ public class NoticeDto {
 	public static class NoticeSearch{
 		private String searchType;
 		private String keyword;
-		private long posId;
 	}
-	
 	
 	// 공지 등록(첨부파일)
 	@Data

@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService{
 	private final NoticeDao dao;
-	
 	private final FileService fileService;
 	
 	@Override
@@ -52,5 +51,4 @@ public class NoticeServiceImpl implements NoticeService{
 	public int notiDelete(Map<String, Object> params) {
 		return dao.notiDelete(params);
 	}
-
 }

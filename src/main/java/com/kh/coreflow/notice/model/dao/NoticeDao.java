@@ -20,5 +20,4 @@ public interface NoticeDao {
 	int notiUpdate(NoticeInsert insertParams);
 
 	int notiDelete(Map<String, Object> params);
-
 }

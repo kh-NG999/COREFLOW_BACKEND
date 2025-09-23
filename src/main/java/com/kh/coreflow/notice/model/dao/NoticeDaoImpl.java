@@ -46,6 +46,4 @@ public class NoticeDaoImpl implements NoticeDao{
 	public int notiDelete(Map<String, Object> params) {
 		return session.delete("notice.notiDelete",params);
 	}
-
-
 }

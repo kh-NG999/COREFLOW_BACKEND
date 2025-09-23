@@ -20,5 +20,4 @@ public interface NoticeService {
 	int notiUpdate(NoticeInsert insertParams, List<MultipartFile> files);
 
 	int notiDelete(Map<String, Object> params);
-	
 }
