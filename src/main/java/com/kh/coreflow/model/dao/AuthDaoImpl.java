@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
 
@@ -36,16 +37,16 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public Optional<User> findUserByUserNo(int userNo) {
+	public Optional<User> findUserByUserNo(Long userNo) {
 		User user = session.selectOne("auth.findUserByUserNo" , userNo);
 		Optional<User> optionalUser = Optional.ofNullable(user);
 		return optionalUser;
 	}
 
 	@Override
-	public User findUserPwd(String name, String email) {
+	public User findUserPwd(String userName, String email) {
 		Map<String, String> param = new HashMap<>();
-		param.put("name", name);
+		param.put("userName", userName);
 		param.put("email", email);
 		return session.selectOne("auth.findUserPwd", param);
 	}
@@ -59,22 +60,7 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public int checkProfileImage(int userNo) {
-		return session.selectOne("auth.checkProfileImage", userNo);
-	}
-	
-	@Override
-	public void insertProfileImage(Map<String, Object> imageUpdate) {
-		session.insert("auth.insertProfileImage", imageUpdate);
-	}
-	
-	@Override
-	public void updateProfileImage(Map<String, Object> imageUpdate) {
-		session.update("auth.updateProfileImage", imageUpdate);
-	}
-
-	@Override
-	public void updatePhone(int userNo, String string) {
+	public void updatePhone(Long userNo, String string) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
 		param.put("string", string);
@@ -82,15 +68,16 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public void updateAddress(int userNo, String string) {
+	public void updateAddress(Long userNo, String string, String string2) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
-		param.put("string", string);
+		param.put("address", string);
+		param.put("addressDetail", string2);
 		session.update("auth.updateAddress", param);
 	}
 
 	@Override
-	public UserAuthority findUserAuthorityByUserNo(int userNo) {
+	public UserAuthority findUserAuthorityByUserNo(Long userNo) {
 	    List<String> roles = session.selectList("auth.findUserAuthorityByUserNo", userNo);
 	    if (roles.isEmpty()) return null;
 
@@ -98,6 +85,16 @@ public class AuthDaoImpl implements AuthDao{
 	            .userNo(userNo)
 	            .roles(roles)
 	            .build();
+	}	
+
+	@Override
+	public long findUserNoByEmail(String email) {
+		return session.selectOne("auth.findUserNoByEmail", email);
+	}
+
+	@Override
+	public boolean isEmailExists(String email) {
+		return session.selectOne("auth.isEmailExists", email);
 	}
 	
 	

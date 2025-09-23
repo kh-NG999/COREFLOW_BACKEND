@@ -15,11 +15,13 @@ public interface AuthService {
 
 	AuthResult refreshByCookie(String refreshCookie);
 
-	Optional<User> findUserByUserNo(int userNo);
+	Optional<User> findUserByUserNo(Long userNo);
 
-	boolean findUserPwd(String name, String email);
+	boolean findUserPwd(String userName, String email);
 
 	Optional<User> findUserByEmail(String email);
+
+	String createTempPwd();
 
 	
 	

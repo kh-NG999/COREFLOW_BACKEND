@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.*;
+import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicy;
+import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicyModHistory;
 import com.kh.coreflow.companypolicy.model.service.CompanyPolicyService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,14 +59,13 @@ public class CompanyPolicyController {
 		@ApiResponse(responseCode="400", description="추가 실패.")
 	})
 	public ResponseEntity<Map<String, Object>> addPolicy(
-			@RequestBody CompanyPolicy policy
+			@RequestBody CompanyPolicy policy,
+			Authentication auth
 			) {
-		policy.setCreatorUserNo(1L);
-		log.info("policy: {}", policy);
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
+		policy.setCreatorUserNo(userNo);
 		
-//		return ResponseEntity.ok(null);
 		int result = service.addPolicy(policy);
-		log.info("policy after: {}", policy);
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("policyId", policy.getPolicyId());
@@ -84,9 +86,11 @@ public class CompanyPolicyController {
 	})
 	public ResponseEntity<Void> updatePolicy(
 			@RequestBody CompanyPolicyModHistory history,
-			@PathVariable Long policyId
+			@PathVariable Long policyId,
+			Authentication auth
 			) {
-		history.setUserNo(1L);
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
+		history.setUserNo(userNo);
 		history.setPolicyId(policyId);
 		
 		int result = service.updatePolicy(history);

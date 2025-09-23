@@ -5,14 +5,22 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JWTProvider {
 
@@ -30,19 +38,20 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(int userNo, int depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, Long depId, Long posId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
 				.claim("roles", roles)
 				.claim("depId", depId)
+				.claim("posId", posId)
 				.setIssuedAt(now) // 토큰 발행시간
 				.setExpiration(new Date(now.getTime()+(1000L * 60 * minutes)))
 				.signWith(key, SignatureAlgorithm.HS256) // 서명에 사용할 키값과, 알고리즘
 				.compact();
 	}
 
-	public String createRefreshToken(int userNo, int i) {
+	public String createRefreshToken(Long userNo, int i) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
@@ -52,8 +61,8 @@ public class JWTProvider {
 				.compact();
 	}
 
-	public int getUserNo(String token) {
-		return Integer.valueOf(
+	public Long getUserNo(String token) {
+		return Long.valueOf(
 				Jwts.parserBuilder()
 				.setSigningKey(key)
 				.build()
@@ -63,8 +72,8 @@ public class JWTProvider {
 				);
 	}
 
-	public int parseRefresh(String token) {
-		return Integer.valueOf(
+	public Long parseRefresh(String token) {
+		return Long.valueOf(
 				Jwts.parserBuilder()
 				.setSigningKey(refreshKey)
 				.build()
@@ -92,13 +101,76 @@ public class JWTProvider {
 	    return List.of();
 	}
 	
-	public int getDeptcode(String token) {
+	public Long getDeptcode(String token) {
 		Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-		return claims.get("depId", Integer.class);
+		
+		return getLongValue(claims.get("depId"));
+	}
+	
+	public Long getPoscode(String token) {
+		Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+		
+		return getLongValue(claims.get("posId"));
+	}
+	
+	private int getIntValue(Object obj) {
+	    if (obj == null) return 0; // 기본값
+	    if (obj instanceof Integer i) return i;
+	    if (obj instanceof Long l) return l.intValue();
+	    return Integer.parseInt(obj.toString());
+	}
+
+	private long getLongValue(Object obj) {
+	    if (obj == null) return 0L;
+	    if (obj instanceof Long l) return l;
+	    if (obj instanceof Integer i) return i.longValue();
+	    return Long.parseLong(obj.toString());
+	}
+	
+	public boolean validateToken(String token) {
+		try {
+			getClaims(token);
+			return true;
+		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+			log.info("잘못된 JWT 서명입니다.");
+		} catch (ExpiredJwtException e) {
+			log.info("만료된 JWT 토큰입니다.");
+		} catch (UnsupportedJwtException e) {
+			log.info("지원되지 않는 JWT 토큰입니다.");
+		} catch (IllegalArgumentException e) {
+			log.info("JWT 토큰이 잘못되었습니다.");
+		}
+		return false;
+	}
+	
+	public Authentication getAuthentication(String accessToken) {
+		// 토큰 복호화
+		Claims claims = getClaims(accessToken);
+		// 클레임에서 userNo 추출
+		long userNo = Long.parseLong(claims.getSubject());
+		// 권한 정보 생성
+		List<String> roles = getRoles(accessToken);
+		List<SimpleGrantedAuthority> authorities = roles.stream()
+														.map(SimpleGrantedAuthority::new)
+														.toList();
+		// UsernamePasswordAuthenticationToken을 만들어 반환
+		return new UsernamePasswordAuthenticationToken(userNo, null, authorities);
+	}
+	
+	private Claims getClaims(String token) {
+		return Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
 	}
 	
 }

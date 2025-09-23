@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
 import com.kh.coreflow.approval.model.dto.ApprovalFileDto;
 import com.kh.coreflow.approval.model.service.ApprovalService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,8 +53,8 @@ public class ApprovalController {
     
     private int getUserNoFromPrincipal(Principal principal) {
         Authentication authentication = (Authentication) principal;
-        UserDeptcode userDetails = (UserDeptcode) authentication.getPrincipal();
-        return userDetails.getUserNo();
+        UserDeptPoscode userDetails = (UserDeptPoscode) authentication.getPrincipal();
+        return (userDetails.getUserNo()).intValue();
     }
 
     // --- API ---

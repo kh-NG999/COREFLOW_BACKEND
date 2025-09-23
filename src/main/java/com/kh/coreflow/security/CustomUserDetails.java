@@ -15,7 +15,7 @@ public class CustomUserDetails implements UserDetails{
 		this.user = user;
 	}
 	
-	public int getUserNo() {
+	public Long getUserNo() {
 		return user.getUserNo();
 	}
 	
@@ -32,6 +32,14 @@ public class CustomUserDetails implements UserDetails{
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;
+	}
+	
+	public Long getDepId() {
+		return user.getDepId();
+	}
+	
+	public Long getPosId() {
+		return user.getPosId();
 	}
 	
 	@Override

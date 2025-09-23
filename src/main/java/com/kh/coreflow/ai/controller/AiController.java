@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.ai.model.dto.AiDto.AiChatHistory;
 import com.kh.coreflow.ai.model.dto.AiDto.AiChatSession;
 import com.kh.coreflow.ai.model.dto.AiDto.AiUsage;
 import com.kh.coreflow.ai.model.service.AiService;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class AiController {
 	public ResponseEntity<List<AiChatSession>> getSessions(
 			Authentication auth
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		List<AiChatSession> list = service.getSessions(userNo);
 		
@@ -52,7 +52,7 @@ public class AiController {
 	public ResponseEntity<Boolean> checkUsedBefore(
 			Authentication auth
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		Integer count = service.countAiUsage(userNo);
 		
@@ -72,7 +72,7 @@ public class AiController {
 			Authentication auth,
 			@RequestBody AiUsage usage
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
@@ -92,7 +92,7 @@ public class AiController {
 			Authentication auth,
 			@RequestBody AiUsage usage
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
@@ -112,7 +112,7 @@ public class AiController {
 			Authentication auth,
 			@RequestBody AiChatSession chatSession
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
@@ -160,7 +160,7 @@ public class AiController {
 			@PathVariable Long sessionId,
 			@RequestBody AiChatHistory history
 			) {
-		Long userNo = Long.parseLong(auth.getPrincipal().toString());
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		Map<String, Object> map = new HashMap<>();
 		map.put("userNo", userNo);
 		map.put("sessionId", sessionId);

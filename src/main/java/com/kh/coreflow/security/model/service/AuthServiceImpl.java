@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.mail.service.MailService;
 import com.kh.coreflow.model.dao.AuthDao;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService{
 	private final AuthDao authDao;
 	private final MailService mailService;
 	private final PasswordEncoder encoder;
+	private final FileService fileService;
 	private final JWTProvider jwt;
 	
 	@Override
@@ -44,18 +46,18 @@ public class AuthServiceImpl implements AuthService{
 					throw new BadCredentialsException("비밀번호 오류");
 				}
 				
-				int userNo = user.getUserNo();
+				Long userNo = user.getUserNo();
 				UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 				if (userAuth == null) {
 				    throw new IllegalArgumentException("권한 정보 없음");
 				}
 				log.info("권한 조회: userNo={} roles={} depId={}", userNo, userAuth.getRoles(), user.getDepId());
-				int depId = user.getDepId();
-
+				Long depId = user.getDepId();
+				Long posId = user.getPosId();
+				
 				// 2. 토큰 발급
-				String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+				String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분
 				String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
-				log.info("로그인한 사용자 권한: {}", userAuth.getRoles());				
 				
 				User userNoPassword = User.builder()
 										.userNo(user.getUserNo())
@@ -76,7 +78,6 @@ public class AuthServiceImpl implements AuthService{
 	@Override
 	@Transactional
 	public AuthResult signUp(String email, String userPwd) {
-		log.info("pwd : {}",userPwd);
 		// 1) Users테이블에 데이터 추가
 		User user = User.builder()
 						.email(email)
@@ -93,15 +94,16 @@ public class AuthServiceImpl implements AuthService{
 											.build();
 		authDao.insertUserRole(auth);
 		
-		int userNo = user.getUserNo();
+		Long userNo = user.getUserNo();
 		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 		if (userAuth == null) {
 		    throw new IllegalArgumentException("권한 정보 없음");
 		}
-		int depId = user.getDepId();
+		Long depId = user.getDepId();
+		Long posId = user.getPosId();
 		
 		//토큰 발급
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30); // 30분
+		String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분
 		String refreshToken = jwt.createRefreshToken(user.getUserNo(), 7); // 7일
 				
 		user = authDao.findUserByUserNo(user.getUserNo())	// 비밀번호 제외 필요
@@ -116,34 +118,52 @@ public class AuthServiceImpl implements AuthService{
 
 	@Override
 	public AuthResult refreshByCookie(String refreshCookie) {
-		int userNo = jwt.parseRefresh(refreshCookie);
+		Long userNo = jwt.parseRefresh(refreshCookie);
 		
 		User user = authDao.findUserByUserNo(userNo)
 				.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
 		UserAuthority userAuth = authDao.findUserAuthorityByUserNo(userNo);
 		if (userAuth == null) {
-		    throw new IllegalArgumentException("권한 정보 없음");
+			throw new IllegalArgumentException("권한 정보 없음");
 		}
-		int depId = user.getDepId();
+		Long depId = user.getDepId();
+		Long posId = user.getPosId();
 
-		String accessToken = jwt.createAccessToken(userNo, depId, userAuth.getRoles(), 30);
+		// 2. 토큰 발급
+		String accessToken = jwt.createAccessToken(userNo, depId, posId, userAuth.getRoles(), 30); // 30분			
 		
+		User userNoPassword = User.builder()
+								.userNo(user.getUserNo())
+								.email(user.getEmail())
+								.userName(user.getUserName())
+								.profile(user.getProfile())
+								.roles(userAuth.getRoles())
+								.depId(user.getDepId())
+								.build();
+
 		return AuthResult.builder()
 				.accessToken(accessToken)
-				.user(user)
+				.refreshToken(refreshCookie)
+				.user(userNoPassword)
 				.build();
 	}
 
 	@Override
-	public Optional<User> findUserByUserNo(int userNo) {
-		return authDao.findUserByUserNo(userNo);
+	public Optional<User> findUserByUserNo(Long userNo) {
+		Optional<User> userOpt = authDao.findUserByUserNo(userNo);
+		if(userOpt.isPresent()) {
+		    User user = userOpt.get();
+		    UserAuthority roles = authDao.findUserAuthorityByUserNo(userNo);
+		    user.setRoles(roles.getRoles());
+		}
+		return userOpt;
 	}
 
 	@Override
-	public boolean findUserPwd(String name, String email) {
-		User user = authDao.findUserPwd(name, email);
+	public boolean findUserPwd(String userName, String email) {
+		User user = authDao.findUserPwd(userName, email);
 		if(user == null) {
-			throw new IllegalArgumentException("해당 정보와 일치하는 계정이 없습니다");
+			return false;
 		}
 		
 		String tempPwd = createTempPwd();
@@ -154,7 +174,8 @@ public class AuthServiceImpl implements AuthService{
 		return true;
 	}
 
-	private String createTempPwd() {
+	@Override
+	public String createTempPwd() {
 		return UUID.randomUUID().toString().replace("-", "").substring(0,10);
 	}
 

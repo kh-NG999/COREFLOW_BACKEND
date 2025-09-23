@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="image">
+
+	<select id="getFile" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		SELECT * FROM IMAGE
+		WHERE IMAGE_CODE = #{imageCode} AND
+		REF_ID = #{refId}
+	</select>
+	
+	<select id="getFiles" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		SELECT * FROM IMAGE
+		WHERE IMAGE_CODE = #{imageCode} AND
+		REF_ID = #{refId}
+	</select>
+	
+	<update id="updateOneImage" parameterType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		UPDATE IMAGE SET
+		ORIGIN_NAME = #{originName},
+		CHANGE_NAME = #{changeName},
+		IMG_ORDER = #{imgOrder},
+		CREATE_DATE = SYSDATE
+		WHERE IMAGE_CODE = #{imageCode} AND
+		REF_ID = #{refId} AND
+		MIME_TYPE= #{mimeType}
+	</update>
+	
+	<insert id="insertOneImage" parameterType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		INSERT INTO IMAGE (
+			IMG_ID,
+			IMAGE_CODE,
+			ORIGIN_NAME,
+			CHANGE_NAME,
+			IMG_ORDER,
+			REF_ID,
+			MIME_TYPE
+		) VALUES (
+			IMAGE_SEQ.NEXTVAL,
+			#{imageCode},
+			#{originName},
+			#{changeName},
+			#{imgOrder},
+			#{refId},
+			#{mimeType}
+		)
+	</insert>
+	
+	<select id="findFile" parameterType="map" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		SELECT * FROM IMAGE
+		WHERE IMAGE_CODE = #{fileCode} AND
+		CHANGE_NAME = #{changeName}
+	</select>
+	
+	<delete id="removeFile" parameterType="map">
+		DELETE FROM IMAGE
+		WHERE IMAGE_CODE = #{fileCode} AND
+		REF_ID = #{refId}
+	</delete>
+</mapper>

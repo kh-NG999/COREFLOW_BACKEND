@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.FindPwdRequest;
 import com.kh.coreflow.model.dto.UserDto.LoginRequest;
@@ -30,6 +32,7 @@ import com.kh.coreflow.security.model.provider.JWTProvider;
 import com.kh.coreflow.security.model.service.AuthService;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +45,13 @@ public class AuthController {
 
 	private final AuthService service;
 	private final UserService userService;
+	private final FileService fileService;
 	private final JWTProvider jwt;
 	public static final String REFRESH_COOKIE = "REFRESH_TOKEN0";
 	
 	@Autowired
 	private final ServletContext servlet;
+	
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResult> login(@RequestBody LoginRequest req){
@@ -82,9 +87,19 @@ public class AuthController {
 	
 	@PostMapping("/refresh")
 	public ResponseEntity<AuthResult> refresh(
+			HttpServletRequest request,
 			@CookieValue(name = REFRESH_COOKIE, required = false)
 			String refreshCookie
 			){
+		// 전체 쿠키 확인
+	    if (request.getCookies() != null) {
+	        for (var c : request.getCookies()) {
+	            //System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
+	        }
+	    } else {
+	        //System.out.println("No cookies received");
+	    }
+		
 		if(refreshCookie == null || refreshCookie.isBlank()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -106,8 +121,8 @@ public class AuthController {
 		
 		// 1. 클라이언트 헤더에서 id값 추출
 		String accessToken = resolveAccessToken(request);
-		int userId = jwt.getUserNo(accessToken);
-				
+		Long userId = jwt.getUserNo(accessToken);
+		
 		// 리프레쉬토큰 제거
 		ResponseCookie refreshCookie = 
 				ResponseCookie
@@ -122,7 +137,7 @@ public class AuthController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<Optional<User>> getUserInfo(HttpServletRequest req){
+	public ResponseEntity<AuthResult> getUserInfo(HttpServletRequest req){
 		
 		// 1. 요청 헤더에서 jwt토큰 추출
 		String jwtToken = resolveAccessToken(req);
@@ -131,7 +146,7 @@ public class AuthController {
 		}
 		
 		// 2. JWT토큰에서 ID값 추출하기
-		int userNo = jwt.getUserNo(jwtToken);
+		Long userNo = jwt.getUserNo(jwtToken);
 		
 		// 사용자 정보 조회
 		Optional<User> user = service.findUserByUserNo(userNo);
@@ -139,12 +154,24 @@ public class AuthController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		return ResponseEntity.ok(user);
+		String refreshToken = resolveRefreshTokenFromCookie(req); // 쿠키에서 읽는 함수
+		
+		// 옵셔널 설정 해제
+		User actualUser = user.orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다"));
+		actualUser.setUserPwd(null); // 마이페이지에서 password안보이게 처리
+
+	    AuthResult result = AuthResult.builder()
+	                                  .accessToken(jwtToken)   // 기존 accessToken 그대로
+	                                  .refreshToken(refreshToken) // 있으면 전달
+	                                  .user(actualUser)
+	                                  .build();
+		
+		return ResponseEntity.ok(result);
 	}
 	
 	@PutMapping("/{userNo}/phone")
     public ResponseEntity<Void> updatePhone(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
 		userService.updatePhone(userNo, body.get("phone"));
         return ResponseEntity.ok().build();
@@ -152,16 +179,16 @@ public class AuthController {
 	
 	@PutMapping("/{userNo}/address")
     public ResponseEntity<Void> updateAddress(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
-        userService.updateAddress(userNo, body.get("address"));
+        userService.updateAddress(userNo, body.get("address"), body.get("addressDetail"));
         return ResponseEntity.ok().build();
     }
 
     // 비밀번호 수정
     @PutMapping("/{userNo}/password")
     public ResponseEntity<Void> updatePassword(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestBody Map<String, String> body) {
         userService.updatePassword(userNo, body.get("currentPassword"), body.get("newPassword"));
         return ResponseEntity.ok().build();
@@ -170,12 +197,23 @@ public class AuthController {
     // 프로필 이미지 수정
     @PutMapping("/{userNo}/profile")
     public ResponseEntity<?> updateProfile(
-    		@PathVariable int userNo, 
+    		@PathVariable Long userNo, 
     		@RequestPart("profile") MultipartFile profile) {
     	
     	if(profile != null && !profile.isEmpty()) {
-            String url = userService.updateProfileImage(userNo, profile);
-            return ResponseEntity.ok(url);
+            //String url = userService.updateProfileImage(userNo, profile); 미사용
+    		customFile url = fileService.setOrChangeOneImage(profile,userNo,"P");
+    		
+            Optional<User> userOpt = service.findUserByUserNo(userNo);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                				.body("User not found");
+            }
+            User user = userOpt.get();
+            user.setProfile(url);
+            log.info("img:{}",url);
+            
+            return ResponseEntity.ok(user);
         }
         return ResponseEntity.badRequest().body("No file uploaded");
     }
@@ -187,17 +225,18 @@ public class AuthController {
         }
         return null;
 	}
+	
+	private String resolveRefreshTokenFromCookie(HttpServletRequest request) {
+	    if (request.getCookies() == null) {
+	        return null;
+	    }
+
+	    for (Cookie cookie : request.getCookies()) {
+	        if ("refreshToken".equals(cookie.getName())) { // 쿠키 이름은 서버에서 설정한 이름과 동일해야 함
+	            return cookie.getValue();
+	        }
+	    }
+
+	    return null; // 쿠키에 refreshToken이 없는 경우
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
