@@ -3,6 +3,8 @@ package com.kh.coreflow.approval.model.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
+
 import lombok.Data;
 
 @Data
@@ -28,7 +30,8 @@ public class ApprovalDto {
 	
 	private List<ApprovalLineDto> lines;
 	
-	private List<ApprovalFileDto> files;
+	//private List<ApprovalFileDto> files;
+	private List<customFile> files;
 
 
 	

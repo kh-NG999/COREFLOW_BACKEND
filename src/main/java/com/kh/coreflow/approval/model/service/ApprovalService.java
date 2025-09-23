@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,17 +19,24 @@ import com.kh.coreflow.approval.model.dao.ApprovalDao;
 import com.kh.coreflow.approval.model.dto.ApprovalDto;
 import com.kh.coreflow.approval.model.dto.ApprovalFileDto;
 import com.kh.coreflow.approval.model.dto.ApprovalLineDto;
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ApprovalService {
 
     private final ApprovalDao dao;
-    @Value("${file.upload-dir}")
-    private String uploadPath;
-
-    public ApprovalService(ApprovalDao dao) {
-        this.dao = dao;
-    }
+//    @Value("${file.upload-dir}")
+//    private String uploadPath;
+    
+//    public ApprovalService(ApprovalDao dao) {
+//        this.dao = dao;
+//    }
+    
+    private final FileService fileService;
 
     @Transactional
     public int submitApproval(ApprovalDto approval,MultipartFile file, int userNo) {
@@ -71,33 +80,7 @@ public class ApprovalService {
 
         // 파일정보
         if (file != null && !file.isEmpty()) {
-            try {
-            	// 파일객체 생성
-            	File uploadDir = new File(uploadPath);
-            	
-            	//폴더없으면 폴더생성
-            	if (!uploadDir.exists()) {
-            		uploadDir.mkdirs(); 
-            	}
-            	
-            	String originalFileName = file.getOriginalFilename();
-            	String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
-            	String uniqueFileName = UUID.randomUUID().toString() + ext;
-            	
-            	File saveFile = new File(this.uploadPath + uniqueFileName);
-            	file.transferTo(saveFile);
-            	
-            	ApprovalFileDto fileDto = new ApprovalFileDto();
-            	fileDto.setApprovalId(approval.getApprovalId());
-            	fileDto.setOriginalFileName(originalFileName);
-            	fileDto.setFilePath(saveFile.getAbsolutePath());
-            	fileDto.setFileSize(file.getSize());
-            	
-            	dao.insertApprovalFile(fileDto);
-            } catch (IOException e) {
-            	e.printStackTrace();
-            	throw new RuntimeException("파일 저장 실패");
-            }
+        	customFile getFile = fileService.setOrChangeOneImage(file, Long.valueOf(approval.getApprovalId()),"A");
         }
 
         return approval.getApprovalId();
@@ -165,7 +148,8 @@ public class ApprovalService {
 		
 		if(approval != null) {
 			approval.setLines(dao.findLinesByApprovalId(approvalId));
-			approval.setFiles(dao.findFilesByApprovalId(approvalId));
+			approval.setFiles(fileService.getFiles("A", Long.valueOf(approvalId)));
+			//approval.setFiles(dao.findFilesByApprovalId(approvalId));
 		}
 		return approval;
 		
