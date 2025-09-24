@@ -310,7 +310,7 @@ public class ConferenceRoomController {
 
     @GetMapping("/{roomId}/detail")
     public ResponseEntity<ConferenceRoomDto.RoomDetailRes> getDetail(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long roomId,
             @RequestParam String from,
             @RequestParam String to
@@ -327,7 +327,7 @@ public class ConferenceRoomController {
     @PreAuthorize("hasAnyRole('HR','ADMIN')")
     @PutMapping("/{roomId}")
     public ResponseEntity<Void> update(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long roomId,
             @RequestBody ConferenceRoomDto.CreateReq req   // UpdateReq가 따로 없으면 CreateReq 재사용
     ) {
@@ -339,7 +339,7 @@ public class ConferenceRoomController {
     @PreAuthorize("hasAnyRole('HR','ADMIN')")
     @DeleteMapping("/{roomId}")
     public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long roomId
     ) {
         if (me == null) return ResponseEntity.status(401).build();
