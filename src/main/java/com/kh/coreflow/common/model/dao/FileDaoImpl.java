@@ -1,6 +1,7 @@
 package com.kh.coreflow.common.model.dao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
@@ -23,7 +24,15 @@ public class FileDaoImpl implements FileDao{
 		Map<String,Object> param = new HashMap<String,Object>();
 		param.put("imageCode", imageCode);
 		param.put("refId", refId);
-		return session.selectOne("image.getImage",param);
+		return session.selectOne("image.getFile",param);
+	}
+	
+	@Override
+	public List<customFile> getFiles(String imageCode, Long refId) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("imageCode", imageCode);
+		param.put("refId", refId);
+		return session.selectList("image.getFiles",param);
 	}
 
 	@Override
@@ -44,4 +53,11 @@ public class FileDaoImpl implements FileDao{
 		return session.selectOne("image.findFile",param);
 	}
 
+	@Override
+	public int removeFile(String fileCode, Long refId) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("fileCode", fileCode);
+		param.put("refId", refId);
+		return session.delete("image.removeFile",param);
+	}
 }

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="image">
-	<select id="getImage" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+
+	<select id="getFile" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+		SELECT * FROM IMAGE
+		WHERE IMAGE_CODE = #{imageCode} AND
+		REF_ID = #{refId}
+	</select>
+	
+	<select id="getFiles" resultType="com.kh.coreflow.common.model.vo.FileDto$customFile">
 		SELECT * FROM IMAGE
 		WHERE IMAGE_CODE = #{imageCode} AND
 		REF_ID = #{refId}
@@ -14,7 +21,7 @@
 		IMG_ORDER = #{imgOrder},
 		CREATE_DATE = SYSDATE
 		WHERE IMAGE_CODE = #{imageCode} AND
-		REF_ID = #{refId}
+		REF_ID = #{refId} AND
 		MIME_TYPE= #{mimeType}
 	</update>
 	
@@ -43,4 +50,10 @@
 		WHERE IMAGE_CODE = #{fileCode} AND
 		CHANGE_NAME = #{changeName}
 	</select>
+	
+	<delete id="removeFile" parameterType="map">
+		DELETE FROM IMAGE
+		WHERE IMAGE_CODE = #{fileCode} AND
+		REF_ID = #{refId}
+	</delete>
 </mapper>

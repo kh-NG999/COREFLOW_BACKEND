@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 
 import com.kh.coreflow.security.filter.JWTAuthenticationFilter;
 
@@ -53,6 +55,7 @@ public class SecurityConfig {
 						.requestMatchers("/vacation/member/**","/attendance/member/**").hasAnyRole("ADMIN","HR")
 						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
 						.requestMatchers("/login**","/error").permitAll()
+						.requestMatchers("/api/approvals/documents").permitAll()
 						.requestMatchers("/images/**","/download/**").permitAll()
 						.requestMatchers("/ws/**").permitAll()
 						.requestMatchers("/**").authenticated()
@@ -91,5 +94,4 @@ public class SecurityConfig {
 	RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-	
 }
